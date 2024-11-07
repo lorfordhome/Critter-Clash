@@ -22,20 +22,20 @@ class Sprite {
 	Vector2 Position{ 400,400 };
 	Vector2 Dir{ 1,0 };
 	Vector2 Origin{ 0,0 };
-	Vector2 Scale{ 3,3 };
-	float depth; //for sorting
+	Vector2 Scale{ 1,1 };
+	float depth=0; //for sorting
 	float animSpeed = 0.8f; //lower value = faster animation
 	float Rotation = 0;
-	RECT spriteRect;
+	RECT spriteRect={ 0,0,0,0 };
 	bool isAnim = false;
-	RECT frameSize;
-	int totalFrames;
+	RECT frameSize = { 0,0,0,0 };
+	int totalFrames=0;
 	int frameCount=0;
 	float animTime = 0; 
 	XMVECTOR colour = Colours::White;
-	string spriteName;//this is used for finding the texture within the texcache
-	string filePath;
-	ID3D11ShaderResourceView* texture;;
+	string spriteName="";//this is used for finding the texture within the texcache
+	string filePath="";
+	ID3D11ShaderResourceView* texture=nullptr;
 
 public:
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
@@ -43,4 +43,12 @@ public:
 	void Update(float dTime, MyD3D& d3d);
 	void Render(MyD3D& d3d, SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
+	Sprite();
+	void setTex(ID3D11ShaderResourceView& tex, const RECT& texRect);
+	void setPos(Vector2& pos) {
+		Position = pos;
+	}
+	void setSpriteRect(RECT& SpriteRect) {
+		spriteRect = SpriteRect;
+	}
 };

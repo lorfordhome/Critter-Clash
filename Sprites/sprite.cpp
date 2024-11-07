@@ -25,6 +25,9 @@ using namespace DirectX::SimpleMath;
 //	assert(texture);
 //	return(texture);
 //}
+Sprite::Sprite() {
+	texture = nullptr;
+};
 Sprite::Sprite(string SpriteName, string path,MyD3D& d3d) :spriteName(SpriteName),filePath(path) {
 	texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
 }
@@ -45,7 +48,6 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spritere
 	animSpeed = animspeed;
 	isAnim = true;
 }
-
 void Sprite::Update(float dTime, MyD3D& d3d)
 {
 	if (isAnim)
@@ -71,4 +73,9 @@ void Sprite::Update(float dTime, MyD3D& d3d)
 void Sprite::Render(MyD3D& d3d, SpriteBatch* Batch)
 {
 	Batch->Draw(texture, Position, &spriteRect, colour, Rotation, Origin, Scale);
+}
+
+void Sprite::setTex(ID3D11ShaderResourceView& tex, const RECT& texRect) {
+	texture = &tex;
+	spriteRect = texRect;
 }

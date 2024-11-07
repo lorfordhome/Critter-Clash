@@ -14,6 +14,30 @@
 #include "DDSTextureLoader.h"
 #include "CommonStates.h"
 #include "sprite.h"
+#include <stdexcept>
+
+struct Tile {
+	enum Container {NONE,CREATURE,ATTACK};
+	Container cellValue = Container::NONE;
+};
+
+class Grid {
+    static constexpr int width = 20;
+    static constexpr int height = 20;
+    float cellSize = 100;
+    Tile grid[width][height];
+	Sprite gridSprite;
+public: 
+		Grid(MyD3D& d3d);
+		Grid();
+      void RenderGrid(float dTime, MyD3D& md3d, SpriteBatch* mySpriteBatch);
+      void SetValues();
+	  Tile Get(int x, int y);
+	  void updateTile(int x, int y, Tile::Container Value);
+
+};
+
+
 
 class Game {
 	enum class State{START,PLAY,END};
@@ -21,6 +45,7 @@ class Game {
 
 	std::vector<Sprite> gameSprites;
 public:
+	Grid grid;
 	Game(MyD3D& md3d);
 	void Release();
 	void Update(float dTime);
