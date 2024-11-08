@@ -17,14 +17,13 @@
 #include "game.h"
 
 Grid::Grid(MyD3D& d3d) {
-	Sprite GridSprite("RED", "squareRED.dds", d3d); //temporary to initialise grid sprite
-	d3d.GetCache().LoadTexture(&d3d.GetDevice(), "squareBlue.dds", "BLUE");
+	Sprite GridSprite("gridLines", "GridSquare.dds", d3d); //temporary to initialise grid sprite
 	gridSprite = GridSprite;
-	gridSprite.setSpriteRect(RECT{ 0,0,256,256 });
+	gridSprite.setSpriteRect(RECT{ 0,0,cellSize,cellSize });
 
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			if(j%2==0&&i%2==0)
+			if(j%2==0^i%2==0)
 				grid[i][j].cellValue = Tile::Container::CREATURE;
 		}
 	}
@@ -44,10 +43,10 @@ void Grid::RenderGrid(float dTime,MyD3D& md3d,SpriteBatch* mySpriteBatch) {
 			Vector2 pos((cellSize * i), (cellSize * j));
 			gridSprite.setPos(pos);
 			if (grid[i][j].cellValue == Tile::Container::CREATURE) {
-				gridSprite.setTex(*md3d.GetCache().Get("BLUE").pTex, RECT{ 0,0,128,128 });
+
 			}
 			else {
-				gridSprite.setTex(*md3d.GetCache().Get("RED").pTex, RECT{ 0,0,128,128 });
+
 			}
 			gridSprite.Render(md3d, mySpriteBatch);
 		}
@@ -70,6 +69,7 @@ Game::Game(MyD3D& d3d) :md3d(d3d), mySpriteBatch(nullptr) {
 
 	Grid _grid(md3d);
 	grid = _grid;
+	breloomAnim.setGridPosition(grid, 10, 10);
 
 }
 
@@ -79,9 +79,15 @@ void Game::Release() {
 	gameSprites.erase(gameSprites.begin());
 }
 
+
+
 void Game::Update(float dTime) {
 	for (int i = 0; i < gameSprites.size(); i++) {
 		gameSprites[i].Update(dTime, md3d);
+		if (isSpriteClicked(gameSprites[i])) {
+			Vector2 gridPos = gameSprites[i].getGridPosition(grid);
+			gameSprites[i].setGridPosition(grid, gridPos.x+1, gridPos.y+1);
+		}
 	}
 }
 void Game::Render(float dTime) {
@@ -90,10 +96,33 @@ void Game::Render(float dTime) {
 	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied());
 
 	grid.RenderGrid(dTime, md3d, mySpriteBatch);
-	/*for (int i = 0; i < gameSprites.size(); i++) {
+	for (int i = 0; i < gameSprites.size(); i++) {
 		gameSprites[i].Render(md3d,mySpriteBatch);
-	}*/
+	}
 
 	mySpriteBatch->End();
 	md3d.EndRender();
+}
+
+bool Game::isSpriteClicked(Sprite& sprite) {
+	Vector2 mousepos = mouse.GetMousePos(true);
+	RECT sRect = sprite.getDim();
+	SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
+	cRect.x = sprite.Position.x;
+	cRect.y = sprite.Position.y;
+
+	if (cRect.Contains(mousepos)) 
+	{
+		if (mouse.GetMouseButton(Mouse::ButtonT::LBUTTON)) {
+			//pressed
+			return true;
+		}
+		else {
+			//is hovering over sprite
+			//do something here later
+		}
+		return false;
+	}
+
+
 }

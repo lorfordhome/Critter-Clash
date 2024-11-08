@@ -15,19 +15,21 @@
 #include "CommonStates.h"
 #include "sprite.h"
 #include <stdexcept>
+#include "Input.h"
+#include "Singleton.h"
 
 struct Tile {
-	enum Container {NONE,CREATURE,ATTACK};
+	enum Container {NONE=0,CREATURE=1,ABILITY=2};
 	Container cellValue = Container::NONE;
 };
 
 class Grid {
-    static constexpr int width = 20;
-    static constexpr int height = 20;
-    float cellSize = 100;
-    Tile grid[width][height];
 	Sprite gridSprite;
 public: 
+	static constexpr int width = 20;
+	static constexpr int height = 20;
+	Tile grid[width][height];
+	long cellSize = 128;
 		Grid(MyD3D& d3d);
 		Grid();
       void RenderGrid(float dTime, MyD3D& md3d, SpriteBatch* mySpriteBatch);
@@ -39,17 +41,23 @@ public:
 
 
 
-class Game {
+class Game : public Singleton<Game> {
 	enum class State{START,PLAY,END};
 	State state = State::START;
 
 	std::vector<Sprite> gameSprites;
 public:
+	~Game() {
+		Release();
+	}
+
+	Mouse mouse;
 	Grid grid;
 	Game(MyD3D& md3d);
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);
+	bool isSpriteClicked(Sprite& sprite);
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;

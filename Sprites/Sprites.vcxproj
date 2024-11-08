@@ -101,6 +101,7 @@
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="D3DUtil.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="TexCache.cpp" />
@@ -110,6 +111,8 @@
     <ClInclude Include="D3D.h" />
     <ClInclude Include="D3DUtil.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Singleton.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="TexCache.h" />
     <ClInclude Include="WindowUtils.h" />

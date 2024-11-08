@@ -11,25 +11,35 @@
 #include "DDSTextureLoader.h"
 #include "CommonStates.h"
 #include "sprite.h"
+#include "game.h"
 using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-//ID3D11ShaderResourceView* LoadTexture(MyD3D& d3d, wstring path) {
-//	ID3D11ShaderResourceView* texture;
-//	DDS_ALPHA_MODE alpha;
-//	if (CreateDDSTextureFromFile(&d3d.GetDevice(), path.c_str(), nullptr, &texture, 0, &alpha) != S_OK) {
-//		WDBOUT(L"Cannot load ");
-//		assert(false);
-//	}
-//	assert(texture);
-//	return(texture);
-//}
+void Sprite::setGridPosition(Grid& grid,int x,int y) {
+	Position=(Vector2(x * grid.cellSize, y * grid.cellSize));
+}
+
+Vector2 Sprite::getGridPosition(Grid& grid) {
+	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
+	for (int i = 0; i < grid.width; i++) {
+		gRect.x = i*grid.cellSize;
+		for (int j = 0; j < grid.height; j++) {
+			gRect.y = j*grid.cellSize;
+			if (gRect.Contains(Position)) {
+				return Vector2(i, j);
+			}
+		}
+	}
+	return Vector2(0,0);//can't find gridpos
+}
+
 Sprite::Sprite() {
 	texture = nullptr;
 };
 Sprite::Sprite(string SpriteName, string path,MyD3D& d3d) :spriteName(SpriteName),filePath(path) {
 	texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
+	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }
 void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin)
 {
@@ -47,6 +57,7 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spritere
 	totalFrames = totalframes;
 	animSpeed = animspeed;
 	isAnim = true;
+	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }
 void Sprite::Update(float dTime, MyD3D& d3d)
 {
@@ -78,4 +89,5 @@ void Sprite::Render(MyD3D& d3d, SpriteBatch* Batch)
 void Sprite::setTex(ID3D11ShaderResourceView& tex, const RECT& texRect) {
 	texture = &tex;
 	spriteRect = texRect;
+	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }

@@ -229,6 +229,10 @@ float WinUtil::EndLoop(bool didUpdateRender)
 	return deltaTime;
 }
 
+HWND WinUtil::GetMainWnd()
+{
+	return mWinData.hMainWnd;
+}
 
 void WinUtil::ChooseRes(int& w, int& h, int defaults[], int numPairs)
 {

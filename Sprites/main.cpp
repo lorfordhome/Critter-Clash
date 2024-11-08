@@ -14,13 +14,14 @@
 #include "CommonStates.h"
 #include "sprite.h"
 #include "game.h"
+#include "Input.h"
 
 using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-
 const int ASCII_ESC = 27;
+Mouse input;
 
 //if ALT+ENTER or resize or drag window we might want do
 //something like pause the game perhaps, but we definitely
@@ -44,8 +45,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'q':
 		case 'Q':
 			PostQuitMessage(0);
-			return 0;
+			break;
 		}
+		break;
+	case WM_INPUT:
+		Game::Get().mouse.MessageEvent((HRAWINPUT)lParam);
+		break;
 	}
 
 	//default message handling (resize window, full screen, etc)
@@ -65,23 +70,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	if (!d3d.InitDirect3D(OnResize))
 		assert(false);
 	WinUtil::Get().SetD3D(d3d);
-	Game game(d3d);
-
+	new Game (d3d);
+	input.Initialise(WinUtil::Get().GetMainWnd(), true, false);
 	bool canUpdateRender;
 	float dTime = 0;
 	while (WinUtil::Get().BeginLoop(canUpdateRender))
 	{
 		if (canUpdateRender)
 		{
-			game.Update(dTime);
-			game.Render(dTime);
+			Game::Get().Update(dTime);
+			Game::Get().Render(dTime);
 		}
 		dTime = WinUtil::Get().EndLoop(canUpdateRender);
 	}
 
-	game.Release();
+	delete &Game::Get();
 	#ifdef _DEBUG
 	d3d.ReleaseD3D(true);	
+	delete& WinUtil::Get();
 	#else
 	d3d.ReleaseD3D(false);
 	#endif

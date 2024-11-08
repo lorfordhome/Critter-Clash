@@ -67,6 +67,7 @@ public:
 	Return the elapsed time for this update in seconds (so it will usually be a very small number)
 	*/
 	float EndLoop(bool didUpdateRender);
+	HWND GetMainWnd();
 	//handle messages from the operating system
 	LRESULT DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

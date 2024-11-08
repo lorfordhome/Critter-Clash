@@ -17,9 +17,9 @@ using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+class Grid;
 
 class Sprite {
-	Vector2 Position{ 400,400 };
 	Vector2 Dir{ 1,0 };
 	Vector2 Origin{ 0,0 };
 	Vector2 Scale{ 1,1 };
@@ -36,8 +36,10 @@ class Sprite {
 	string spriteName="";//this is used for finding the texture within the texcache
 	string filePath="";
 	ID3D11ShaderResourceView* texture=nullptr;
+	RECT dim{ 0,0,0,0 };
 
 public:
+	Vector2 Position{ 400,400 };
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Update(float dTime, MyD3D& d3d);
@@ -48,7 +50,14 @@ public:
 	void setPos(Vector2& pos) {
 		Position = pos;
 	}
+	void setGridPosition(Grid& grid,int x, int y);
+	Vector2 getGridPosition(Grid& grid);
 	void setSpriteRect(RECT& SpriteRect) {
 		spriteRect = SpriteRect;
+		dim = (RECT{long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y)});
+	}
+	RECT getDim() {
+		dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
+		return dim;
 	}
 };
