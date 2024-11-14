@@ -2,11 +2,12 @@
 #include <cassert>
 #include <sstream>
 
-
+#include"game.h"
 #include "Input.h"
 #include "D3D.h"
 #include "D3DUtil.h"
 #include "WindowUtils.h"
+#include <algorithm> //for copying array
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -54,10 +55,13 @@ void Mouse::Initialise(HWND hwnd, bool showMouse, bool confineMouse)
 		ClipCursor(&mNewClip);
 	}
 	GetMousePosAbsolute(mMouseScreen);
+	Reset();
 }
 
 void Mouse::ProcessMouse(RAWINPUT* raw)
 {
+	//store value of mouse buttons
+	copy(mButtons, mButtons + MAX_BUTTONS, lastmButtons);
 	unsigned short flags = raw->data.mouse.usButtonFlags;
 
 	if (flags & RI_MOUSE_LEFT_BUTTON_DOWN)
@@ -78,6 +82,9 @@ void Mouse::ProcessMouse(RAWINPUT* raw)
 	mMouseMove = mMouseScreen - last;
 }
 
+bool Mouse::isClickRelease() {
+	return (mButtons[LBUTTON] == false && lastmButtons[LBUTTON] == true);
+}
 void Mouse::Reset()
 {
 	ZeroMemory(mInBuffer, sizeof(mInBuffer));
@@ -129,6 +136,20 @@ void Mouse::PostProcess()
 {
 	mMouseMove.x = 0;
 	mMouseMove.y = 0;
+}
+
+Vector2 Mouse::getGridPosition(Grid& grid) {
+	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
+	for (int i = 0; i < grid.width; i++) {
+		gRect.x = i * grid.cellSize;
+		for (int j = 0; j < grid.height; j++) {
+			gRect.y = j * grid.cellSize;
+			if (gRect.Contains(GetMousePos(true))) {
+				return Vector2(i, j);
+			}
+		}
+	}
+	return Vector2(0, 0);//can't find gridpos
 }
 
 

@@ -83,6 +83,10 @@ void MyD3D::BindRenderTargetViewAndDepthStencilView()
 	mpd3dImmediateContext->OMSetRenderTargets(1, &mpRenderTargetView, mpDepthStencilView);
 }
 
+const SimpleMath::Rectangle MyD3D::GetViewportRect() {
+	SimpleMath::Rectangle rect(mScreenViewport.TopLeftX, mScreenViewport.TopLeftY, mScreenViewport.Width, mScreenViewport.Height);
+	return rect;
+}
 // Set the viewport transform.
 void MyD3D::SetViewportDimensions(int screenWidth, int screenHeight)
 {

@@ -10,11 +10,14 @@
 #include "SimpleMath.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-
+class Grid;
 class Mouse{
 public:
 	void GetMousePosAbsolute(Vector2& pos);
 	void ProcessMouse(RAWINPUT* raw);
+
+	//returns true if LMOUSE has just been released
+	bool isClickRelease();
 
 	//zero and forget everything so we can start again
 	void Reset();
@@ -31,6 +34,8 @@ public:
 
 	//call this after game has finished using the mouse, probably at end of render
 	void PostProcess();
+
+	Vector2 getGridPosition(Grid& grid);
 
 	//start up the mouse/keys system, call once only
 	//hwnd - main windows handle
@@ -54,6 +59,7 @@ public:
 
 
 private:
+
 	enum { RAWBUFF_SIZE = 512, KEYBUFF_SIZE = 255, KMASK_IS_DOWN = 1, MAX_BUTTONS = 3 };
 	//raw input buffer
 	BYTE mInBuffer[RAWBUFF_SIZE];
@@ -67,6 +73,7 @@ private:
 	RECT mOldClip;        // previous area for ClipCursor
 	//support for three mouse buttons
 	bool mButtons[MAX_BUTTONS];
+	bool lastmButtons[MAX_BUTTONS];
 };
 
 

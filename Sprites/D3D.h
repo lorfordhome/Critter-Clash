@@ -46,7 +46,7 @@ public:
 	const std::wstring& GetGPUDesc() const {
 		return mGPUDesc;
 	}
-
+	const DirectX::SimpleMath::Rectangle GetViewportRect();
 	TexCache& GetCache();
 private:
 	TexCache mTexCache;

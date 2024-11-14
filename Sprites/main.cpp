@@ -21,7 +21,6 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 const int ASCII_ESC = 27;
-Mouse input;
 
 //if ALT+ENTER or resize or drag window we might want do
 //something like pause the game perhaps, but we definitely
@@ -71,7 +70,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 		assert(false);
 	WinUtil::Get().SetD3D(d3d);
 	new Game (d3d);
-	input.Initialise(WinUtil::Get().GetMainWnd(), true, false);
 	bool canUpdateRender;
 	float dTime = 0;
 	while (WinUtil::Get().BeginLoop(canUpdateRender))

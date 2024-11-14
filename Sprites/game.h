@@ -57,8 +57,12 @@ public:
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);
+	void dragSprite(Sprite& sprite);
 	bool isSpriteClicked(Sprite& sprite);
+	bool isGridClicked(Grid& Grid, Sprite& sprite);
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
+	bool spriteDragging = false;
+	int movedSprite;
 };

@@ -59,18 +59,24 @@ void Grid::updateTile(int x, int y, Tile::Container Value) {
 }
 
 Game::Game(MyD3D& d3d) :md3d(d3d), mySpriteBatch(nullptr) {
+	mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
 	mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
 	md3d.GetCache().SetAssetPath("data/");
 	mySpriteBatch = new SpriteBatch(&d3d.GetDeviceCtx());
 	assert(mySpriteBatch);
-	Sprite breloomAnim("Breloom", "sleepanim.dds", md3d);
-	breloomAnim.Init(Vector2(400, 400), Vector2(3, 3), Vector2(0, 0), RECT{ 0,0,32,32 }, RECT{ 0,0,32,32 }, 2, 0.8f);
-	gameSprites.push_back(breloomAnim);
 
 	Grid _grid(md3d);
 	grid = _grid;
-	breloomAnim.setGridPosition(grid, 10, 10);
 
+	Sprite breloomAnim("Breloom", "sleepanim.dds", md3d);
+	breloomAnim.Init(grid,Vector2(0, 5), Vector2(3, 3), true, RECT{ 0,0,32,32 }, RECT{ 0,0,32,32 }, 2, 0.8f);
+
+	gameSprites.push_back(breloomAnim);
+
+	Sprite breloom2("Breloom", "sleepanim.dds", md3d);
+	breloom2.Init(grid,Vector2(1, 5), Vector2(3, 3), true, RECT{ 0,0,32,32 }, RECT{ 0,0,32,32 }, 2, 0.8f);
+
+	gameSprites.push_back(breloom2);
 }
 
 void Game::Release() {
@@ -84,9 +90,29 @@ void Game::Release() {
 void Game::Update(float dTime) {
 	for (int i = 0; i < gameSprites.size(); i++) {
 		gameSprites[i].Update(dTime, md3d);
-		if (isSpriteClicked(gameSprites[i])) {
-			Vector2 gridPos = gameSprites[i].getGridPosition(grid);
-			gameSprites[i].setGridPosition(grid, gridPos.x+1, gridPos.y+1);
+		if(!spriteDragging){
+			//has player clicked a sprite?
+			if (isSpriteClicked(gameSprites[i]) && spriteDragging == false) {
+				gameSprites[i].previousGridPos = gameSprites[i].getGridPosition(grid);//store grid positionin case it needs to be reset
+				spriteDragging = true;
+				movedSprite = i; //store the sprite that is being moved
+			}
+		}
+	}
+	//is player currently trying to move a sprite?
+	if (spriteDragging) {
+		dragSprite(gameSprites[movedSprite]);
+		if (mouse.isClickRelease()) {
+			if (isGridClicked(grid, gameSprites[movedSprite]))
+			{
+				//pressed
+				spriteDragging = false;
+			}
+			else {
+				//user tried to place sprite in invalid position - reset the sprite to original pos
+				gameSprites[movedSprite].setGridPosition(grid, gameSprites[movedSprite].previousGridPos.x, gameSprites[movedSprite].previousGridPos.y);
+				spriteDragging = false;
+			}
 		}
 	}
 }
@@ -102,6 +128,11 @@ void Game::Render(float dTime) {
 
 	mySpriteBatch->End();
 	md3d.EndRender();
+	mouse.PostProcess();
+}
+
+void Game::dragSprite(Sprite& sprite) {
+	sprite.setPos(mouse.GetMousePos(true));
 }
 
 bool Game::isSpriteClicked(Sprite& sprite) {
@@ -113,7 +144,7 @@ bool Game::isSpriteClicked(Sprite& sprite) {
 
 	if (cRect.Contains(mousepos)) 
 	{
-		if (mouse.GetMouseButton(Mouse::ButtonT::LBUTTON)) {
+		if (mouse.GetMouseButton(Mouse::LBUTTON)) {
 			//pressed
 			return true;
 		}
@@ -126,3 +157,19 @@ bool Game::isSpriteClicked(Sprite& sprite) {
 
 
 }
+
+bool Game::isGridClicked(Grid& Grid,Sprite& sprite) {
+			Vector2 gridPos = sprite.getGridPosition(grid);
+
+			//has player clicked within the grid?
+			if (mouse.isClickRelease() && mouse.getGridPosition(grid) != Vector2(0, 0))
+			{
+				if (gridPos == mouse.getGridPosition(grid))
+				{
+					sprite.setGridPosition(grid, gridPos.x, gridPos.y);
+					return true;
+				}
+			}
+	return false;
+}
+

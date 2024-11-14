@@ -48,16 +48,18 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin)
 	Origin = origin;
 
 }
-void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
-	Position = position;
+void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
+	setGridPosition(grid, position.x,position.y);
 	Scale = scale;
-	Origin = origin;
 	spriteRect = spriterect;
 	frameSize = framerect;
 	totalFrames = totalframes;
 	animSpeed = animspeed;
 	isAnim = true;
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
+	if (centerOrigin) {
+		Origin = Vector2(spriteRect.right / 2, spriteRect.bottom / 2);
+	}
 }
 void Sprite::Update(float dTime, MyD3D& d3d)
 {

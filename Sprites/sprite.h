@@ -39,9 +39,11 @@ class Sprite {
 	RECT dim{ 0,0,0,0 };
 
 public:
+	Vector2 previousGridPos = Vector2(0, 0);
+	bool isMovingSprite = false;
 	Vector2 Position{ 400,400 };
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
-	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
+	void Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Update(float dTime, MyD3D& d3d);
 	void Render(MyD3D& d3d, SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
@@ -59,5 +61,8 @@ public:
 	RECT getDim() {
 		dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 		return dim;
+	}
+	const RECT getspriteRect() {
+		return spriteRect;
 	}
 };
