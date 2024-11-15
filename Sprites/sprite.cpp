@@ -17,7 +17,7 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 void Sprite::setGridPosition(Grid& grid,int x,int y) {
-	Position=(Vector2(x * grid.cellSize, y * grid.cellSize));
+	Position=(Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize)+grid.YOFFSET )));
 }
 
 Vector2 Sprite::getGridPosition(Grid& grid) {
@@ -31,7 +31,7 @@ Vector2 Sprite::getGridPosition(Grid& grid) {
 			}
 		}
 	}
-	return Vector2(0,0);//can't find gridpos
+	return Vector2(420,420);//can't find gridpos
 }
 
 Sprite::Sprite() {
@@ -58,7 +58,6 @@ void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin,
 	isAnim = true;
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 	if (centerOrigin) {
-		Origin = Vector2(spriteRect.right / 2, spriteRect.bottom / 2);
 	}
 }
 void Sprite::Update(float dTime, MyD3D& d3d)
@@ -75,7 +74,7 @@ void Sprite::Update(float dTime, MyD3D& d3d)
 			}
 			else
 			{
-				spriteRect.left = 0;
+				spriteRect.left = frameSize.left;
 				spriteRect.right = frameSize.right;
 				frameCount = 0;
 			}

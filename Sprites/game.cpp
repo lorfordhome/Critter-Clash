@@ -68,15 +68,20 @@ Game::Game(MyD3D& d3d) :md3d(d3d), mySpriteBatch(nullptr) {
 	Grid _grid(md3d);
 	grid = _grid;
 
-	Sprite breloomAnim("Breloom", "sleepanim.dds", md3d);
-	breloomAnim.Init(grid,Vector2(0, 5), Vector2(3, 3), true, RECT{ 0,0,32,32 }, RECT{ 0,0,32,32 }, 2, 0.8f);
+	Sprite breloomAnim("Breloom", "breloomIdle.dds", md3d);
+	breloomAnim.Init(grid,Vector2(0, 5), Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
 
 	gameSprites.push_back(breloomAnim);
 
-	Sprite breloom2("Breloom", "sleepanim.dds", md3d);
-	breloom2.Init(grid,Vector2(1, 5), Vector2(3, 3), true, RECT{ 0,0,32,32 }, RECT{ 0,0,32,32 }, 2, 0.8f);
+	Sprite Buizel("Buizel", "buizelIdle.dds", md3d);
+	Buizel.Init(grid,Vector2(1, 5), Vector2(3, 3), true, RECT{ 0,96,32,144 }, RECT{ 0,0,32,48 }, 9, 0.2f);
 
-	gameSprites.push_back(breloom2);
+	gameSprites.push_back(Buizel);
+
+	Sprite Skitty("Skitty", "skittyIdle.dds", md3d);
+	Skitty.Init(grid, Vector2(2, 5), Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
+
+	gameSprites.push_back(Skitty);
 }
 
 void Game::Release() {
@@ -119,7 +124,7 @@ void Game::Update(float dTime) {
 void Game::Render(float dTime) {
 	md3d.BeginRender(Vector4(Colors::CadetBlue));
 	CommonStates dxstate(&md3d.GetDevice());
-	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied());
+	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied(),dxstate.PointWrap());
 
 	grid.RenderGrid(dTime, md3d, mySpriteBatch);
 	for (int i = 0; i < gameSprites.size(); i++) {

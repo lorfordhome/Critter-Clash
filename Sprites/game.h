@@ -26,8 +26,10 @@ struct Tile {
 class Grid {
 	Sprite gridSprite;
 public: 
+	int XOFFSET = 15;
+	int YOFFSET = 20;
 	static constexpr int width = 20;
-	static constexpr int height = 20;
+	static constexpr int height = 23;
 	Tile grid[width][height];
 	long cellSize = 128;
 		Grid(MyD3D& d3d);
