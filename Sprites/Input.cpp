@@ -138,18 +138,5 @@ void Mouse::PostProcess()
 	mMouseMove.y = 0;
 }
 
-Vector2 Mouse::getGridPosition(Grid& grid) {
-	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
-	for (int i = 0; i < grid.width; i++) {
-		gRect.x = i * grid.cellSize;
-		for (int j = 0; j < grid.height; j++) {
-			gRect.y = j * grid.cellSize;
-			if (gRect.Contains(GetMousePos(true))) {
-				return Vector2(i, j);
-			}
-		}
-	}
-	return Vector2(0, 0);//can't find gridpos
-}
 
 

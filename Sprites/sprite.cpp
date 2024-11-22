@@ -16,22 +16,15 @@ using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-void Sprite::setGridPosition(Grid& grid,int x,int y) {
-	Position=(Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize)+grid.YOFFSET )));
-}
-
-Vector2 Sprite::getGridPosition(Grid& grid) {
-	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
-	for (int i = 0; i < grid.width; i++) {
-		gRect.x = i*grid.cellSize;
-		for (int j = 0; j < grid.height; j++) {
-			gRect.y = j*grid.cellSize;
-			if (gRect.Contains(Position)) {
-				return Vector2(i, j);
-			}
-		}
+bool Sprite::setGridPosition(Grid& grid,int x,int y, bool checkCol) {
+	if (grid.Get(x, y).cellValue != Tile::CREATURE||!checkCol) {
+		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize) + grid.YOFFSET)));
+		grid.updateTile(x, y, Tile::CREATURE);
+		grid.updateTile(previousGridPos.x, previousGridPos.y, Tile::NONE);
+		return true;
 	}
-	return Vector2(420,420);//can't find gridpos
+	else 
+		return false;
 }
 
 Sprite::Sprite() {
@@ -48,6 +41,14 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin)
 	Origin = origin;
 
 }
+void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect)
+{
+	Position = position;
+	Scale = scale;
+	Origin = origin;
+	spriteRect = spriterect;
+
+}
 void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
 	setGridPosition(grid, position.x,position.y);
 	Scale = scale;
@@ -62,6 +63,7 @@ void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin,
 }
 void Sprite::Update(float dTime, MyD3D& d3d)
 {
+	colour = Colours::White;
 	if (isAnim)
 	{
 		animTime += dTime;
@@ -84,6 +86,7 @@ void Sprite::Update(float dTime, MyD3D& d3d)
 }
 void Sprite::Render(MyD3D& d3d, SpriteBatch* Batch)
 {
+	if (active)
 	Batch->Draw(texture, Position, &spriteRect, colour, Rotation, Origin, Scale);
 }
 
@@ -92,3 +95,4 @@ void Sprite::setTex(ID3D11ShaderResourceView& tex, const RECT& texRect) {
 	spriteRect = texRect;
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }
+

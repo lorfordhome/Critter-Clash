@@ -35,8 +35,6 @@ public:
 	//call this after game has finished using the mouse, probably at end of render
 	void PostProcess();
 
-	Vector2 getGridPosition(Grid& grid);
-
 	//start up the mouse/keys system, call once only
 	//hwnd - main windows handle
 	//showMouse - hide the mouse cursor

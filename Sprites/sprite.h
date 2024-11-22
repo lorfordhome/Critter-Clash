@@ -37,13 +37,21 @@ class Sprite {
 	string filePath="";
 	ID3D11ShaderResourceView* texture=nullptr;
 	RECT dim{ 0,0,0,0 };
+	friend class Creature;
 
 public:
+	enum spriteTYPE
+	{
+		CREATURE = 0, UI = 1
+	};
+	spriteTYPE type = spriteTYPE::CREATURE;
 	Vector2 previousGridPos = Vector2(0, 0);
 	bool isMovingSprite = false;
+	bool active = true;
 	Vector2 Position{ 400,400 };
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
 	void Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
+	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
 	void Update(float dTime, MyD3D& d3d);
 	void Render(MyD3D& d3d, SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
@@ -52,8 +60,7 @@ public:
 	void setPos(Vector2& pos) {
 		Position = pos;
 	}
-	void setGridPosition(Grid& grid,int x, int y);
-	Vector2 getGridPosition(Grid& grid);
+	bool setGridPosition(Grid& grid,int x, int y, bool checkCol=true);
 	void setSpriteRect(RECT& SpriteRect) {
 		spriteRect = SpriteRect;
 		dim = (RECT{long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y)});
@@ -64,5 +71,8 @@ public:
 	}
 	const RECT getspriteRect() {
 		return spriteRect;
+	}
+	void setColour(XMVECTOR newCol) {
+		colour = newCol;
 	}
 };

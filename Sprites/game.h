@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include "Input.h"
 #include "Singleton.h"
+#include "creature.h"
+#include "ModeMgr.h"
 
 struct Tile {
 	enum Container {NONE=0,CREATURE=1,ABILITY=2};
@@ -26,10 +28,11 @@ struct Tile {
 class Grid {
 	Sprite gridSprite;
 public: 
+	bool visible = true;
 	int XOFFSET = 15;
 	int YOFFSET = 20;
-	static constexpr int width = 20;
-	static constexpr int height = 23;
+	static constexpr int width = 4;
+	static constexpr int height = 6;
 	Tile grid[width][height];
 	long cellSize = 128;
 		Grid(MyD3D& d3d);
@@ -44,10 +47,12 @@ public:
 
 
 class Game : public Singleton<Game> {
-	enum class State{START,PLAY,END};
-	State state = State::START;
+	enum class State{BUILD, FIGHT, END};
+	State state = State::BUILD;
 
 	std::vector<Sprite> gameSprites;
+	std::vector<Creature> gameCreatures;
+	std::vector<Sprite> uiSprites;
 public:
 	~Game() {
 		Release();
@@ -55,16 +60,24 @@ public:
 
 	Mouse mouse;
 	Grid grid;
+	Grid enemyGrid;
+	ModeMgr modeManager;
 	Game(MyD3D& md3d);
+	void BuildUpdate(float dTime);
+	void FightUpdate(float dTime);
+	void InitBattle();
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);
 	void dragSprite(Sprite& sprite);
 	bool isSpriteClicked(Sprite& sprite);
+	bool isSpriteClickReleased(Sprite& sprite);
 	bool isGridClicked(Grid& Grid, Sprite& sprite);
+	void spawnEnemy();
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
 	bool spriteDragging = false;
 	int movedSprite;
 };
+Vector2 getGridPosition(Grid& grid, Vector2 Position);
