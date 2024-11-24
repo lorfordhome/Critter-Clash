@@ -85,7 +85,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	delete &Game::Get();
 	#ifdef _DEBUG
 	d3d.ReleaseD3D(true);	
-	delete& WinUtil::Get();
+	delete &WinUtil::Get();
 	#else
 	d3d.ReleaseD3D(false);
 	#endif

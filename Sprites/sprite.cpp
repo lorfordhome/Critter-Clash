@@ -54,7 +54,7 @@ void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin,
 	if (centerOrigin) {
 	}
 }
-void Sprite::Update(float dTime, MyD3D& d3d)
+void Sprite::Update(float dTime)
 {
 	colour = Colours::White;
 	if (isAnim)
@@ -77,7 +77,7 @@ void Sprite::Update(float dTime, MyD3D& d3d)
 		}
 	}
 }
-void Sprite::Render(MyD3D& d3d, SpriteBatch* Batch)
+void Sprite::Render(SpriteBatch* Batch)
 {
 	if (active)
 	Batch->Draw(texture, Position, &spriteRect, colour, Rotation, Origin, Scale);

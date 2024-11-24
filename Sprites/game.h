@@ -38,7 +38,6 @@ public:
 		Grid(MyD3D& d3d);
 		Grid();
       void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
-      void SetValues();
 	  Tile Get(int x, int y);
 	  void updateTile(int x, int y, Tile::Container Value);
 
@@ -46,83 +45,68 @@ public:
 
 
 
-class Game : public Singleton<Game> {
-	//enum class State{BUILD, FIGHT, END};
-	//State state = State::BUILD;
 
-	std::vector<Sprite> gameSprites;
-	std::vector<Creature> gameCreatures;
-	std::vector<Sprite> uiSprites;
-	Sprite bgSprite;
+class Game : public Singleton<Game> {
 public:
+	Game();
 	~Game() {
 		Release();
 	}
 
 	Mouse mouse;
-	Grid grid;
-	Grid enemyGrid;
-	ModeMgr modeManager;
+
 	Game(MyD3D& md3d);
-	void BuildUpdate(float dTime);
-	void FightUpdate(float dTime);
-	void InitBattle();
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);
-	void FightRender(float dTime);
-	void dragSprite(Sprite& sprite);
-	bool isSpriteClicked(Sprite& sprite);
-	bool isSpriteClickReleased(Sprite& sprite);
-	bool isGridClicked(Grid& Grid, Sprite& sprite);
-	void spawnEnemy();
+	void ProcessKey(char key) {
+		mModeMgr.ProcessKey(key);
+	}
+
+	//getters
+	MyD3D& GetD3D() { return md3d; }
+	ModeMgr& GetModeMgr() { return mModeMgr; }
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
-	bool spriteDragging = false;
-	int movedSprite;
+	ModeMgr mModeMgr;
 };
 Vector2 getGridPosition(Grid& grid, Vector2 Position);
 
+
+//GAME MODES
 
 class PlayMode : public AMode {
 	enum class State{BUILD, FIGHT, END};
 	State state = State::BUILD;
 
-	std::vector<Sprite> gameSprites;
 	std::vector<Creature> gameCreatures;
 	std::vector<Sprite> uiSprites;
 	Sprite bgSprite;
 public:
-
-	static const GAMEMODE GAME_MODE = GAMEMODE::PLAY;
+	int findClosest(int idx,bool Enemy);
+	PlayMode();
+	static const GAMEMODE MODE_NAME = GAMEMODE::PLAY;
 	void Update(float dTime) override;
 	void Render(float dTime, SpriteBatch& batch) override;
-	State GetMName() const override {
-		return State::BUILD;
+	void BuildRender(float dTime, SpriteBatch& batch);
+	GAMEMODE GetMName() const override {
+		return GAMEMODE::PLAY;
 	}
-	void ProcessKey(char key) override;
-	bool Exit() override;
-	void Enter() override;
 
-	Mouse mouse;
 	Grid grid;
 	Grid enemyGrid;
 	ModeMgr modeManager;
-	Game(MyD3D& md3d);
 	void BuildUpdate(float dTime);
 	void FightUpdate(float dTime);
 	void InitBattle();
-	void Release();
-	void FightRender(float dTime);
-	void dragSprite(Sprite& sprite);
-	bool isSpriteClicked(Sprite& sprite);
-	bool isSpriteClickReleased(Sprite& sprite);
-	bool isGridClicked(Grid& Grid, Sprite& sprite);
-	void spawnEnemy();
+	void FightRender(float dTime,SpriteBatch& batch);
+	void dragSprite(Sprite& sprite, Mouse& mouse);
+	bool isSpriteClicked(Sprite& sprite, Mouse& mouse);
+	bool isSpriteClickReleased(Sprite& sprite, Mouse& mouse);
+	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse);
+	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 private:
-	MyD3D& md3d;
-	SpriteBatch* mySpriteBatch = nullptr;
 	bool spriteDragging = false;
 	int movedSprite;
 };

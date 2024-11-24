@@ -26,7 +26,7 @@ public:
 	//used by a mode to render itself
 	virtual void Render(float dTime, DirectX::SpriteBatch& batch) = 0;
 	//get a mode's name
-	virtual State GetMName() const = 0;
+	virtual GAMEMODE GetMName() const = 0;
 	//pass WM_CHAR key messages to a mode
 	virtual void ProcessKey(char key) {};
 };
@@ -48,7 +48,7 @@ public:
 		Release();
 	}
 	//change mode
-	void SwitchMode(const std::string& newMode);
+	void SwitchMode(GAMEMODE newMode);
 	//update the current mode
 	void Update(float dTime);
 	//render the current mode

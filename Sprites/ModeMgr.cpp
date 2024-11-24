@@ -1,6 +1,6 @@
 #include "ModeMgr.h"
 
-void ModeMgr::SwitchMode(const std::string& newMode) {
+void ModeMgr::SwitchMode(GAMEMODE newMode) {
 	int idx = 0;
 	assert(!mModes.empty());
 	while (idx < (int)mModes.size() && mModes[idx]->GetMName() != newMode)
