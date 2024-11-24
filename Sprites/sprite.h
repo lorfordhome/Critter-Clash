@@ -75,4 +75,7 @@ public:
 	void setColour(XMVECTOR newCol) {
 		colour = newCol;
 	}
+	void setScale(Vector2 newScale) {
+		Scale = newScale;
+	}
 };

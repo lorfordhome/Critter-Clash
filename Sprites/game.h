@@ -37,7 +37,7 @@ public:
 	long cellSize = 128;
 		Grid(MyD3D& d3d);
 		Grid();
-      void RenderGrid(float dTime, MyD3D& md3d, SpriteBatch* mySpriteBatch);
+      void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
       void SetValues();
 	  Tile Get(int x, int y);
 	  void updateTile(int x, int y, Tile::Container Value);
@@ -47,12 +47,13 @@ public:
 
 
 class Game : public Singleton<Game> {
-	enum class State{BUILD, FIGHT, END};
-	State state = State::BUILD;
+	//enum class State{BUILD, FIGHT, END};
+	//State state = State::BUILD;
 
 	std::vector<Sprite> gameSprites;
 	std::vector<Creature> gameCreatures;
 	std::vector<Sprite> uiSprites;
+	Sprite bgSprite;
 public:
 	~Game() {
 		Release();
@@ -69,6 +70,7 @@ public:
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);
+	void FightRender(float dTime);
 	void dragSprite(Sprite& sprite);
 	bool isSpriteClicked(Sprite& sprite);
 	bool isSpriteClickReleased(Sprite& sprite);
@@ -81,3 +83,46 @@ private:
 	int movedSprite;
 };
 Vector2 getGridPosition(Grid& grid, Vector2 Position);
+
+
+class PlayMode : public AMode {
+	enum class State{BUILD, FIGHT, END};
+	State state = State::BUILD;
+
+	std::vector<Sprite> gameSprites;
+	std::vector<Creature> gameCreatures;
+	std::vector<Sprite> uiSprites;
+	Sprite bgSprite;
+public:
+
+	static const GAMEMODE GAME_MODE = GAMEMODE::PLAY;
+	void Update(float dTime) override;
+	void Render(float dTime, SpriteBatch& batch) override;
+	State GetMName() const override {
+		return State::BUILD;
+	}
+	void ProcessKey(char key) override;
+	bool Exit() override;
+	void Enter() override;
+
+	Mouse mouse;
+	Grid grid;
+	Grid enemyGrid;
+	ModeMgr modeManager;
+	Game(MyD3D& md3d);
+	void BuildUpdate(float dTime);
+	void FightUpdate(float dTime);
+	void InitBattle();
+	void Release();
+	void FightRender(float dTime);
+	void dragSprite(Sprite& sprite);
+	bool isSpriteClicked(Sprite& sprite);
+	bool isSpriteClickReleased(Sprite& sprite);
+	bool isGridClicked(Grid& Grid, Sprite& sprite);
+	void spawnEnemy();
+private:
+	MyD3D& md3d;
+	SpriteBatch* mySpriteBatch = nullptr;
+	bool spriteDragging = false;
+	int movedSprite;
+};

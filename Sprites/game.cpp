@@ -22,6 +22,19 @@ Vector2 moveTowards(Vector2 startPos, Vector2 endPos, float speed)
 	return newPos;
 }
 
+ Vector2 MoveTowards(Vector2 current, Vector2 target, float maxDistanceDelta)
+{
+	Vector2 a =  target - current;
+	a.Normalize();
+	float magnitude = (a.x * a.x + a.y * a.y);
+	if (magnitude <= maxDistanceDelta || magnitude == 0.f)
+	{
+		return target;
+	}
+	return current + a * maxDistanceDelta;
+	//return current + a / magnitude * maxDistanceDelta;
+}
+
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
 	for (int i = 0; i < grid.width; i++) {
@@ -36,10 +49,12 @@ Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	return Vector2(420, 420);//can't find gridpos
 }
 
+
 Grid::Grid(MyD3D& d3d) {
-	Sprite GridSprite("gridLines", "GridSquare.dds", d3d); //temporary to initialise grid sprite
+	Sprite GridSprite("gridLines", "gridSquare2.dds", d3d); //temporary to initialise grid sprite
 	gridSprite = GridSprite;
-	gridSprite.setSpriteRect(RECT{ 0,0,cellSize,cellSize });
+	gridSprite.setScale(Vector2(4, 4));
+	gridSprite.setSpriteRect(RECT{ 0,0,33,33 });
 
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
@@ -47,6 +62,7 @@ Grid::Grid(MyD3D& d3d) {
 		}
 	}
 }
+
 Grid::Grid() {
 
 }
@@ -83,6 +99,10 @@ Game::Game(MyD3D& d3d) :md3d(d3d), mySpriteBatch(nullptr) {
 	md3d.GetCache().SetAssetPath("data/");
 	mySpriteBatch = new SpriteBatch(&d3d.GetDeviceCtx());
 	assert(mySpriteBatch);
+
+	Sprite _bg("Background", "map2.dds", md3d);
+	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0),RECT{0,0,512,384});
+	bgSprite = _bg;
 
 	Grid _grid(md3d);
 	grid = _grid;
@@ -162,8 +182,9 @@ void Game::FightUpdate(float dTime)
 	{
 		gameSprites[i].Update(dTime, md3d);
 
-		//gameSprites[0].setPos(moveTowards(gameSprites[0].Position, gameSprites[2].Position, 10.f));
 	}
+	gameSprites[0].setPos(MoveTowards(gameSprites[0].Position, gameSprites[2].Position, 0.03f));
+
 }
 
 void Game::InitBattle() 
@@ -195,9 +216,29 @@ void Game::Render(float dTime) {
 	CommonStates dxstate(&md3d.GetDevice());
 	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied(),dxstate.PointWrap());
 
+	bgSprite.Render(md3d, mySpriteBatch);
 	grid.RenderGrid(dTime, md3d, mySpriteBatch);
 	for (int i = 0; i < gameSprites.size(); i++) {
 		gameSprites[i].Render(md3d,mySpriteBatch);
+	}
+	for (int i = 0; i < uiSprites.size(); i++) {
+		uiSprites[i].Render(md3d, mySpriteBatch);
+	}
+
+	mySpriteBatch->End();
+	md3d.EndRender();
+	mouse.PostProcess();
+}
+
+void Game::FightRender(float dTime) 
+{
+	md3d.BeginRender(Vector4(Colors::CadetBlue));
+	CommonStates dxstate(&md3d.GetDevice());
+	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied(), dxstate.PointWrap());
+
+	bgSprite.Render(md3d, mySpriteBatch);
+	for (int i = 0; i < gameSprites.size(); i++) {
+		gameSprites[i].Render(md3d, mySpriteBatch);
 	}
 	for (int i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render(md3d, mySpriteBatch);
@@ -235,7 +276,6 @@ bool Game::isSpriteClicked(Sprite& sprite) {
 		}
 		else {
 			//is hovering over sprite
-			//do something here later
 			if (sprite.type == Sprite::spriteTYPE::UI) {
 				sprite.setColour(Colors::DarkGreen);
 			}
@@ -262,7 +302,6 @@ bool Game::isSpriteClickReleased(Sprite& sprite)
 		}
 		else {
 			//is hovering over sprite
-			//do something here later
 			if (sprite.type == Sprite::spriteTYPE::UI) {
 				sprite.setColour(Colors::DarkGreen);
 			}

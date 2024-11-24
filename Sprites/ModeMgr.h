@@ -5,7 +5,7 @@
 
 #include "D3D.h"
 #include "SpriteBatch.h"
-
+enum class GAMEMODE { INTRO, MENU, PLAY, OVER };
 /*
 ABC representing a game mode like intro, game, gameOver, highScores, etc.
 */
@@ -26,7 +26,7 @@ public:
 	//used by a mode to render itself
 	virtual void Render(float dTime, DirectX::SpriteBatch& batch) = 0;
 	//get a mode's name
-	virtual std::string GetMName() const = 0;
+	virtual State GetMName() const = 0;
 	//pass WM_CHAR key messages to a mode
 	virtual void ProcessKey(char key) {};
 };

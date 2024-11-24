@@ -19,8 +19,8 @@ using namespace DirectX::SimpleMath;
 bool Sprite::setGridPosition(Grid& grid,int x,int y, bool checkCol) {
 	if (grid.Get(x, y).cellValue != Tile::CREATURE||!checkCol) {
 		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize) + grid.YOFFSET)));
-		grid.updateTile(x, y, Tile::CREATURE);
 		grid.updateTile(previousGridPos.x, previousGridPos.y, Tile::NONE);
+		grid.updateTile(x, y, Tile::CREATURE);
 		return true;
 	}
 	else 
@@ -33,13 +33,6 @@ Sprite::Sprite() {
 Sprite::Sprite(string SpriteName, string path,MyD3D& d3d) :spriteName(SpriteName),filePath(path) {
 	texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
-}
-void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin)
-{
-	Position = position;
-	Scale = scale;
-	Origin = origin;
-
 }
 void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect)
 {
