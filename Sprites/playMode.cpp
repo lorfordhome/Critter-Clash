@@ -92,17 +92,18 @@ PlayMode::PlayMode() {
 	enemyGrid.visible = false;
 	enemyGrid.width * 2;
 
-	Creature breloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D());
-	breloom.SpriteInit(grid, Vector2(0, 5), Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+	//Creature breloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D());
+	//breloom.SpriteInit(grid, Vector2(0, 5), Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+	Creature breloom(creatureType::BRELOOM, Vector2(0, 5), grid);
 	gameCreatures.push_back(breloom);
 
-	Creature Skitty("Skitty", "skittyIdle.dds", Game::Get().GetD3D());
-	Skitty.SpriteInit(grid, Vector2(2, 5), Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
-	Skitty.attackRange = 200.f;
-	gameCreatures.push_back(Skitty);
+	Creature skitty(creatureType::SKITTY, Vector2(2, 5), grid);
+	gameCreatures.push_back(skitty);
 
-	spawnEnemy(BUIZEL,Vector2(1,4));
-	spawnEnemy(BUIZEL, Vector2(0, 1));
+	spawnEnemy(BUIZEL,Vector2(2,4));
+	spawnEnemy(BUIZEL, Vector2(1, 1));
+
+	spriteDragging = false;
 
 
 	Sprite Button("Button", "startButton.dds", Game::Get().GetD3D());
@@ -156,13 +157,9 @@ void PlayMode::BuildUpdate(float dTime)
 
 void PlayMode::FightUpdate(float dTime)
 {
-	for (int i = 0; i < gameCreatures.size(); i++)
-	{
-		gameCreatures[i].sprite.Update(dTime);
-
-	}
 	for (int i = 0; i < gameCreatures.size(); i++) 
 	{
+		gameCreatures[i].Update(dTime);
 		gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
 
 		if(!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
@@ -239,17 +236,17 @@ void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
 
 	if (enemyToSpawn == BRELOOM) {
 		Creature ebreloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D(), true);
-		ebreloom.SpriteInit(grid, position, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+		ebreloom.SpriteInit(enemyGrid, position, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
 		gameCreatures.push_back(ebreloom);
 	}
 	if (enemyToSpawn == BUIZEL){
-		Creature eBuizel("Buizel", "buizelIdle.dds", Game::Get().GetD3D(), true);
-		eBuizel.SpriteInit(enemyGrid, position, Vector2(3, 3), true, RECT{ 0,288,32,336 }, RECT{ 0,0,32,48 }, 9, 0.2f);
-		gameCreatures.push_back(eBuizel);
+		Creature buizel(creatureType::BUIZEL, position, enemyGrid,true);
+		buizel.attackRange = 50.f;
+		gameCreatures.push_back(buizel);
 }
 	if (enemyToSpawn == SKITTY){
 			Creature eSkitty("Skitty", "skittyIdle.dds", Game::Get().GetD3D(),true);
-			eSkitty.SpriteInit(grid, position, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
+			eSkitty.SpriteInit(enemyGrid, position, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
 			eSkitty.attackRange = 200.f;
 			gameCreatures.push_back(eSkitty);
 		}

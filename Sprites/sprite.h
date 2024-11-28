@@ -49,13 +49,14 @@ public:
 	bool active = true;
 	Vector2 Position{ 400,400 };
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
-	void Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
+	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
 	void Update(float dTime);
 	void Render(SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
 	Sprite();
-	void setTex(ID3D11ShaderResourceView& tex, const RECT& texRect);
+	void setTex(ID3D11ShaderResourceView* tex, const RECT& texRect);
+	void setTex(ID3D11ShaderResourceView* tex);
 	void setPos(Vector2& pos) {
 		Position = pos;
 	}
@@ -76,5 +77,20 @@ public:
 	}
 	void setScale(Vector2 newScale) {
 		Scale = newScale;
+	}
+	void setAnimValues(int totalframes, float animspeed) {
+		totalFrames = totalframes;
+		animSpeed = animspeed;
+		//reset animation counter
+		animTime = 0;
+		frameCount = 0;
+	}
+	void setAnimValues(int totalframes, float animspeed, RECT frameRect) {
+		frameSize = frameRect;
+		totalFrames = totalframes;
+		animSpeed = animspeed;
+		//reset animation counter
+		animTime = 0;
+		frameCount = 0;
 	}
 };

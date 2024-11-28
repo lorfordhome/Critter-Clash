@@ -42,8 +42,7 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spritere
 	spriteRect = spriterect;
 
 }
-void Sprite::Init(Grid& grid,Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
-	setGridPosition(grid, position.x,position.y);
+void Sprite::Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
 	Scale = scale;
 	spriteRect = spriterect;
 	frameSize = framerect;
@@ -83,9 +82,13 @@ void Sprite::Render(SpriteBatch* Batch)
 	Batch->Draw(texture, Position, &spriteRect, colour, Rotation, Origin, Scale);
 }
 
-void Sprite::setTex(ID3D11ShaderResourceView& tex, const RECT& texRect) {
-	texture = &tex;
+void Sprite::setTex(ID3D11ShaderResourceView* tex, const RECT& texRect) {
+	texture = tex;
 	spriteRect = texRect;
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }
 
+void Sprite::setTex(ID3D11ShaderResourceView* tex) 
+{
+	texture = tex;
+}
