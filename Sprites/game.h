@@ -77,7 +77,7 @@ Vector2 getGridPosition(Grid& grid, Vector2 Position);
 //GAME MODES
 
 class PlayMode : public AMode {
-	enum class State{BUILD, FIGHT, END};
+	enum class State{BUILD, FIGHT, WIN, LOSE};
 	State state = State::BUILD;
 
 	std::vector<Creature> gameCreatures;
@@ -102,11 +102,12 @@ public:
 	void InitBattle();
 	void FightRender(float dTime,SpriteBatch& batch);
 	void dragSprite(Sprite& sprite, Mouse& mouse);
-	bool isSpriteClicked(Sprite& sprite, Mouse& mouse);
-	bool isSpriteClickReleased(Sprite& sprite, Mouse& mouse);
 	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 private:
 	bool spriteDragging = false;
 	int movedSprite;
 };
+
+bool isSpriteClicked(Sprite& sprite, Mouse& mouse);
+bool isSpriteClickReleased(Sprite& sprite, Mouse& mouse);

@@ -29,8 +29,8 @@ class Sprite {
 	RECT spriteRect={ 0,0,0,0 };
 	bool isAnim = false;
 	RECT frameSize = { 0,0,0,0 };
-	int totalFrames=0;
-	int frameCount=0;
+	unsigned char totalFrames=0;
+	unsigned char frameCount=0;
 	float animTime = 0; 
 	XMVECTOR colour = Colours::White;
 	string spriteName="";//this is used for finding the texture within the texcache

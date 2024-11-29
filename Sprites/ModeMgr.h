@@ -5,10 +5,12 @@
 
 #include "D3D.h"
 #include "SpriteBatch.h"
+#include "sprite.h"
 enum class GAMEMODE { INTRO, MENU, PLAY, OVER };
 /*
 ABC representing a game mode like intro, game, gameOver, highScores, etc.
 */
+//interface
 class AMode
 {
 public:
@@ -31,9 +33,19 @@ public:
 	virtual void ProcessKey(char key) {};
 };
 
-class BuildMode : public AMode 
+class MenuMode : public AMode 
 {
+	std::vector<Sprite> uiSprites;
+	Sprite bgSprite;
+	Sprite logoSprite;
+public:
+	MenuMode();
 	void Update(float dTime) override;
+	void Render(float dTime, SpriteBatch& batch) override;
+	static const GAMEMODE MODE_NAME = GAMEMODE::MENU;
+	GAMEMODE GetMName() const override {
+		return GAMEMODE::MENU;
+	}
 
 
 };

@@ -55,7 +55,8 @@ void Sprite::Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT sprit
 }
 void Sprite::Update(float dTime)
 {
-	colour = Colours::White;
+	if (type==spriteTYPE::UI)
+		colour = Colours::White;
 	if (isAnim)
 	{
 		animTime += dTime;

@@ -62,7 +62,7 @@ int PlayMode::findClosest(int idx,bool Enemy)
 	{
 		if (i != idx) //stops it from checking itself
 		{
-			if ((!Enemy && gameCreatures[i].isEnemy) || (Enemy && !gameCreatures[i].isEnemy)) //only check opposite team
+			if (gameCreatures[i].active&&((!Enemy && gameCreatures[i].isEnemy) || (Enemy && !gameCreatures[i].isEnemy))) //only check opposite team
 			{
 				Vector2 y = gameCreatures[i].getSprite().Position;
 				float Distance = sqrt(pow((x.x - y.x), 2) + pow((x.y - y.y), 2));
@@ -159,7 +159,7 @@ void PlayMode::FightUpdate(float dTime)
 {
 	for (int i = 0; i < gameCreatures.size(); i++) 
 	{
-		gameCreatures[i].Update(dTime);
+		gameCreatures[i].Update(dTime,true);
 		gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
 
 		if(!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
@@ -167,6 +167,11 @@ void PlayMode::FightUpdate(float dTime)
 			gameCreatures[i].sprite.setPos(MoveTowards(gameCreatures[i].sprite.Position,
 			gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
 			gameCreatures[i].speed)); 
+		}
+		else
+		{
+			if (gameCreatures[i].readyToAttack)
+				gameCreatures[i].Attack(gameCreatures[gameCreatures[i].targetIndex]);
 		}
 	}
 }
@@ -258,7 +263,7 @@ void PlayMode::dragSprite(Sprite& sprite,Mouse& mouse) {
 	sprite.setPos(mouse.GetMousePos(true));
 }
 
-bool PlayMode::isSpriteClicked(Sprite& sprite, Mouse& mouse) {
+bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 	Vector2 mousepos = mouse.GetMousePos(true);
 	RECT sRect = sprite.getDim();
 	SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
@@ -283,7 +288,7 @@ bool PlayMode::isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 
 }
 
-bool PlayMode::isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
+bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
 {
 	Vector2 mousepos = mouse.GetMousePos(true);
 	RECT sRect = sprite.getDim();

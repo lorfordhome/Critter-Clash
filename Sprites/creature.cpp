@@ -76,12 +76,49 @@ void Creature::ChangeAnimation(ACTION toChangeTo)
 	currAction = toChangeTo;
 }
 
-void Creature::Update(float dTime) 
+void Creature::Update(float dTime, bool fightMode) 
 {
-	if (lastPos != sprite.Position && currAction != ACTION::WALK)
-		ChangeAnimation(ACTION::WALK);
-	else if (currAction!=IDLE && lastPos == sprite.Position)
-		ChangeAnimation(ACTION::IDLE);
-	sprite.Update(dTime);
-	lastPos = sprite.Position;
+	if (active) {
+		if (lastPos != sprite.Position && currAction != ACTION::WALK)
+			ChangeAnimation(ACTION::WALK);
+		else if (currAction != IDLE && lastPos == sprite.Position)
+			ChangeAnimation(ACTION::IDLE);
+		sprite.Update(dTime);
+		lastPos = sprite.Position;
+
+		//attack
+		if (fightMode) {
+			attackTimer += dTime;
+			readyToAttack = (attackTimer >= attackCooldown); //returns true if the cooldown is ready
+		}
+		//damage flash
+		if (flashing) 
+		{
+			flashTimer += dTime;
+			if (flashTimer >= damageFlashDuration) {
+				sprite.colour = Colours::White;
+				flashing = false;
+			}
+		}
+
+		if (health <= 0) {
+			active = false;
+			sprite.active = false;
+			readyToAttack = false;
+		}
+	}
+}
+
+void Creature::Attack(Creature& target)
+{
+	target.TakeDamage(attackDmg);
+	attackTimer = 0.f;
+}
+
+void Creature::TakeDamage(float damage) 
+{
+	health -= damage;
+	flashing = true;
+	sprite.colour = Colours::Red;
+	flashTimer = 0.f;
 }

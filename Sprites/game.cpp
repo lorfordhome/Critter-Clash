@@ -82,7 +82,8 @@ Game::Game(MyD3D& d3d) :md3d(d3d)
 	md3d.GetCache().SetAssetPath("data/");
 	assert(mySpriteBatch);
 	mModeMgr.AddMode(new PlayMode());
-	mModeMgr.SwitchMode(PlayMode::MODE_NAME);
+	mModeMgr.AddMode(new MenuMode());
+	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
 }
 
 
