@@ -19,9 +19,9 @@
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
 	for (int i = 0; i < grid.width; i++) {
-		gRect.x = i * grid.cellSize;
 		for (int j = 0; j < grid.height; j++) {
-			gRect.y = j * grid.cellSize;
+			gRect.x = (i * grid.cellSize) + grid.gridOriginX;
+			gRect.y = (j * grid.cellSize)+grid.gridOriginY;
 			if (gRect.Contains(Position)) {
 				return Vector2(i, j);
 			}
@@ -57,14 +57,8 @@ void Grid::RenderGrid(float dTime,SpriteBatch* mySpriteBatch) {
 	if (visible) {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				Vector2 pos((cellSize * i), (cellSize * j));
+				Vector2 pos((cellSize * i)+gridOriginX, (cellSize * j)+gridOriginY);
 				gridSprite.setPos(pos);
-				if (grid[i][j].cellValue == Tile::Container::CREATURE) {
-					gridSprite.setColour(Colours::Red);
-				}
-				else {
-					gridSprite.setColour(Colours::White);
-				}
 				gridSprite.Render(mySpriteBatch);
 			}
 		}

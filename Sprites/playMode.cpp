@@ -89,10 +89,10 @@ PlayMode::PlayMode() {
 	Grid _grid(Game::Get().GetD3D()); //temp for initialising
 	grid = _grid;
 
-	Creature breloom(creatureType::BRELOOM, Vector2(0, 5), grid);
+	Creature breloom(creatureType::BRELOOM, Vector2(0, 3), grid);
 	gameCreatures.push_back(breloom);
 
-	Creature skitty(creatureType::SKITTY, Vector2(2, 5), grid);
+	Creature skitty(creatureType::SKITTY, Vector2(2, 3), grid);
 	gameCreatures.push_back(skitty);
 
 	InitBuild();
@@ -102,8 +102,8 @@ PlayMode::PlayMode() {
 
 void PlayMode::InitBuild() 
 {
-
-	spawnEnemy(BUIZEL, Vector2(2, 4));
+	//spawn enemies
+	spawnEnemy(BUIZEL, Vector2(2, 3));
 	spawnEnemy(BUIZEL, Vector2(2, 1));
 
 	spriteDragging = false;
@@ -120,6 +120,7 @@ void PlayMode::InitBuild()
 
 void PlayMode::BuildUpdate(float dTime)
 {
+	//pull mouse now to save on performance
 	Mouse& mouse = Game::Get().mouse;
 	//UPDATE UI
 	for (int i = 0; i < uiSprites.size(); i++)
@@ -177,9 +178,12 @@ void PlayMode::FightUpdate(float dTime)
 
 		if(!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
 		{
-			gameCreatures[i].sprite.setPos(MoveTowards(gameCreatures[i].sprite.Position,
-			gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
-			gameCreatures[i].speed)); 
+			Vector2 posToMove= MoveTowards(gameCreatures[i].sprite.Position,
+				gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
+				gameCreatures[i].speed);
+			posToMove.x* dTime;
+			posToMove.y* dTime;
+			gameCreatures[i].sprite.setPos(posToMove);
 		}
 		else
 		{
@@ -310,7 +314,7 @@ void PlayMode::FightRender(float dTime, SpriteBatch& batch)
 
 	bgSprite.Render(&batch);
 	for (int i = 0; i < gameCreatures.size(); i++) {
-		gameCreatures[i].sprite.Render(&batch);
+		gameCreatures[i].Render(&batch);
 	}
 	for (int i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render(&batch);
@@ -415,6 +419,9 @@ void PlayMode::UIAction(Sprite::UITYPE uitype)
 {
 	if (uitype == Sprite::UITYPE::start)
 	{
+		//reset counters
+		enemiesAlive = 0;
+		teamAlive = 0;
 		//check how many creatures on each team
 		for (int i = 0; i < gameCreatures.size(); i++)
 		{

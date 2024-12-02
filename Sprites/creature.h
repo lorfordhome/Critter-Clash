@@ -14,6 +14,7 @@ private:
 	Sprite walkSprite;
 	Sprite attackSprite;
 	Vector2 lastPos = { 0,0 };
+	Sprite healthBar;
 public:
 	creatureType type=creatureType::NONE;
 	Sprite sprite; //active sprite
@@ -48,6 +49,7 @@ public:
 	}
 	Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool Enemy = false);
 	void ChangeAnimation(ACTION toChangeTo);
+	void UpdateHealthBar();
 	Creature(bool Enemy = false) :isEnemy(Enemy){}
 	Sprite getSprite() {
 		return sprite;
@@ -55,5 +57,6 @@ public:
 	bool Update(float dTime, bool fightMode);
 	void Attack(Creature& target);
 	void TakeDamage(float damage);
+	void Render(SpriteBatch* Batch,bool renderHealth=true);
 	void ResetCreature();
 };

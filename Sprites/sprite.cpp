@@ -18,13 +18,13 @@ using namespace DirectX::SimpleMath;
 
 bool Sprite::setGridPosition(Grid& grid,int x,int y, bool checkCol) {
 	if (grid.Get(x, y).cellValue != Tile::CREATURE) {
-		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize) + grid.YOFFSET)));
+		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET + grid.gridOriginX), float((y * grid.cellSize) + grid.YOFFSET+grid.gridOriginY)));
 		grid.updateTile(previousGridPos.x, previousGridPos.y, Tile::NONE);
 		grid.updateTile(x, y, Tile::CREATURE);
 		return true;
 	}
 	else if (!checkCol) {
-		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET), float((y * grid.cellSize) + grid.YOFFSET)));
+		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET+grid.gridOriginX), float((y * grid.cellSize) + grid.YOFFSET + grid.gridOriginY)));
 		return true;
 	}
 	else 

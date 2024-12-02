@@ -18,6 +18,7 @@ void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool cen
 	lastPos = sprite.Position;
 }
 
+
 Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool Enemy):isEnemy(Enemy),type(typeToMake)
 {
 	if (typeToMake == creatureType::BRELOOM) 
@@ -25,6 +26,8 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool En
 		Sprite _sprite("Breloom", "breloomIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
 		SpriteInit(grid, gridPos, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+		//set stats
+		maxHealth = 125;
 		//set other animations
 		Sprite wSprite("breloomWalk", "breloomWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
@@ -45,14 +48,26 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool En
 		Sprite _sprite("Skitty", "skittyIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
 		SpriteInit(grid, gridPos, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
-		attackRange = 200.f;
+		attackRange = 300.f;
 		//set other animations
 		Sprite wSprite("skittyWalk", "skittyWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
 		walkSprite.Init(gridPos, Vector2(3, 3), true, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 7, 0.2f);
 	}
-
+	health = maxHealth;
 	idleSprite = sprite;
+
+	//initialise healthbar
+	if (isEnemy) {
+		Sprite hSprite("enemyHealth", "Enemy Health Bar.dds", Game::Get().GetD3D());
+		healthBar = hSprite;
+		healthBar.Init(Vector2(0, 0), Vector2(0.35, 0.5), Vector2(0, 0), RECT{ 0,0,277,11 });
+	}
+	else {
+		Sprite hSprite("playerHealth", "Player Health Bar.dds", Game::Get().GetD3D());
+		healthBar = hSprite;
+		healthBar.Init(Vector2(0, 0), Vector2(0.35, 0.5), Vector2(0, 0), RECT{ 0,0,277,11 });
+	}
 }
 
 void Creature::ResetCreature()
@@ -64,6 +79,7 @@ void Creature::ResetCreature()
 	attackTimer = 0.f;
 	flashTimer = 0.f;
 	ChangeAnimation(ACTION::IDLE);
+	UpdateHealthBar();
 }
 
 void Creature::ChangeAnimation(ACTION toChangeTo)
@@ -84,6 +100,13 @@ void Creature::ChangeAnimation(ACTION toChangeTo)
 	currAction = toChangeTo;
 }
 
+void Creature::UpdateHealthBar() 
+{
+	float healthPercentage = health / maxHealth;
+	healthPercentage = 0.35 * healthPercentage;
+	healthBar.Scale.x = healthPercentage;
+}
+
 bool Creature::Update(float dTime, bool fightMode) 
 {
 	if (active) {
@@ -93,6 +116,7 @@ bool Creature::Update(float dTime, bool fightMode)
 			ChangeAnimation(ACTION::IDLE);
 		sprite.Update(dTime);
 		lastPos = sprite.Position;
+		healthBar.Position = Vector2(sprite.Position.x, sprite.Position.y + 100);
 
 		//attack
 		if (fightMode) {
@@ -132,4 +156,15 @@ void Creature::TakeDamage(float damage)
 	flashing = true;
 	sprite.colour = Colours::Red;
 	flashTimer = 0.f;
+	UpdateHealthBar();
+}
+
+void Creature::Render(SpriteBatch* Batch,bool renderHealth)
+{
+	if (active) {
+		sprite.Render(Batch);
+		if (renderHealth) {
+			healthBar.Render(Batch);
+		}
+	}
 }

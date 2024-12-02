@@ -28,15 +28,17 @@ struct Tile {
 class Grid {
 	Sprite gridSprite;
 public: 
+	int gridOriginX = 128;
+	int gridOriginY = 128;
 	bool visible = true;
 	int XOFFSET = 15;
 	int YOFFSET = 20;
-	static constexpr int width = 4;
-	static constexpr int height = 6;
+	static constexpr int width = 3;
+	static constexpr int height = 4;
 	Tile grid[width][height];
-	long cellSize = 128;
-		Grid(MyD3D& d3d);
-		Grid();
+	static constexpr int cellSize = 128;
+	Grid(MyD3D& d3d);
+	Grid();
       void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
 	  Tile Get(int x, int y);
 	  void updateTile(int x, int y, Tile::Container Value);
