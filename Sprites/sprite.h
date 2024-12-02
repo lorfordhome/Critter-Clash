@@ -40,11 +40,18 @@ class Sprite {
 	friend class Creature;
 
 public:
+	~Sprite() {
+		texture = nullptr;
+	}
 	enum spriteTYPE
 	{
 		CREATURE = 0, UI = 1
 	};
+	enum UITYPE {
+		none,start,options,next,restart,menu,quit
+	};
 	spriteTYPE type = spriteTYPE::CREATURE;
+	UITYPE uiType = UITYPE::none;
 	Vector2 previousGridPos = Vector2(0, 0);
 	bool active = true;
 	Vector2 Position{ 400,400 };
@@ -52,6 +59,7 @@ public:
 	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
 	void Update(float dTime);
+	void UIAction();
 	void Render(SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
 	Sprite();

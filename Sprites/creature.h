@@ -11,13 +11,13 @@ enum creatureType
 class Creature 
 {
 private:
-	Sprite idleSprite;
 	Sprite walkSprite;
 	Sprite attackSprite;
 	Vector2 lastPos = { 0,0 };
 public:
 	creatureType type=creatureType::NONE;
 	Sprite sprite; //active sprite
+	Sprite idleSprite;
 	enum ACTION{IDLE=0,WALK=1,ATTACK=2,DEAD=3};
 	ACTION currAction = ACTION::IDLE;
 	bool active = true;
@@ -30,6 +30,7 @@ public:
 	bool readyToAttack = true;
 	int targetIndex = 0; //index of creature it is targeting within the gameCreatures array
 	float health = 100;
+	float maxHealth = 100;
 
 	float speed = 0.03f;
 	bool isEnemy = false;
@@ -51,7 +52,8 @@ public:
 	Sprite getSprite() {
 		return sprite;
 	}
-	void Update(float dTime, bool fightMode);
+	bool Update(float dTime, bool fightMode);
 	void Attack(Creature& target);
 	void TakeDamage(float damage);
+	void ResetCreature();
 };

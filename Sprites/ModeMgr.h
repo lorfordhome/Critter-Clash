@@ -31,6 +31,8 @@ public:
 	virtual GAMEMODE GetMName() const = 0;
 	//pass WM_CHAR key messages to a mode
 	virtual void ProcessKey(char key) {};
+	//process UI button
+	virtual void UIAction(Sprite::UITYPE uitype) = 0;
 };
 
 class MenuMode : public AMode 
@@ -39,9 +41,13 @@ class MenuMode : public AMode
 	Sprite bgSprite;
 	Sprite logoSprite;
 public:
+	~MenuMode() {
+		uiSprites.clear();
+	}
 	MenuMode();
 	void Update(float dTime) override;
 	void Render(float dTime, SpriteBatch& batch) override;
+	void UIAction(Sprite::UITYPE uiType) override;
 	static const GAMEMODE MODE_NAME = GAMEMODE::MENU;
 	GAMEMODE GetMName() const override {
 		return GAMEMODE::MENU;

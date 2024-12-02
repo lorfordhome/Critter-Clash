@@ -75,6 +75,14 @@ void Grid::updateTile(int x, int y, Tile::Container Value) {
 	grid[x][y].cellValue = Value;
 }
 
+void Grid::ResetTiles() {
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			updateTile(width, height, Tile::Container::NONE);
+		}
+	}
+}
+
 Game::Game(MyD3D& d3d) :md3d(d3d)
 {
 	mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);

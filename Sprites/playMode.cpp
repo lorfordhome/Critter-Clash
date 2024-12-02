@@ -88,28 +88,34 @@ PlayMode::PlayMode() {
 
 	Grid _grid(Game::Get().GetD3D()); //temp for initialising
 	grid = _grid;
-	enemyGrid = _grid;
-	enemyGrid.visible = false;
-	enemyGrid.width * 2;
 
-	//Creature breloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D());
-	//breloom.SpriteInit(grid, Vector2(0, 5), Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
 	Creature breloom(creatureType::BRELOOM, Vector2(0, 5), grid);
 	gameCreatures.push_back(breloom);
 
 	Creature skitty(creatureType::SKITTY, Vector2(2, 5), grid);
 	gameCreatures.push_back(skitty);
 
-	spawnEnemy(BUIZEL,Vector2(2,4));
-	spawnEnemy(BUIZEL, Vector2(1, 1));
+	InitBuild();
+
+
+}
+
+void PlayMode::InitBuild() 
+{
+
+	spawnEnemy(BUIZEL, Vector2(2, 4));
+	spawnEnemy(BUIZEL, Vector2(2, 1));
 
 	spriteDragging = false;
 
 
-	Sprite Button("Button", "startButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(430, 50), Vector2(0.15, 0.15), Vector2(0, 0), RECT{ 0,0,1280,427 });
+	Sprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(430, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
+	Button.uiType = Sprite::UITYPE::start;
 	uiSprites.push_back(Button);
+
+	state = State::BUILD;
 }
 
 void PlayMode::BuildUpdate(float dTime)
@@ -121,7 +127,7 @@ void PlayMode::BuildUpdate(float dTime)
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i],mouse) && !spriteDragging)
 		{
-			InitBattle();
+			UIAction(uiSprites[i].uiType);
 		}
 	}
 
@@ -159,7 +165,14 @@ void PlayMode::FightUpdate(float dTime)
 {
 	for (int i = 0; i < gameCreatures.size(); i++) 
 	{
-		gameCreatures[i].Update(dTime,true);
+		//update returns false if the creature has died
+		if (!gameCreatures[i].Update(dTime, true))
+		{
+			if (gameCreatures[i].isEnemy)
+				enemiesAlive--;
+			else
+				teamAlive--;
+		}
 		gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
 
 		if(!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
@@ -174,18 +187,76 @@ void PlayMode::FightUpdate(float dTime)
 				gameCreatures[i].Attack(gameCreatures[gameCreatures[i].targetIndex]);
 		}
 	}
+	//check for end
+	if (enemiesAlive <= 0)
+		InitWin();
+	if (teamAlive <= 0)
+		InitLose();
+}
+
+void PlayMode::OverUpdate(float dTime) 
+{
+	for (int i = 0; i < gameCreatures.size(); i++)
+	{
+		gameCreatures[i].Update(dTime, true);
+	}
+
+	Mouse& mouse = Game::Get().mouse;
+	//UPDATE UI
+	for (int i = 0; i < uiSprites.size(); i++)
+	{
+		uiSprites[i].Update(dTime);
+		if (isSpriteClickReleased(uiSprites[i], mouse) && !spriteDragging)
+		{
+			UIAction(uiSprites[i].uiType);
+		}
+	}
+}
+
+void PlayMode::InitLose() 
+{
+	state = State::LOSE;
+	//init text
+	Sprite Logo("defeatText", "defeatText.dds", Game::Get().GetD3D());
+	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,313,73 });
+	uiSprites.push_back(Logo);
+	//init ui
+	Sprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
+	Button3.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button3.type = Sprite::spriteTYPE::UI;
+	Button3.uiType = Sprite::UITYPE::menu;
+	uiSprites.push_back(Button3);
+
+	Sprite Button("restartButton", "restartButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(400, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button.type = Sprite::spriteTYPE::UI;
+	Button.uiType = Sprite::UITYPE::restart;
+	uiSprites.push_back(Button);
+}
+void PlayMode::InitWin()
+{
+	state = State::WIN;
+	//init text
+	Sprite Logo("victoryText", "victoryText.dds", Game::Get().GetD3D());
+	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,316,91 });
+	uiSprites.push_back(Logo);
+	//init ui
+	Sprite Button("nextButton", "nextButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(400, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button.type = Sprite::spriteTYPE::UI;
+	Button.uiType = Sprite::UITYPE::next;
+	uiSprites.push_back(Button);
 }
 
 void PlayMode::InitBattle()
 {
-	for (int i = 0; i < uiSprites.size(); i++)
-	{
-		uiSprites[i].active = false;
+	//store grid position before fight
+	for (int i = 0; i < gameCreatures.size(); ++i) {
+		if (!gameCreatures[i].isEnemy)
+			gameCreatures[i].idleSprite.previousGridPos = getGridPosition(grid, gameCreatures[i].sprite.Position);
 	}
-
-
+	uiSprites.clear();
 	state = State::FIGHT;
-
 }
 
 void PlayMode::Update(float dTime)
@@ -197,6 +268,12 @@ void PlayMode::Update(float dTime)
 	case(State::FIGHT):
 		FightUpdate(dTime);
 		break;
+	case(State::WIN):
+		OverUpdate(dTime);
+		break;
+	case(State::LOSE):
+		OverUpdate(dTime);
+		break;
 	}
 }
 
@@ -207,6 +284,12 @@ void PlayMode::Render(float dTime, SpriteBatch& batch) {
 		break;
 	case(State::FIGHT):
 		FightRender(dTime,batch);
+		break;
+	case(State::WIN):
+		FightRender(dTime, batch);
+		break;
+	case(State::LOSE):
+		FightRender(dTime, batch);
 		break;
 	}
 }
@@ -241,17 +324,17 @@ void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
 
 	if (enemyToSpawn == BRELOOM) {
 		Creature ebreloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D(), true);
-		ebreloom.SpriteInit(enemyGrid, position, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+		ebreloom.SpriteInit(grid, position, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
 		gameCreatures.push_back(ebreloom);
 	}
 	if (enemyToSpawn == BUIZEL){
-		Creature buizel(creatureType::BUIZEL, position, enemyGrid,true);
+		Creature buizel(creatureType::BUIZEL, position, grid,true);
 		buizel.attackRange = 50.f;
 		gameCreatures.push_back(buizel);
 }
 	if (enemyToSpawn == SKITTY){
 			Creature eSkitty("Skitty", "skittyIdle.dds", Game::Get().GetD3D(),true);
-			eSkitty.SpriteInit(enemyGrid, position, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
+			eSkitty.SpriteInit(grid, position, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
 			eSkitty.attackRange = 200.f;
 			gameCreatures.push_back(eSkitty);
 		}
@@ -279,7 +362,7 @@ bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 		else {
 			//is hovering over sprite
 			if (sprite.type == Sprite::spriteTYPE::UI) {
-				sprite.setColour(Colors::DarkGreen);
+				sprite.setColour(Colors::DarkGray);
 			}
 		}
 		return false;
@@ -305,7 +388,7 @@ bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
 		else {
 			//is hovering over sprite
 			if (sprite.type == Sprite::spriteTYPE::UI) {
-				sprite.setColour(Colors::DarkGreen);
+				sprite.setColour(Colors::DarkGray);
 			}
 		}
 		return false;
@@ -327,3 +410,56 @@ bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse) {
 	return false;
 }
 
+
+void PlayMode::UIAction(Sprite::UITYPE uitype)
+{
+	if (uitype == Sprite::UITYPE::start)
+	{
+		//check how many creatures on each team
+		for (int i = 0; i < gameCreatures.size(); i++)
+		{
+			if (gameCreatures[i].isEnemy)
+				enemiesAlive++;
+			else
+				teamAlive++;
+		}
+		InitBattle();
+	}
+	else if (uitype == Sprite::UITYPE::quit)
+	{
+		PostQuitMessage(0);
+	}
+	else if (uitype == Sprite::UITYPE::next) 
+	{
+		//clear enemies
+		for (auto it = gameCreatures.begin(); it != gameCreatures.end();) {
+			if ((*it).isEnemy)
+			{
+				it=gameCreatures.erase(it);
+			}
+			else
+				++it;
+		}
+		//reset grid
+		grid.ResetTiles();
+		//reset team members
+		for (auto it = gameCreatures.begin(); it != gameCreatures.end(); ++it)
+		{
+			(*it).ResetCreature();
+			(*it).sprite.setGridPosition(grid, (*it).sprite.previousGridPos.x, (*it).sprite.previousGridPos.y,false);
+		}
+		uiSprites.clear();
+		InitBuild();
+	}
+	else if (uitype == Sprite::UITYPE::restart) 
+	{
+		MyD3D& tempd3d = Game::Get().GetD3D();
+		delete& Game::Get();
+		new Game(tempd3d);
+		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+	}
+	else if (uitype == Sprite::UITYPE::menu)
+	{
+		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
+	}
+}

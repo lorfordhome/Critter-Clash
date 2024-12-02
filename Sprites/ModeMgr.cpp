@@ -39,8 +39,8 @@ void ModeMgr::AddMode(AMode* p) {
 }
 
 void ModeMgr::Release() {
-	for (size_t i = 0; i < mModes.size(); ++i)
-		delete mModes[i];
+	//for (size_t i = 0; i < mModes.size(); ++i)
+	//	delete mModes[i];
 	mModes.clear();
 }
 
@@ -50,10 +50,27 @@ MenuMode::MenuMode()
 	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
 	bgSprite = _bg;
 
-	Sprite Button("Button", "startButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(410, 600), Vector2(0.15, 0.15), Vector2(0, 0), RECT{ 0,0,1280,427 });
+
+
+	//initialise UI
+	Sprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(400, 200), Vector2(1,1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
+	Button.uiType = Sprite::UITYPE::start;
 	uiSprites.push_back(Button);
+
+	Sprite Button2("optionsButton", "optionButton.dds", Game::Get().GetD3D());
+	Button2.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button2.type = Sprite::spriteTYPE::UI;
+	Button2.uiType = Sprite::UITYPE::options;
+	uiSprites.push_back(Button2);
+
+
+	Sprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
+	Button3.Init(Vector2(400, 400), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button3.type = Sprite::spriteTYPE::UI;
+	Button3.uiType = Sprite::UITYPE::quit;
+	uiSprites.push_back(Button3);
 
 	Sprite Logo("Logo", "muddyLogo.dds", Game::Get().GetD3D());
 	Logo.Init(Vector2(125, 0), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,757,113 });
@@ -69,7 +86,7 @@ void MenuMode::Update(float dTime)
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i], mouse))
 		{
-			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+			UIAction(uiSprites[i].uiType);
 		}
 	}
 }
@@ -80,5 +97,22 @@ void MenuMode::Render(float dTime, SpriteBatch& batch)
 	logoSprite.Render(&batch);
 	for (int i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render(&batch);
+	}
+}
+
+
+void MenuMode::UIAction(Sprite::UITYPE uitype) 
+{
+	if (uitype == Sprite::UITYPE::start)
+	{
+		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+	}
+	else if (uitype == Sprite::UITYPE::options) 
+	{
+
+	}
+	else if (uitype == Sprite::UITYPE::quit)
+	{
+		PostQuitMessage(0);
 	}
 }

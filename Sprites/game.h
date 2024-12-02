@@ -41,6 +41,8 @@ public:
 	  Tile Get(int x, int y);
 	  void updateTile(int x, int y, Tile::Container Value);
 
+	  void ResetTiles();
+
 };
 
 
@@ -84,21 +86,30 @@ class PlayMode : public AMode {
 	std::vector<Sprite> uiSprites;
 	Sprite bgSprite;
 public:
+	~PlayMode() 
+	{
+		gameCreatures.clear();
+		uiSprites.clear();
+	}
 	int findClosest(int idx,bool Enemy);
 	PlayMode();
+	void InitBuild();
 	static const GAMEMODE MODE_NAME = GAMEMODE::PLAY;
 	void Update(float dTime) override;
 	void Render(float dTime, SpriteBatch& batch) override;
+	void UIAction(Sprite::UITYPE uitype) override;
 	void BuildRender(float dTime, SpriteBatch& batch);
 	GAMEMODE GetMName() const override {
 		return GAMEMODE::PLAY;
 	}
 
 	Grid grid;
-	Grid enemyGrid;
 	ModeMgr modeManager;
 	void BuildUpdate(float dTime);
 	void FightUpdate(float dTime);
+	void OverUpdate(float dTime);
+	void InitLose();
+	void InitWin();
 	void InitBattle();
 	void FightRender(float dTime,SpriteBatch& batch);
 	void dragSprite(Sprite& sprite, Mouse& mouse);
@@ -107,6 +118,8 @@ public:
 private:
 	bool spriteDragging = false;
 	int movedSprite;
+	unsigned char enemiesAlive = 0;
+	unsigned char teamAlive = 0;
 };
 
 bool isSpriteClicked(Sprite& sprite, Mouse& mouse);

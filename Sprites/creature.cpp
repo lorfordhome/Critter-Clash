@@ -3,7 +3,10 @@
 #include "game.h"
 
 void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed) {
-	sprite.setGridPosition(grid, position.x, position.y);
+	if (isEnemy)
+		sprite.setGridPosition(grid, position.x, position.y,false);
+	else
+		sprite.setGridPosition(grid, position.x, position.y);
 	sprite.Scale = scale;
 	sprite.spriteRect = spriterect;
 	sprite.frameSize = framerect;
@@ -11,12 +14,6 @@ void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool cen
 	sprite.animSpeed = animspeed;
 	sprite.isAnim = true;
 	sprite.dim = (RECT{ long(sprite.spriteRect.left * sprite.Scale.x), long(sprite.spriteRect.top * sprite.Scale.y), long(sprite.spriteRect.right * sprite.Scale.x), long(sprite.spriteRect.bottom * sprite.Scale.y) });
-
-
-	if (type==BUIZEL)
-	{
-		Sprite _walk("Buizel", "buizelIdle.dds",Game::Get().GetD3D());
-	}
 
 	lastPos = sprite.Position;
 }
@@ -58,6 +55,17 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool En
 	idleSprite = sprite;
 }
 
+void Creature::ResetCreature()
+{
+	health = maxHealth;
+	active = true;
+	flashing = false;
+	readyToAttack = true;
+	attackTimer = 0.f;
+	flashTimer = 0.f;
+	ChangeAnimation(ACTION::IDLE);
+}
+
 void Creature::ChangeAnimation(ACTION toChangeTo)
 {
 	switch(toChangeTo) 
@@ -76,7 +84,7 @@ void Creature::ChangeAnimation(ACTION toChangeTo)
 	currAction = toChangeTo;
 }
 
-void Creature::Update(float dTime, bool fightMode) 
+bool Creature::Update(float dTime, bool fightMode) 
 {
 	if (active) {
 		if (lastPos != sprite.Position && currAction != ACTION::WALK)
@@ -105,8 +113,11 @@ void Creature::Update(float dTime, bool fightMode)
 			active = false;
 			sprite.active = false;
 			readyToAttack = false;
+			return false;
 		}
+		return true;
 	}
+	return true;
 }
 
 void Creature::Attack(Creature& target)
