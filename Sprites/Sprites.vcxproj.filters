@@ -81,4 +81,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\data\pixelText.spritefont" />
+  </ItemGroup>
 </Project>

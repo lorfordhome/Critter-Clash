@@ -11,6 +11,7 @@
 #include "CommonStates.h"
 #include "sprite.h"
 #include "game.h"
+#include <SpriteFont.h> //for text rendering
 
 
 Vector2 MoveTowards(Vector2 current, Vector2 target, float maxDistanceDelta)
@@ -95,25 +96,46 @@ PlayMode::PlayMode() {
 	Creature skitty(creatureType::SKITTY, Vector2(2, 3), grid);
 	gameCreatures.push_back(skitty);
 
+	Sprite _coin("coin", "coin.dds", Game::Get().GetD3D());
+	_coin.Init(Vector2(5, 20), Vector2(0.8, 0.8), Vector2(0, 0), RECT{ 0,0,45,48 });
+	coinSprite = _coin;
+
+	pixelFont = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelText.spritefont");
+	assert(pixelFont);
+
+
 	InitBuild();
 
 
 }
 
+void PlayMode::InitShop() 
+{
+	Sprite _sprite("store", "store.dds", Game::Get().GetD3D());
+	_sprite.Init(Vector2(525, 0), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,512,768 });
+	shopSprite = _sprite;
+	state = State::SHOP;
+}
+
 void PlayMode::InitBuild() 
 {
+	spriteDragging = false;
+
 	//spawn enemies
 	spawnEnemy(BUIZEL, Vector2(2, 3));
 	spawnEnemy(BUIZEL, Vector2(2, 1));
 
-	spriteDragging = false;
-
-
-	Sprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(430, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(550, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = Sprite::UITYPE::start;
+	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
+
+	UISprite Button2("storeButton", "storeButton.dds", Game::Get().GetD3D());
+	Button2.Init(Vector2(300, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button2.type = Sprite::spriteTYPE::UI;
+	Button2.uiType = UISprite::UITYPE::store;
+	uiSprites.push_back(Button2);
 
 	state = State::BUILD;
 }
@@ -128,7 +150,12 @@ void PlayMode::BuildUpdate(float dTime)
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i],mouse) && !spriteDragging)
 		{
-			UIAction(uiSprites[i].uiType);
+			if (uiSprites[i].Action()) {
+				UIAction(uiSprites[i]);
+				if (uiSprites.size() > 0) {
+					uiSprites[i].canBeClicked = false;
+				}
+			}
 		}
 	}
 
@@ -160,6 +187,15 @@ void PlayMode::BuildUpdate(float dTime)
 		}
 
 	}
+}
+
+void PlayMode::StoreUpdate(float dtime) 
+{
+	//we need all the same functions that are used in build update, so might as well just call it...
+	BuildUpdate(dtime);
+
+
+
 }
 
 void PlayMode::FightUpdate(float dTime)
@@ -212,7 +248,7 @@ void PlayMode::OverUpdate(float dTime)
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i], mouse) && !spriteDragging)
 		{
-			UIAction(uiSprites[i].uiType);
+			UIAction(uiSprites[i]);
 		}
 	}
 }
@@ -223,18 +259,18 @@ void PlayMode::InitLose()
 	//init text
 	Sprite Logo("defeatText", "defeatText.dds", Game::Get().GetD3D());
 	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,313,73 });
-	uiSprites.push_back(Logo);
+	logoSprite = Logo;
 	//init ui
-	Sprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
+	UISprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
 	Button3.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button3.type = Sprite::spriteTYPE::UI;
-	Button3.uiType = Sprite::UITYPE::menu;
+	Button3.uiType = UISprite::UITYPE::menu;
 	uiSprites.push_back(Button3);
 
-	Sprite Button("restartButton", "restartButton.dds", Game::Get().GetD3D());
+	UISprite Button("restartButton", "restartButton.dds", Game::Get().GetD3D());
 	Button.Init(Vector2(400, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = Sprite::UITYPE::restart;
+	Button.uiType = UISprite::UITYPE::restart;
 	uiSprites.push_back(Button);
 }
 void PlayMode::InitWin()
@@ -243,12 +279,12 @@ void PlayMode::InitWin()
 	//init text
 	Sprite Logo("victoryText", "victoryText.dds", Game::Get().GetD3D());
 	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,316,91 });
-	uiSprites.push_back(Logo);
+	logoSprite = Logo;
 	//init ui
-	Sprite Button("nextButton", "nextButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(400, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button("nextButton", "nextButton.dds", Game::Get().GetD3D());
+	Button.Init(Vector2(420, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = Sprite::UITYPE::next;
+	Button.uiType = UISprite::UITYPE::next;
 	uiSprites.push_back(Button);
 }
 
@@ -278,6 +314,9 @@ void PlayMode::Update(float dTime)
 	case(State::LOSE):
 		OverUpdate(dTime);
 		break;
+	case(State::SHOP):
+		StoreUpdate(dTime);
+		break;
 	}
 }
 
@@ -295,11 +334,24 @@ void PlayMode::Render(float dTime, SpriteBatch& batch) {
 	case(State::LOSE):
 		FightRender(dTime, batch);
 		break;
+	case(State::SHOP):
+		StoreRender(dTime,batch);
+		break;
 	}
+}
+
+void PlayMode::StoreRender(float dtime, SpriteBatch& batch) 
+{
+	//we need to render all the same things as BuildRender, so...
+	BuildRender(dtime, batch);
+	//plus extra
+	shopSprite.Render(&batch);
 }
 
 void PlayMode::BuildRender(float dTime, SpriteBatch& batch) {
 	bgSprite.Render(&batch);
+	coinSprite.Render(&batch);
+	GetFont().DrawString(&batch, to_string(coins).c_str(), Vector2(35, 20));
 	grid.RenderGrid(dTime, &batch);
 	for (int i = 0; i < gameCreatures.size(); i++) {
 		gameCreatures[i].sprite.Render(&batch);
@@ -318,6 +370,9 @@ void PlayMode::FightRender(float dTime, SpriteBatch& batch)
 	}
 	for (int i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render(&batch);
+	}
+	if (state == State::WIN || state == State::LOSE) {
+		logoSprite.Render(&batch);
 	}
 }
 
@@ -371,32 +426,32 @@ bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 		}
 		return false;
 	}
-
-
 }
 
 bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
 {
-	Vector2 mousepos = mouse.GetMousePos(true);
-	RECT sRect = sprite.getDim();
-	SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
-	cRect.x = sprite.Position.x;
-	cRect.y = sprite.Position.y;
+		Vector2 mousepos = mouse.GetMousePos(true);
+		RECT sRect = sprite.getDim();
+		SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
+		cRect.x = sprite.Position.x;
+		cRect.y = sprite.Position.y;
 
-	if (cRect.Contains(mousepos))
-	{
-		if (mouse.isClickRelease()) {
-			//pressed
-			return true;
-		}
-		else {
-			//is hovering over sprite
-			if (sprite.type == Sprite::spriteTYPE::UI) {
-				sprite.setColour(Colors::DarkGray);
+		if (cRect.Contains(mousepos))
+		{
+			if (mouse.isClickRelease()&&!mouse.clickedLastFrame) {
+				//pressed
+				mouse.clickedLastFrame = true;
+				return true;
+			}
+			else {
+				//is hovering over sprite
+				sprite.isHover = true;
+				return false;
 			}
 		}
-		return false;
-	}
+		if (sprite.isHover)
+			sprite.isHover = false;
+	return false;
 }
 
 bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse) {
@@ -415,58 +470,74 @@ bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse) {
 }
 
 
-void PlayMode::UIAction(Sprite::UITYPE uitype)
+void PlayMode::UIAction(UISprite& sprite)
 {
-	if (uitype == Sprite::UITYPE::start)
-	{
-		//reset counters
-		enemiesAlive = 0;
-		teamAlive = 0;
-		//check how many creatures on each team
-		for (int i = 0; i < gameCreatures.size(); i++)
+	if (sprite.canBeClicked) {
+		if (sprite.uiType == UISprite::UITYPE::start)
 		{
-			if (gameCreatures[i].isEnemy)
-				enemiesAlive++;
-			else
-				teamAlive++;
-		}
-		InitBattle();
-	}
-	else if (uitype == Sprite::UITYPE::quit)
-	{
-		PostQuitMessage(0);
-	}
-	else if (uitype == Sprite::UITYPE::next) 
-	{
-		//clear enemies
-		for (auto it = gameCreatures.begin(); it != gameCreatures.end();) {
-			if ((*it).isEnemy)
+			//reset counters
+			enemiesAlive = 0;
+			teamAlive = 0;
+			//check how many creatures on each team
+			for (int i = 0; i < gameCreatures.size(); i++)
 			{
-				it=gameCreatures.erase(it);
+				if (gameCreatures[i].isEnemy)
+					enemiesAlive++;
+				else
+					teamAlive++;
 			}
-			else
-				++it;
+			InitBattle();
 		}
-		//reset grid
-		grid.ResetTiles();
-		//reset team members
-		for (auto it = gameCreatures.begin(); it != gameCreatures.end(); ++it)
+		else if (sprite.uiType == UISprite::UITYPE::quit)
 		{
-			(*it).ResetCreature();
-			(*it).sprite.setGridPosition(grid, (*it).sprite.previousGridPos.x, (*it).sprite.previousGridPos.y,false);
+			PostQuitMessage(0);
 		}
-		uiSprites.clear();
-		InitBuild();
+		else if (sprite.uiType == UISprite::UITYPE::next)
+		{
+			ResetBoard();
+			InitBuild();
+		}
+		else if (sprite.uiType == UISprite::UITYPE::restart)
+		{
+			MyD3D& tempd3d = Game::Get().GetD3D();
+			delete& Game::Get();
+			new Game(tempd3d);
+			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+		}
+		else if (sprite.uiType == UISprite::UITYPE::menu)
+		{
+			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
+		}
+		else if (sprite.uiType == UISprite::UITYPE::store)
+		{
+			if (state == State::SHOP) {
+				state = State::BUILD;
+			}
+			else {
+				InitShop();
+			}
+		}
 	}
-	else if (uitype == Sprite::UITYPE::restart) 
+}
+
+void PlayMode::ResetBoard() 
+{
+	//clear enemies
+	for (auto it = gameCreatures.begin(); it != gameCreatures.end();) {
+		if ((*it).isEnemy)
+		{
+			it = gameCreatures.erase(it);
+		}
+		else
+			++it;
+	}
+	//reset grid
+	grid.ResetTiles();
+	//reset team members
+	for (auto it = gameCreatures.begin(); it != gameCreatures.end(); ++it)
 	{
-		MyD3D& tempd3d = Game::Get().GetD3D();
-		delete& Game::Get();
-		new Game(tempd3d);
-		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+		(*it).ResetCreature();
+		(*it).sprite.setGridPosition(grid, (*it).sprite.previousGridPos.x, (*it).sprite.previousGridPos.y, false);
 	}
-	else if (uitype == Sprite::UITYPE::menu)
-	{
-		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
-	}
+	uiSprites.clear();
 }

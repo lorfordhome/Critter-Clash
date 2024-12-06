@@ -32,12 +32,12 @@ public:
 	//pass WM_CHAR key messages to a mode
 	virtual void ProcessKey(char key) {};
 	//process UI button
-	virtual void UIAction(Sprite::UITYPE uitype) = 0;
+	virtual void UIAction(UISprite& sprite) = 0;
 };
 
 class MenuMode : public AMode 
 {
-	std::vector<Sprite> uiSprites;
+	std::vector<UISprite> uiSprites;
 	Sprite bgSprite;
 	Sprite logoSprite;
 public:
@@ -47,7 +47,7 @@ public:
 	MenuMode();
 	void Update(float dTime) override;
 	void Render(float dTime, SpriteBatch& batch) override;
-	void UIAction(Sprite::UITYPE uiType) override;
+	void UIAction(UISprite& sprite) override;
 	static const GAMEMODE MODE_NAME = GAMEMODE::MENU;
 	GAMEMODE GetMName() const override {
 		return GAMEMODE::MENU;

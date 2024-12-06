@@ -20,6 +20,7 @@ using namespace DirectX::SimpleMath;
 class Grid;
 
 class Sprite {
+protected:
 	Vector2 Dir{ 1,0 };
 	Vector2 Origin{ 0,0 };
 	Vector2 Scale{ 1,1 };
@@ -38,8 +39,8 @@ class Sprite {
 	ID3D11ShaderResourceView* texture=nullptr;
 	RECT dim{ 0,0,0,0 };
 	friend class Creature;
-
 public:
+	bool isHover = false;
 	~Sprite() {
 		texture = nullptr;
 	}
@@ -47,20 +48,15 @@ public:
 	{
 		CREATURE = 0, UI = 1
 	};
-	enum UITYPE {
-		none,start,options,next,restart,menu,quit
-	};
 	spriteTYPE type = spriteTYPE::CREATURE;
-	UITYPE uiType = UITYPE::none;
 	Vector2 previousGridPos = Vector2(0, 0);
 	bool active = true;
 	Vector2 Position{ 400,400 };
 	void Init(Vector2 position,Vector2 scale,Vector2 origin);
 	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
-	void Update(float dTime);
-	void UIAction();
-	void Render(SpriteBatch* Batch);
+	virtual void Update(float dTime);
+	virtual void Render(SpriteBatch* Batch);
 	Sprite(string spriteName, string path, MyD3D& d3d);
 	Sprite();
 	void setTex(ID3D11ShaderResourceView* tex, const RECT& texRect);
@@ -101,4 +97,25 @@ public:
 		animTime = 0;
 		frameCount = 0;
 	}
+	virtual bool Action() {
+		return true;
+	}
+};
+
+class UISprite : public Sprite {
+	float clickTimer = 0; //tracking how long until it can be clicked again
+public:
+	~UISprite() {
+		texture = nullptr;
+	}
+	UISprite(string spriteName, string path, MyD3D& d3d);
+	UISprite();
+	enum UITYPE {
+		none, start, options, next, restart, menu, quit, store
+	};
+	UITYPE uiType = UITYPE::none;
+	float clickCooldown = 0;//how long before button can be clicked again
+	bool canBeClicked = true;
+	void Update(float dTime) override;
+	bool Action() override; //returns true if can be clicked
 };

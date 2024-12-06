@@ -13,6 +13,7 @@ using namespace DirectX::SimpleMath;
 class Grid;
 class Mouse{
 public:
+	bool clickedLastFrame = false;
 	void GetMousePosAbsolute(Vector2& pos);
 	void ProcessMouse(RAWINPUT* raw);
 

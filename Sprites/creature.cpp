@@ -49,6 +49,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool En
 		sprite = _sprite;
 		SpriteInit(grid, gridPos, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
 		attackRange = 300.f;
+		maxHealth = 75;
 		//set other animations
 		Sprite wSprite("skittyWalk", "skittyWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;

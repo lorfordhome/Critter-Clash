@@ -122,6 +122,9 @@
     <ClInclude Include="TexCache.h" />
     <ClInclude Include="WindowUtils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\data\pixelText.spritefont" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

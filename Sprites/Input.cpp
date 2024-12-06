@@ -28,7 +28,7 @@ void Mouse::Initialise(HWND hwnd, bool showMouse, bool confineMouse)
 {
 	mHwnd = hwnd;
 
-	RAWINPUTDEVICE Rid[2];
+	RAWINPUTDEVICE Rid[2] = {};
 
 	//these ids trigger mouse input
 	Rid[0].usUsagePage = 0x01;
@@ -83,7 +83,13 @@ void Mouse::ProcessMouse(RAWINPUT* raw)
 }
 
 bool Mouse::isClickRelease() {
-	return (mButtons[LBUTTON] == false && lastmButtons[LBUTTON] == true);
+	if (mButtons[LBUTTON] == false && lastmButtons[LBUTTON] == true) {
+		return true;
+	}
+	else {
+		clickedLastFrame = false;
+		return false;
+	}
 }
 void Mouse::Reset()
 {

@@ -101,7 +101,7 @@ void Game::Update(float dTime)
 }
 void Game::Render(float dTime)
 {
-	md3d.BeginRender(Colours::Black);
+	md3d.BeginRender(Vector4(0.1843137254901961, 0.5058823529411764, 0.21176470588235294, 1));
 
 
 	CommonStates dxstate(&md3d.GetDevice());

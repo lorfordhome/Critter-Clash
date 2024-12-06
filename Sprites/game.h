@@ -81,25 +81,34 @@ Vector2 getGridPosition(Grid& grid, Vector2 Position);
 //GAME MODES
 
 class PlayMode : public AMode {
-	enum class State{BUILD, FIGHT, WIN, LOSE};
+	enum class State{BUILD,SHOP, FIGHT, WIN, LOSE};
 	State state = State::BUILD;
 
-	std::vector<Creature> gameCreatures;
-	std::vector<Sprite> uiSprites;
-	Sprite bgSprite;
+	std::vector<Creature> gameCreatures{};
+	std::vector<UISprite> uiSprites{};
+	Sprite bgSprite{};
+	Sprite coinSprite{};
+	SpriteFont* pixelFont = nullptr;
+	Sprite shopSprite{};
+	Sprite logoSprite{};
 public:
 	~PlayMode() 
 	{
+		delete pixelFont;
+		pixelFont = nullptr;
 		gameCreatures.clear();
 		uiSprites.clear();
 	}
 	int findClosest(int idx,bool Enemy);
 	PlayMode();
+	void InitShop();
 	void InitBuild();
 	static const GAMEMODE MODE_NAME = GAMEMODE::PLAY;
 	void Update(float dTime) override;
 	void Render(float dTime, SpriteBatch& batch) override;
-	void UIAction(Sprite::UITYPE uitype) override;
+	void StoreRender(float dtime, SpriteBatch& batch);
+	void UIAction(UISprite& sprite);
+	void ResetBoard();
 	void BuildRender(float dTime, SpriteBatch& batch);
 	GAMEMODE GetMName() const override {
 		return GAMEMODE::PLAY;
@@ -108,6 +117,7 @@ public:
 	Grid grid;
 	ModeMgr modeManager;
 	void BuildUpdate(float dTime);
+	void StoreUpdate(float dtime);
 	void FightUpdate(float dTime);
 	void OverUpdate(float dTime);
 	void InitLose();
@@ -117,11 +127,17 @@ public:
 	void dragSprite(Sprite& sprite, Mouse& mouse);
 	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
+	SpriteFont& GetFont() {
+		assert(pixelFont);
+		return *pixelFont;
+	}
 private:
+	bool wasClickReleased = false;
 	bool spriteDragging = false;
-	int movedSprite;
+	int movedSprite=0;
 	unsigned char enemiesAlive = 0;
 	unsigned char teamAlive = 0;
+	int coins = 10;
 };
 
 bool isSpriteClicked(Sprite& sprite, Mouse& mouse);

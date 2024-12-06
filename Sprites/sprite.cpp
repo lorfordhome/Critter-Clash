@@ -38,6 +38,17 @@ Sprite::Sprite(string SpriteName, string path,MyD3D& d3d) :spriteName(SpriteName
 	texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
 	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 }
+UISprite::UISprite() {
+	texture = nullptr;
+	type = Sprite::spriteTYPE::UI;
+}
+UISprite::UISprite(string SpriteName, string path, MyD3D& d3d) {
+	spriteName = SpriteName;
+	filePath = path;
+	texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
+	dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
+	type = Sprite::spriteTYPE::UI;
+}
 void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect)
 {
 	Position = position;
@@ -59,8 +70,6 @@ void Sprite::Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT sprit
 }
 void Sprite::Update(float dTime)
 {
-	if (type==spriteTYPE::UI)
-		colour = Colours::White;
 	if (isAnim)
 	{
 		animTime += dTime;
@@ -79,6 +88,54 @@ void Sprite::Update(float dTime)
 			}
 			animTime = 0;
 		}
+	}
+}
+
+void UISprite::Update(float dTime) 
+{
+	if (isHover)
+		colour = Colors::DarkGray;
+	else
+		colour = Colours::White;
+	if (isAnim)
+	{
+		animTime += dTime;
+		if (animTime > animSpeed)
+		{
+			if (frameCount < totalFrames - 1) {
+				spriteRect.left += frameSize.right;
+				spriteRect.right += frameSize.right;
+				++frameCount;
+			}
+			else
+			{
+				spriteRect.left = frameSize.left;
+				spriteRect.right = frameSize.right;
+				frameCount = 0;
+			}
+			animTime = 0;
+		}
+	}
+
+	if (!canBeClicked)
+	{
+		clickTimer += dTime;
+		if (clickTimer >= clickCooldown) {
+			canBeClicked = true;
+			clickTimer = 0;
+		}
+	}
+}
+
+//returns true if can be clicked
+bool UISprite::Action() 
+{
+	if (canBeClicked) {
+		clickTimer = 0; //makes sure clickTimer is reset
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 

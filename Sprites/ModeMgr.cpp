@@ -53,23 +53,20 @@ MenuMode::MenuMode()
 
 
 	//initialise UI
-	Sprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
+	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
 	Button.Init(Vector2(400, 200), Vector2(1,1), Vector2(0, 0), RECT{ 0,0,144,72 });
-	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = Sprite::UITYPE::start;
+	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
 
-	Sprite Button2("optionsButton", "optionButton.dds", Game::Get().GetD3D());
+	UISprite Button2("optionsButton", "optionButton.dds", Game::Get().GetD3D());
 	Button2.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
-	Button2.type = Sprite::spriteTYPE::UI;
-	Button2.uiType = Sprite::UITYPE::options;
+	Button2.uiType = UISprite::UITYPE::options;
 	uiSprites.push_back(Button2);
 
 
-	Sprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
+	UISprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
 	Button3.Init(Vector2(400, 400), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
-	Button3.type = Sprite::spriteTYPE::UI;
-	Button3.uiType = Sprite::UITYPE::quit;
+	Button3.uiType = UISprite::UITYPE::quit;
 	uiSprites.push_back(Button3);
 
 	Sprite Logo("Logo", "muddyLogo.dds", Game::Get().GetD3D());
@@ -86,7 +83,9 @@ void MenuMode::Update(float dTime)
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i], mouse))
 		{
-			UIAction(uiSprites[i].uiType);
+			if (uiSprites[i].Action()) {
+				UIAction(uiSprites[i]);
+			}
 		}
 	}
 }
@@ -101,17 +100,17 @@ void MenuMode::Render(float dTime, SpriteBatch& batch)
 }
 
 
-void MenuMode::UIAction(Sprite::UITYPE uitype) 
+void MenuMode::UIAction(UISprite& sprite)
 {
-	if (uitype == Sprite::UITYPE::start)
+	if (sprite.uiType == UISprite::UITYPE::start)
 	{
 		Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
 	}
-	else if (uitype == Sprite::UITYPE::options) 
+	else if (sprite.uiType == UISprite::UITYPE::options)
 	{
 
 	}
-	else if (uitype == Sprite::UITYPE::quit)
+	else if (sprite.uiType == UISprite::UITYPE::quit)
 	{
 		PostQuitMessage(0);
 	}
