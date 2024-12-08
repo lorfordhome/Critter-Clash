@@ -86,7 +86,7 @@ PlayMode::PlayMode() {
 	shopCreatures.reserve(4);
 	uiSprites.reserve(4);
 
-	srand(GetTickCount());
+	srand(GetTickCount64());
 
 	Sprite _bg("Background", "map4.dds", Game::Get().GetD3D()); //temp for initialising
 	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
@@ -175,14 +175,14 @@ void PlayMode::SpawnShopCreatures()
 	}
 }
 
-void PlayMode::InitBuild() 
+void PlayMode::GenerateEnemies() //generate all enemies
 {
-	resetShop = true;
-	spriteDragging = false;
 
-	//spawn enemies
-	for (int i = 0; i < currentRound + 1; i++) 
+
+	for (int i = 0; i < currentRound + 1; i++)
 	{
+		if (i > (grid.gridWidth * grid.gridHeight))
+			return;
 		int rand = std::rand() % 3; //randomly generate creature
 		int rand2 = std::rand() % 3; //randomly generate x pos to place enemy in
 		int rand3 = std::rand() % 4;//randomly generate y pos to place enemy in
@@ -200,6 +200,27 @@ void PlayMode::InitBuild()
 			spawnEnemy(SKITTY, Vector2(rand2, rand3));
 		}
 	}
+
+	//validate that none overlap
+	for (int i = 0; i < gameCreatures.size(); i++) {
+		if (gameCreatures[i].isEnemy) {
+			for (int j = i + 1; j < gameCreatures.size();j++) {
+				// erase and replace if overlap is found
+				if(gameCreatures[j].isEnemy){}
+				if (gameCreatures[j].sprite.Position == gameCreatures[i].sprite.Position) {
+					gameCreatures.erase(gameCreatures.begin() + j);
+				}
+			}
+		}
+	}
+}
+
+void PlayMode::InitBuild() 
+{
+	resetShop = true;
+	spriteDragging = false;
+
+	GenerateEnemies();
 
 	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
 	Button.Init(Vector2(550, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });

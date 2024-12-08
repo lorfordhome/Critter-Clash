@@ -140,6 +140,7 @@ public:
 private:
 	void SetShopPositions();
 	void SpawnShopCreatures();
+	void GenerateEnemies();
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;

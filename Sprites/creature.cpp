@@ -3,10 +3,12 @@
 #include "game.h"
 
 void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed, bool isShop) {
-	if (isEnemy||isShop)
-		sprite.setGridPosition(grid, position.x, position.y,false);
-	else
-		sprite.setGridPosition(grid, position.x, position.y);
+	if (!isShop) {
+		if (isEnemy)
+			sprite.setGridPosition(grid, position.x, position.y, false);
+		else
+			sprite.setGridPosition(grid, position.x, position.y);
+	}
 	sprite.Scale = scale;
 	sprite.spriteRect = spriterect;
 	sprite.frameSize = framerect;
@@ -85,6 +87,8 @@ void Creature::ResetCreature()
 	flashTimer = 0.f;
 	ChangeAnimation(ACTION::IDLE);
 	UpdateHealthBar();
+	if (facingLeft && !isEnemy)
+		ChangeDirection();
 }
 
 void Creature::ChangeAnimation(ACTION toChangeTo)
@@ -163,7 +167,6 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 			else if ((sprite.Position.x < lastPos.x) && !facingLeft) //if creature has moved to the left
 			{
 				ChangeDirection();
-			
 			}
 		}
 
