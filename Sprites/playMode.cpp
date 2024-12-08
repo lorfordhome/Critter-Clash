@@ -86,6 +86,8 @@ PlayMode::PlayMode() {
 	shopCreatures.reserve(4);
 	uiSprites.reserve(4);
 
+	srand(GetTickCount());
+
 	Sprite _bg("Background", "map4.dds", Game::Get().GetD3D()); //temp for initialising
 	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
 	bgSprite = _bg;
@@ -118,7 +120,6 @@ void PlayMode::InitShop()
 {
 	if (resetShop) //only reset shop between rounds
 	{
-		srand(time(0));
 		SpawnShopCreatures();
 		SetShopPositions();
 		resetShop = false;
@@ -180,8 +181,25 @@ void PlayMode::InitBuild()
 	spriteDragging = false;
 
 	//spawn enemies
-	spawnEnemy(BUIZEL, Vector2(2, 3));
-	spawnEnemy(BUIZEL, Vector2(2, 1));
+	for (int i = 0; i < currentRound + 1; i++) 
+	{
+		int rand = std::rand() % 3; //randomly generate creature
+		int rand2 = std::rand() % 3; //randomly generate x pos to place enemy in
+		int rand3 = std::rand() % 4;//randomly generate y pos to place enemy in
+
+		if (rand == 0) {
+			//spawn breloom
+			spawnEnemy(BRELOOM, Vector2(rand2, rand3));
+		}
+		if (rand == 1) {
+			//spawn buizel
+			spawnEnemy(BUIZEL, Vector2(rand2, rand3));
+		}
+		if (rand == 2) {
+			//spawn skitty
+			spawnEnemy(SKITTY, Vector2(rand2, rand3));
+		}
+	}
 
 	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
 	Button.Init(Vector2(550, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
@@ -206,13 +224,13 @@ void PlayMode::InitLose()
 	logoSprite = Logo;
 	//init ui
 	UISprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
-	Button3.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button3.Init(Vector2(410, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button3.type = Sprite::spriteTYPE::UI;
 	Button3.uiType = UISprite::UITYPE::menu;
 	uiSprites.push_back(Button3);
 
 	UISprite Button("restartButton", "restartButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(400, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button.Init(Vector2(410, 400), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::restart;
 	uiSprites.push_back(Button);
@@ -302,7 +320,7 @@ void PlayMode::StoreUpdate(float dTime)
 		if (uiSprites[i].uiType != UISprite::start) //we dont want the play button to function while we're in the shop menu
 		{
 			uiSprites[i].Update(dTime);
-			if (isSpriteClickReleased(uiSprites[i], _mouse) && (!spriteDragging||(uiSprites[i].uiType==UISprite::sell&&!draggingShop)))
+			if (isSpriteClickReleased(uiSprites[i], _mouse) && ((!spriteDragging&&uiSprites[i].uiType != UISprite::sell)||(uiSprites[i].uiType==UISprite::sell&&!draggingShop&&spriteDragging)))
 			{
 				if (uiSprites[i].Action()) {
 					UIAction(uiSprites[i]);
@@ -404,7 +422,6 @@ void PlayMode::FightUpdate(float dTime)
 		{
 			if (gameCreatures[i].isEnemy) {
 				enemiesAlive--;
-				coins += gameCreatures[i].getValue ()/ 2;
 			}
 			else
 				teamAlive--;
@@ -520,6 +537,10 @@ void PlayMode::FightRender(float dTime, SpriteBatch& batch)
 	if (state == State::WIN || state == State::LOSE) {
 		logoSprite.Render(&batch);
 	}
+	if (state == State::LOSE) 
+	{
+		GetFont().DrawString(&batch, ("You got to Round " + to_string(currentRound)).c_str(), Vector2(265, 150));
+	}
 }
 
 void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
@@ -528,20 +549,16 @@ void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
 	position.x += grid.gridWidth;
 
 	if (enemyToSpawn == BRELOOM) {
-		Creature ebreloom("Breloom", "breloomIdle.dds", Game::Get().GetD3D(), true);
-		ebreloom.SpriteInit(grid, position, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f);
+		Creature ebreloom(creatureType::BRELOOM, position, grid, false, true);
 		gameCreatures.push_back(ebreloom);
 	}
 	if (enemyToSpawn == BUIZEL){
 		Creature buizel(creatureType::BUIZEL, position, grid,false,true);
-		buizel.attackRange = 50.f;
 		gameCreatures.push_back(buizel);
 }
 	if (enemyToSpawn == SKITTY){
-			Creature eSkitty("Skitty", "skittyIdle.dds", Game::Get().GetD3D(),true);
-			eSkitty.SpriteInit(grid, position, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f);
-			eSkitty.attackRange = 200.f;
-			gameCreatures.push_back(eSkitty);
+		Creature eSkitty(creatureType::SKITTY, position, grid, false, true);
+		gameCreatures.push_back(eSkitty);
 		}
 
 }
@@ -693,6 +710,8 @@ void PlayMode::UIAction(UISprite& sprite)
 		else if (sprite.uiType == UISprite::UITYPE::next)
 		{
 			ResetBoard();
+			currentRound++;
+			coins += 10 + (rand() % 10); //gain random amount of coins, minimum 10
 			InitBuild();
 		}
 		else if (sprite.uiType == UISprite::UITYPE::restart)

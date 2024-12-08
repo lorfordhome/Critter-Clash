@@ -28,6 +28,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 		SpriteInit(grid, gridPos, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f,isShop);
 		//set stats
 		maxHealth = 125;
+		attackCooldown = 1.15f;
 		//set other animations
 		Sprite wSprite("breloomWalk", "breloomWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
@@ -48,6 +49,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 		Sprite _sprite("Skitty", "skittyIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
 		SpriteInit(grid, gridPos, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f, isShop);
+		//set stats
 		attackRange = 300.f;
 		maxHealth = 75;
 		//set other animations

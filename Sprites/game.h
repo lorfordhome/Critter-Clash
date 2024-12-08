@@ -151,6 +151,7 @@ private:
 	unsigned char enemiesAlive = 0;
 	unsigned char teamAlive = 0;
 	unsigned char maxShopSlots = 4;
+	unsigned char currentRound = 1;
 	int movedSprite = 0; //index of creature being moved
 	int coins = 20;
 };
