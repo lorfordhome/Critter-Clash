@@ -18,8 +18,8 @@
 
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
-	for (int i = 0; i < grid.width; i++) {
-		for (int j = 0; j < grid.height; j++) {
+	for (int i = 0; i < grid.gridWidth; i++) {
+		for (int j = 0; j < grid.gridHeight; j++) {
 			gRect.x = (i * grid.cellSize) + grid.gridOriginX;
 			gRect.y = (j * grid.cellSize)+grid.gridOriginY;
 			if (gRect.Contains(Position)) {
@@ -37,8 +37,8 @@ Grid::Grid(MyD3D& d3d) {
 	gridSprite.setScale(Vector2(4, 4));
 	gridSprite.setSpriteRect(RECT{ 0,0,33,33 });
 
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
+	for (int i = 0; i < gridWidth; i++) {
+		for (int j = 0; j < gridHeight; j++) {
 			grid[i][j].cellValue = Tile::Container::NONE;
 		}
 	}
@@ -55,8 +55,8 @@ Tile Grid::Get(int x, int y) {
 
 void Grid::RenderGrid(float dTime,SpriteBatch* mySpriteBatch) {
 	if (visible) {
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+		for (int i = 0; i < gridWidth; i++) {
+			for (int j = 0; j < gridHeight; j++) {
 				Vector2 pos((cellSize * i)+gridOriginX, (cellSize * j)+gridOriginY);
 				gridSprite.setPos(pos);
 				gridSprite.Render(mySpriteBatch);
@@ -70,9 +70,9 @@ void Grid::updateTile(int x, int y, Tile::Container Value) {
 }
 
 void Grid::ResetTiles() {
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
-			updateTile(width, height, Tile::Container::NONE);
+	for (int i = 0; i < gridWidth; i++) {
+		for (int j = 0; j < gridHeight; j++) {
+			updateTile(i, j, Tile::Container::NONE);
 		}
 	}
 }

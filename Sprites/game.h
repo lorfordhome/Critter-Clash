@@ -30,13 +30,13 @@ class Grid {
 public: 
 	int gridOriginX = 128;
 	int gridOriginY = 128;
-	bool visible = true;
 	int XOFFSET = 15;
 	int YOFFSET = 20;
-	static constexpr int width = 3;
-	static constexpr int height = 4;
-	Tile grid[width][height];
+	static constexpr int gridWidth = 3;
+	static constexpr int gridHeight = 4;
 	static constexpr int cellSize = 128;
+	Tile grid[gridWidth][gridHeight];
+	bool visible = true;
 	Grid(MyD3D& d3d);
 	Grid();
       void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
@@ -82,13 +82,15 @@ Vector2 getGridPosition(Grid& grid, Vector2 Position);
 
 class PlayMode : public AMode {
 	enum class State{BUILD,SHOP, FIGHT, WIN, LOSE};
+	SpriteFont* pixelFont = nullptr;
+	SpriteFont* pixelFontSmall = nullptr;
 	State state = State::BUILD;
 
 	std::vector<Creature> gameCreatures{};
+	std::vector<Creature> shopCreatures{};
 	std::vector<UISprite> uiSprites{};
 	Sprite bgSprite{};
 	Sprite coinSprite{};
-	SpriteFont* pixelFont = nullptr;
 	Sprite shopSprite{};
 	Sprite logoSprite{};
 public:
@@ -115,7 +117,6 @@ public:
 	}
 
 	Grid grid;
-	ModeMgr modeManager;
 	void BuildUpdate(float dTime);
 	void StoreUpdate(float dtime);
 	void FightUpdate(float dTime);
@@ -127,17 +128,31 @@ public:
 	void dragSprite(Sprite& sprite, Mouse& mouse);
 	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
+	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
 	SpriteFont& GetFont() {
 		assert(pixelFont);
 		return *pixelFont;
 	}
+	SpriteFont& GetFontSmall() {
+		assert(pixelFontSmall);
+		return *pixelFontSmall;
+	}
 private:
+	void SetShopPositions();
+	void SpawnShopCreatures();
+	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;
-	int movedSprite=0;
+	bool resetShop = true;
+	bool draggingShop = false;
+	const unsigned char shopCreatureOffset = 45;
+	const unsigned char pixelsBetweenTilesX = 250;
+	const unsigned char pixelsBetweenTilesY = 245;
 	unsigned char enemiesAlive = 0;
 	unsigned char teamAlive = 0;
-	int coins = 10;
+	unsigned char maxShopSlots = 4;
+	int movedSprite = 0; //index of creature being moved
+	int coins = 20;
 };
 
 bool isSpriteClicked(Sprite& sprite, Mouse& mouse);

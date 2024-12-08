@@ -52,7 +52,6 @@ public:
 	Vector2 previousGridPos = Vector2(0, 0);
 	bool active = true;
 	Vector2 Position{ 400,400 };
-	void Init(Vector2 position,Vector2 scale,Vector2 origin);
 	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
 	virtual void Update(float dTime);
@@ -67,7 +66,6 @@ public:
 	bool setGridPosition(Grid& grid,int x, int y, bool checkCol=true);
 	void setSpriteRect(RECT& SpriteRect) {
 		spriteRect = SpriteRect;
-		dim = (RECT{long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y)});
 	}
 	RECT getDim() {
 		dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
@@ -75,6 +73,9 @@ public:
 	}
 	const RECT getspriteRect() {
 		return spriteRect;
+	}
+	const RECT getFrameSize() {
+		return frameSize;
 	}
 	void setColour(XMVECTOR newCol) {
 		colour = newCol;
@@ -111,7 +112,7 @@ public:
 	UISprite(string spriteName, string path, MyD3D& d3d);
 	UISprite();
 	enum UITYPE {
-		none, start, options, next, restart, menu, quit, store
+		none, start, options, next, restart, menu, quit, store,sell
 	};
 	UITYPE uiType = UITYPE::none;
 	float clickCooldown = 0;//how long before button can be clicked again
