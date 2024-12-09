@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 {
 
 	int w(1024), h(768);
-	if (!WinUtil::Get().InitMainWindow(w, h, hInstance, "DX11 Test", MainWndProc, true))
+	if (!WinUtil::Get().InitMainWindow(w, h, hInstance, "Critter Clash", MainWndProc, true))
 		assert(false);
 
 	MyD3D d3d;

@@ -69,9 +69,10 @@ MenuMode::MenuMode()
 	Button3.uiType = UISprite::UITYPE::quit;
 	uiSprites.push_back(Button3);
 
-	Sprite Logo("Logo", "muddyLogo.dds", Game::Get().GetD3D());
-	Logo.Init(Vector2(125, 0), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,757,113 });
+	Sprite Logo("Logo", "Logo.dds", Game::Get().GetD3D());
+	Logo.Init(Vector2(230, 75), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,502,89 });
 	logoSprite = Logo;
+
 }
 
 void MenuMode::Update(float dTime)

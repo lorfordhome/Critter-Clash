@@ -1,19 +1,4 @@
 #pragma once
-#include <windows.h>
-#include <string>
-#include <cassert>
-#include <d3d11.h>
-#include <iomanip>
-#include <vector>
-#include "creature.h"
-#include "WindowUtils.h"
-#include "D3DUtil.h"
-#include "D3D.h"
-#include "SimpleMath.h"
-#include "SpriteFont.h"
-#include "DDSTextureLoader.h"
-#include "CommonStates.h"
-#include "sprite.h"
 #include "game.h"
 
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
@@ -22,6 +7,20 @@ Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 		for (int j = 0; j < grid.gridHeight; j++) {
 			gRect.x = (i * grid.cellSize) + grid.gridOriginX;
 			gRect.y = (j * grid.cellSize)+grid.gridOriginY;
+			if (gRect.Contains(Position)) {
+				return Vector2(i, j);
+			}
+		}
+	}
+	return Vector2(420, 420);//can't find gridpos
+}
+
+Vector2 getGridPosition(int gridWidth,int gridHeight,int gridCellSize,int gridOriginX,int gridOriginY, Vector2 Position) {
+	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,gridCellSize,gridCellSize });
+	for (int i = 0; i < gridWidth; i++) {
+		for (int j = 0; j < gridHeight; j++) {
+			gRect.x = (i * gridCellSize) + gridOriginX;
+			gRect.y = (j * gridCellSize) + gridOriginY;
 			if (gRect.Contains(Position)) {
 				return Vector2(i, j);
 			}
@@ -79,6 +78,8 @@ void Grid::ResetTiles() {
 
 Game::Game(MyD3D& d3d) :md3d(d3d)
 {
+	File::initialiseSystem();
+	audioManager.Initialise();
 	mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
 	mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
 	md3d.GetCache().SetAssetPath("data/");
@@ -86,6 +87,7 @@ Game::Game(MyD3D& d3d) :md3d(d3d)
 	mModeMgr.AddMode(new PlayMode());
 	mModeMgr.AddMode(new MenuMode());
 	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
+	audioManager.GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &musicHdl, audioManager.GetSongMgr()->GetVolume());
 }
 
 
@@ -97,6 +99,7 @@ void Game::Release() {
 
 void Game::Update(float dTime)
 {
+	audioManager.Update();
 	mModeMgr.Update(dTime);
 }
 void Game::Render(float dTime)

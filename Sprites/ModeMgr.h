@@ -56,6 +56,20 @@ public:
 
 };
 
+class IntroMode :public AMode 
+{
+	Sprite bgSprite;
+
+public:
+	IntroMode();
+	void Update(float dTime) override;
+	void Render(float dTime, SpriteBatch& batch) override;
+	static const GAMEMODE MODE_NAME = GAMEMODE::INTRO;
+	GAMEMODE GetMName() const override {
+		return GAMEMODE::INTRO;
+	}
+};
+
 /*
 organise all the mode instances and call them at the right time, switch between them
 */

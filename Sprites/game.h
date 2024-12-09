@@ -1,17 +1,9 @@
 #pragma once
-#include <windows.h>
-#include <string>
-#include <cassert>
-#include <d3d11.h>
-#include <iomanip>
-#include <vector>
-
 #include "WindowUtils.h"
 #include "D3DUtil.h"
 #include "D3D.h"
 #include "SimpleMath.h"
 #include "SpriteFont.h"
-#include "DDSTextureLoader.h"
 #include "CommonStates.h"
 #include "sprite.h"
 #include <stdexcept>
@@ -19,6 +11,7 @@
 #include "Singleton.h"
 #include "creature.h"
 #include "ModeMgr.h"
+#include "AudioMgrFMOD.h"
 
 struct Tile {
 	enum Container {NONE=0,CREATURE=1,ABILITY=2};
@@ -70,13 +63,16 @@ public:
 	//getters
 	MyD3D& GetD3D() { return md3d; }
 	ModeMgr& GetModeMgr() { return mModeMgr; }
+	AudioMgrFMOD& getAudioMgr() { return audioManager; }
+	unsigned int musicHdl = 1;
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
 	ModeMgr mModeMgr;
+	AudioMgrFMOD audioManager;
 };
 Vector2 getGridPosition(Grid& grid, Vector2 Position);
-
+Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize, int gridOriginX, int gridOriginY, Vector2 Position);
 
 //GAME MODES
 
@@ -126,7 +122,7 @@ public:
 	void InitBattle();
 	void FightRender(float dTime,SpriteBatch& batch);
 	void dragSprite(Sprite& sprite, Mouse& mouse);
-	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse);
+	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev=false);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
 	SpriteFont& GetFont() {
@@ -141,6 +137,7 @@ private:
 	void SetShopPositions();
 	void SpawnShopCreatures();
 	void GenerateEnemies();
+	void GenerateEnemy();
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;

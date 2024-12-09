@@ -177,46 +177,54 @@ void PlayMode::SpawnShopCreatures()
 
 void PlayMode::GenerateEnemies() //generate all enemies
 {
-
-
-	for (int i = 0; i < currentRound + 1; i++)
+	
+	while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
 	{
-		if (i > (grid.gridWidth * grid.gridHeight))
+		GenerateEnemy();
+		if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
 			return;
-		int rand = std::rand() % 3; //randomly generate creature
-		int rand2 = std::rand() % 3; //randomly generate x pos to place enemy in
-		int rand3 = std::rand() % 4;//randomly generate y pos to place enemy in
-
-		if (rand == 0) {
-			//spawn breloom
-			spawnEnemy(BRELOOM, Vector2(rand2, rand3));
-		}
-		if (rand == 1) {
-			//spawn buizel
-			spawnEnemy(BUIZEL, Vector2(rand2, rand3));
-		}
-		if (rand == 2) {
-			//spawn skitty
-			spawnEnemy(SKITTY, Vector2(rand2, rand3));
-		}
 	}
 
-	//validate that none overlap
-	for (int i = 0; i < gameCreatures.size(); i++) {
-		if (gameCreatures[i].isEnemy) {
-			for (int j = i + 1; j < gameCreatures.size();j++) {
-				// erase and replace if overlap is found
-				if(gameCreatures[j].isEnemy){}
-				if (gameCreatures[j].sprite.Position == gameCreatures[i].sprite.Position) {
-					gameCreatures.erase(gameCreatures.begin() + j);
-				}
+}
+
+void PlayMode::GenerateEnemy() 
+{
+	int rand2 = std::rand() % 3; //randomly generate x pos to place enemy in
+	int rand3 = std::rand() % 4;//randomly generate y pos to place enemy in
+
+
+	for (auto it = gameCreatures.begin(); it != gameCreatures.end();++it) {
+		if ((*it).isEnemy) {
+			if (getGridPosition((grid.gridWidth*2),grid.gridHeight,grid.cellSize,grid.gridOriginX,grid.gridOriginY, (*it).sprite.Position) == Vector2(rand2+grid.gridWidth, rand3) )
+			{
+				return; //can't spawn enemy - will overlap
 			}
 		}
 	}
+	//if it didn't return, a valid position was created - now we can spawn the enemy
+
+	int rand = std::rand() % 3; //randomly generate creature
+	if (rand == 0) {
+		//spawn breloom
+		spawnEnemy(BRELOOM, Vector2(rand2, rand3));
+	}
+	if (rand == 1) {
+		//spawn buizel
+		spawnEnemy(BUIZEL, Vector2(rand2, rand3));
+	}
+	if (rand == 2) {
+		//spawn skitty
+		spawnEnemy(SKITTY, Vector2(rand2, rand3));
+	}
+	enemiesAlive++;
 }
 
 void PlayMode::InitBuild() 
 {
+	//check if music is playing - if no, load music
+	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
 	resetShop = true;
 	spriteDragging = false;
 
@@ -273,6 +281,12 @@ void PlayMode::InitWin()
 
 void PlayMode::InitBattle()
 {
+	//music
+	if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Stop();
+		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("BattleMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
+
 	//store grid position before fight
 	for (int i = 0; i < gameCreatures.size(); ++i) {
 		if (!gameCreatures[i].isEnemy)
@@ -393,7 +407,7 @@ void PlayMode::StoreUpdate(float dTime)
 		if (draggingShop){
 			dragSprite(shopCreatures[movedSprite].sprite, _mouse);
 			if (_mouse.isClickRelease()) {
-				if (isGridClicked(grid, shopCreatures[movedSprite].sprite, _mouse))
+				if (isGridClicked(grid, shopCreatures[movedSprite].sprite, _mouse, true))
 				{
 					//player placed shop creature into their team
 					spriteDragging = false;
@@ -582,6 +596,7 @@ void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
 		gameCreatures.push_back(eSkitty);
 		}
 
+
 }
 
 void PlayMode::StoreRender(float dTime, SpriteBatch& batch)
@@ -688,16 +703,26 @@ bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
 	return false;
 }
 
-bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse) {
+bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev) {
 	Vector2 gridPos = getGridPosition(grid, sprite.Position);
 
 	//has player clicked within the grid?
 	if (Game::Get().mouse.isClickRelease() && getGridPosition(grid, Game::Get().mouse.GetMousePos(true)) != Vector2(420, 420))
 	{
-		if (gridPos == getGridPosition(grid, mouse.GetMousePos(true)))
+		if (!noPrev) {
+			if (gridPos == getGridPosition(grid, mouse.GetMousePos(true)))
+			{
+				if (sprite.setGridPosition(grid, gridPos.x, gridPos.y))
+					return true;
+			}
+		}
+		else
 		{
-			if (sprite.setGridPosition(grid, gridPos.x, gridPos.y))
-				return true;
+			if (gridPos == getGridPosition(grid, mouse.GetMousePos(true)))
+			{
+				if (sprite.setGridPositionNoPrev(grid, gridPos.x, gridPos.y))
+					return true;
+			}
 		}
 	}
 	return false;
@@ -733,6 +758,7 @@ void PlayMode::UIAction(UISprite& sprite)
 			ResetBoard();
 			currentRound++;
 			coins += 10 + (rand() % 10); //gain random amount of coins, minimum 10
+			Game::Get().getAudioMgr().GetSongMgr()->Stop();
 			InitBuild();
 		}
 		else if (sprite.uiType == UISprite::UITYPE::restart)
@@ -795,8 +821,10 @@ void PlayMode::ResetBoard()
 	for (auto it = gameCreatures.begin(); it != gameCreatures.end(); ++it)
 	{
 		(*it).ResetCreature();
-		(*it).sprite.setGridPosition(grid, (*it).sprite.previousGridPos.x, (*it).sprite.previousGridPos.y, false);
+		(*it).sprite.setGridPositionNoPrev(grid, (*it).sprite.previousGridPos.x, (*it).sprite.previousGridPos.y);
 	}
+	enemiesAlive = 0;
+	teamAlive = 0;
 	shopCreatures.clear();
 	uiSprites.clear();
 }

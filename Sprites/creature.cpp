@@ -169,6 +169,8 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 				ChangeDirection();
 			}
 		}
+		else if (!isEnemy && facingLeft)
+			ChangeDirection();
 
 		sprite.Update(dTime);
 		lastPos = sprite.Position;

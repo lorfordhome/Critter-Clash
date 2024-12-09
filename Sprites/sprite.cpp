@@ -31,6 +31,20 @@ bool Sprite::setGridPosition(Grid& grid,int x,int y, bool checkCol) {
 		return false;
 }
 
+bool Sprite::setGridPositionNoPrev(Grid& grid, int x, int y, bool checkCol) {
+	if (!checkCol) {
+		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET + grid.gridOriginX), float((y * grid.cellSize) + grid.YOFFSET + grid.gridOriginY)));
+		return true;
+	}
+	if (grid.Get(x, y).cellValue != Tile::CREATURE) {
+		Position = (Vector2(float((x * grid.cellSize) + grid.XOFFSET + grid.gridOriginX), float((y * grid.cellSize) + grid.YOFFSET + grid.gridOriginY)));
+		grid.updateTile(x, y, Tile::CREATURE);
+		return true;
+	}
+	else
+		return false;
+}
+
 Sprite::Sprite() {
 	texture = nullptr;
 };

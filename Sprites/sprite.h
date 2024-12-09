@@ -64,6 +64,8 @@ public:
 		Position = pos;
 	}
 	bool setGridPosition(Grid& grid,int x, int y, bool checkCol=true);
+	//change grid pos without resetting previous pos to empty
+	bool setGridPositionNoPrev(Grid& grid, int x, int y, bool checkCol=true); 
 	void setSpriteRect(RECT& SpriteRect) {
 		spriteRect = SpriteRect;
 	}
