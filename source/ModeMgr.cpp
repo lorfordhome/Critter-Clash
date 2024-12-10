@@ -90,6 +90,9 @@ MenuMode::MenuMode()
 
 void MenuMode::Update(float dTime)
 {
+	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
 	Mouse& mouse = Game::Get().mouse;
 	//UPDATE UI
 	for (int i = 0; i < uiSprites.size(); i++)

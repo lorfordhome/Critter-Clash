@@ -15,6 +15,7 @@ private:
 	Sprite attackSprite;
 	Sprite healthBar;
 	void ChangeDirection();
+	void PlayDeathSFX();
 public:
 	creatureType type=creatureType::NONE;
 	Sprite sprite; //active sprite
@@ -61,6 +62,7 @@ public:
 	void TakeDamage(float damage);
 	void Render(SpriteBatch* Batch,bool renderHealth=true);
 	void ResetCreature();
+
 
 	//functions for generating shop display data
 	const char* getName();

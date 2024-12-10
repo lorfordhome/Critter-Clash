@@ -65,6 +65,7 @@ public:
 	ModeMgr& GetModeMgr() { return mModeMgr; }
 	AudioMgrFMOD& getAudioMgr() { return audioManager; }
 	unsigned int musicHdl = 1;
+	unsigned int sfxHdl = 2;
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
@@ -138,6 +139,9 @@ private:
 	void SpawnShopCreatures();
 	void GenerateEnemies();
 	void GenerateEnemy();
+	//call when placing creature
+	void PlaceCreatureSFX(Creature& creature);
+
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;

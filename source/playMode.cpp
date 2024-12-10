@@ -265,6 +265,10 @@ void PlayMode::InitLose()
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::restart;
 	uiSprites.push_back(Button);
+	if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Stop();
+	}
+	Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Defeat"), false, false, &Game::Get().sfxHdl);
 }
 void PlayMode::InitWin()
 {
@@ -279,6 +283,10 @@ void PlayMode::InitWin()
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::next;
 	uiSprites.push_back(Button);
+	if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Stop();
+	}
+	Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Victory"), false, false, &Game::Get().sfxHdl);
 }
 
 void PlayMode::InitBattle()
@@ -300,6 +308,10 @@ void PlayMode::InitBattle()
 
 void PlayMode::BuildUpdate(float dTime)
 {
+	//make sure music is playing
+	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
 	//pull mouse now to save on performance
 	Mouse& _mouse = Game::Get().mouse;
 	//UPDATE UI
@@ -336,6 +348,7 @@ void PlayMode::BuildUpdate(float dTime)
 			{
 				//pressed
 				spriteDragging = false;
+				PlaceCreatureSFX(gameCreatures[movedSprite]);
 			}
 			else {
 				//user tried to place sprite in invalid position - reset the sprite to original pos
@@ -344,6 +357,21 @@ void PlayMode::BuildUpdate(float dTime)
 			}
 		}
 
+	}
+}
+
+void PlayMode::PlaceCreatureSFX(Creature& creature) 
+{
+	switch (creature.type) {
+	case BUIZEL:
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("BuizelHi"), false, false, &Game::Get().sfxHdl);
+		break;
+	case BRELOOM:
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("BreloomHi"), false, false, &Game::Get().sfxHdl);
+		break;
+	case SKITTY:
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("SkittyHi"), false, false, &Game::Get().sfxHdl);
+		break;
 	}
 }
 
@@ -411,7 +439,9 @@ void PlayMode::StoreUpdate(float dTime)
 			if (_mouse.isClickRelease()) {
 				if (isGridClicked(grid, shopCreatures[movedSprite].sprite, _mouse, true))
 				{
+
 					//player placed shop creature into their team
+					PlaceCreatureSFX(shopCreatures[movedSprite]);
 					spriteDragging = false;
 					draggingShop = false;
 					coins -= shopCreatures[movedSprite].getValue();
@@ -437,6 +467,7 @@ void PlayMode::StoreUpdate(float dTime)
 				{
 					//pressed
 					spriteDragging = false;
+					PlaceCreatureSFX(gameCreatures[movedSprite]);
 				}
 				else {
 					//user tried to place sprite in invalid position - reset the sprite to original pos
@@ -765,13 +796,14 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::UITYPE::restart)
 		{
-			//MyD3D& tempd3d = Game::Get().GetD3D();
-			//delete& Game::Get();
-			//new Game(tempd3d);
-			//Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
 			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
 			Game::Get().GetModeMgr().AddMode(new PlayMode());
 			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+			//reset music
+			if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+				Game::Get().getAudioMgr().GetSongMgr()->Stop();
+				Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+			}
 
 
 		}
@@ -780,6 +812,11 @@ void PlayMode::UIAction(UISprite& sprite)
 			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
 			Game::Get().GetModeMgr().AddMode(new PlayMode());
 			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
+			//reset music
+			if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+				Game::Get().getAudioMgr().GetSongMgr()->Stop();
+				Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+			}
 		}
 		else if (sprite.uiType == UISprite::UITYPE::store)
 		{
@@ -803,6 +840,7 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::sell) 
 		{
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("sell"), false, false, &Game::Get().sfxHdl);
 			grid.updateTile(gameCreatures[movedSprite].sprite.previousGridPos.x, gameCreatures[movedSprite].sprite.previousGridPos.y, Tile::NONE);
 			coins += gameCreatures[movedSprite].getValue()/2;
 			gameCreatures.erase(gameCreatures.begin() + movedSprite);

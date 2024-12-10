@@ -192,6 +192,7 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 		}
 
 		if (health <= 0) {
+			PlayDeathSFX();
 			active = false;
 			sprite.active = false;
 			readyToAttack = false;
@@ -203,10 +204,43 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 }
 
 
+void Creature::PlayDeathSFX() 
+{
+	if (isEnemy) {
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("EnemyDeath"), false, false, &Game::Get().sfxHdl);
+	}
+	else 
+	{
+		switch (type) {
+		case BUIZEL:
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("BuizelSad"), false, false, &Game::Get().sfxHdl);
+			break;
+		case BRELOOM:
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("BreloomSad"), false, false, &Game::Get().sfxHdl);
+			break;
+		case SKITTY:
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("SkittySad"), false, false, &Game::Get().sfxHdl);
+			break;
+		}
+	}
+}
+
+
 void Creature::Attack(Creature& target)
 {
 	target.TakeDamage(attackDmg);
 	attackTimer = 0.f;
+	//play sfx
+	int soundIdx = std::rand() % 3;
+	if (soundIdx == 0) {
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("strike1"), false, false, &Game::Get().sfxHdl);
+	}
+	if (soundIdx == 1) {
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("strike2"), false, false, &Game::Get().sfxHdl);
+	}
+	if (soundIdx == 2) {
+		Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("strike3"), false, false, &Game::Get().sfxHdl);
+	}
 }
 
 void Creature::TakeDamage(float damage) 

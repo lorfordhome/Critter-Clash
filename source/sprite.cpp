@@ -146,6 +146,16 @@ bool UISprite::Action()
 {
 	if (canBeClicked) {
 		clickTimer = 0; //makes sure clickTimer is reset
+		int soundIdx = std::rand() % 3;
+		if (soundIdx == 0) {
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Click1"), false, false, &Game::Get().sfxHdl);
+		}
+		if (soundIdx == 1) {
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Click2"), false, false, &Game::Get().sfxHdl);
+		}
+		if (soundIdx == 2) {
+			Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Click3"), false, false, &Game::Get().sfxHdl);
+		}
 		return true;
 	}
 	else {
