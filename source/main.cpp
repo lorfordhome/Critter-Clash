@@ -82,10 +82,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 		dTime = WinUtil::Get().EndLoop(canUpdateRender);
 	}
 
-	delete &Game::Get();
 	#ifdef _DEBUG
 	d3d.ReleaseD3D(true);	
-
+	delete& Game::Get();
 	#else
 	d3d.ReleaseD3D(false);
 	#endif

@@ -93,6 +93,8 @@ public:
 	//left to the destructor
 	void Release();
 
+	void DeleteMode(GAMEMODE modeToDelete);
+
 private:
 	std::vector<AMode*> mModes;	//container of modes
 	int mCurrentMIdx = -1;		//the one that is active

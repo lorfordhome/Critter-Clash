@@ -95,6 +95,8 @@ void Game::Release() {
 	delete mySpriteBatch;
 	mySpriteBatch = nullptr;
 	mModeMgr.Release();
+	md3d.GetCache().Release();
+	audioManager.Shutdown();
 }
 
 void Game::Update(float dTime)
@@ -104,7 +106,7 @@ void Game::Update(float dTime)
 }
 void Game::Render(float dTime)
 {
-	md3d.BeginRender(Vector4(0.1843137254901961, 0.5058823529411764, 0.21176470588235294, 1));
+	md3d.BeginRender(Vector4(0.1843137254901961, 0.5058823529411764, 0.21176470588235294, 1)); //hexcode for background colour
 
 
 	CommonStates dxstate(&md3d.GetDevice());

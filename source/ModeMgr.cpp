@@ -39,9 +39,22 @@ void ModeMgr::AddMode(AMode* p) {
 }
 
 void ModeMgr::Release() {
-	//for (size_t i = 0; i < mModes.size(); ++i)
-	//	delete mModes[i];
+	for (size_t i = 0; i < mModes.size(); ++i)
+		delete mModes[i];
 	mModes.clear();
+}
+
+void ModeMgr::DeleteMode(GAMEMODE modeToDelete) {
+	int idx = 0;
+	assert(!mModes.empty());
+	while (idx < (int)mModes.size() && mModes[idx]->GetMName() != modeToDelete)
+		++idx;
+	assert(idx < (int)mModes.size());
+	delete mModes[idx];
+	auto it = mModes.begin();
+	it += idx;
+	mModes.erase(it);
+
 }
 
 MenuMode::MenuMode() 

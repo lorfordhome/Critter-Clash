@@ -43,6 +43,7 @@ public:
 	bool isHover = false;
 	~Sprite() {
 		texture = nullptr;
+		delete texture;
 	}
 	enum spriteTYPE
 	{

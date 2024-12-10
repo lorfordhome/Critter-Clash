@@ -139,7 +139,7 @@ void PlayMode::SetShopPositions()
 {
 	Vector2 Pos = { baseTilePos.x + shopCreatureOffset,baseTilePos.y + shopCreatureOffset };
 	for (int i = 0; i < shopCreatures.size(); ++i) {
-		//messy solution - fix later
+		//messy solution - fix later?
 		if (i == 0)
 			shopCreatures[i].sprite.setPos(Pos);
 		else if (i == 1)
@@ -225,11 +225,13 @@ void PlayMode::InitBuild()
 	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
 		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
 	}
+	//reset bools
 	resetShop = true;
 	spriteDragging = false;
 
 	GenerateEnemies();
-
+	
+	//init ui
 	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
 	Button.Init(Vector2(550, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
@@ -763,16 +765,21 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::UITYPE::restart)
 		{
-			MyD3D& tempd3d = Game::Get().GetD3D();
-			delete& Game::Get();
-			new Game(tempd3d);
+			//MyD3D& tempd3d = Game::Get().GetD3D();
+			//delete& Game::Get();
+			//new Game(tempd3d);
+			//Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
+			Game::Get().GetModeMgr().AddMode(new PlayMode());
 			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+
+
 		}
 		else if (sprite.uiType == UISprite::UITYPE::menu)
 		{
-			MyD3D& tempd3d = Game::Get().GetD3D();
-			delete& Game::Get();
-			new Game(tempd3d);
+			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
+			Game::Get().GetModeMgr().AddMode(new PlayMode());
+			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
 		}
 		else if (sprite.uiType == UISprite::UITYPE::store)
 		{

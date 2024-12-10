@@ -93,7 +93,7 @@ public:
 	~PlayMode() 
 	{
 		delete pixelFont;
-		pixelFont = nullptr;
+		delete pixelFontSmall;
 		gameCreatures.clear();
 		uiSprites.clear();
 	}
