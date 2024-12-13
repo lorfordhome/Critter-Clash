@@ -116,8 +116,8 @@ void Creature::UpdateHealthBar()
 
 void Creature::ChangeDirection() 
 {
-	RECT _rect = idleSprite.getspriteRect();
-	RECT _rect2 = walkSprite.getspriteRect();
+	RECT _rect = idleSprite.getSpriteRect();
+	RECT _rect2 = walkSprite.getSpriteRect();
 	if (!facingLeft) 
 	{
 		idleSprite.setSpriteRect(RECT{ _rect.left,idleSprite.getFrameSize().bottom * 6,_rect.right, idleSprite.getFrameSize().bottom * 7 });

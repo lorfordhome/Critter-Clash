@@ -3,16 +3,19 @@
 #include <d3d11.h>
 #include "SimpleMath.h"
 #include "TexCache.h"
+#include "FX.h"
+#include "Mesh.h"
 
 /*
 Wrap up DirectX11 - the minimum bits we need to render
 */
+
 class MyD3D
 {
 public:
-
+	MyD3D() : mFX(*this) {};
 	//main start up function
-	bool InitDirect3D(void(*pOnResize)(int, int, MyD3D&));
+	bool InitDirect3D();
 	//default minimum behaviour when ALT+ENTER or drag or resize
 	//parameters are new width and height of window
 	void OnResize_Default(int clientWidth, int clientHeight);
@@ -22,40 +25,49 @@ public:
 	void ReleaseD3D(bool extraReporting = true);
 	//is the screen/window square or letterbox or?
 	float GetAspectRatio();
-	//don't display anything unless it's between a BeginRender() and an EndRender()
-	//there should only be ONE of each in your program
 	void BeginRender(const DirectX::SimpleMath::Vector4& colour);
 	void EndRender();
-	//is everything setup OK?
-	bool GetDeviceReady() const {
-		return mpd3dDevice!=nullptr;
-	}
 	ID3D11Device& GetDevice() {
-		assert(GetDeviceReady());
+		assert(mpd3dDevice);
 		return *mpd3dDevice;
 	}
 	ID3D11DeviceContext& GetDeviceCtx() {
-		assert(GetDeviceReady());
+		assert(mpd3dImmediateContext);
 		return *mpd3dImmediateContext;
+	}
+	bool GetDeviceReady() const {
+		return mpd3dDevice != nullptr;
 	}
 	//see mpOnResize
 	void OnResize(int sw, int sh, MyD3D& d3d) {
-		assert(mpOnResize);
-		mpOnResize(sw, sh, d3d);
+		if (mpOnResize)
+			mpOnResize(sw, sh, d3d);
+		else
+			OnResize_Default(sw, sh);
 	}
-	const std::wstring& GetGPUDesc() const {
-		return mGPUDesc;
+	void SetOnResize(void(*pOnResize)(int, int, MyD3D&)) {
+		mpOnResize = pOnResize;
 	}
-	const DirectX::SimpleMath::Rectangle GetViewportRect();
-	TexCache& GetCache();
+	TexCache& GetCache() { return mTexCache; }
+	MeshMgr& GetMeshMgr() { return mMeshMgr; }
+	FX::MyFX& GetFX() { return mFX; }
+	ID3D11SamplerState& GetWrapSampler() {
+		assert(mpWrapSampler);
+		return *mpWrapSampler;
+	}
+	void InitInputAssembler(ID3D11InputLayout* pInputLayout, ID3D11Buffer* pVBuffer, UINT szVertex, ID3D11Buffer* pIBuffer,
+		D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 private:
 	TexCache mTexCache;
+	MeshMgr mMeshMgr;
+	FX::MyFX mFX;
 	//what type of gpu have we got - hopefully a hardware one
 	D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_UNKNOWN;
 	//texture multisampling quality level supported
-	UINT m4xMsaaQuality=0;
+	UINT m4xMsaaQuality = 0;
 	//depth buffer for sorting pixels by distance from camera
-	ID3D11Texture2D* mpDepthStencilBuffer=nullptr;
+	ID3D11Texture2D* mpDepthStencilBuffer = nullptr;
 	bool mEnable4xMsaa = true;
 	//running in a window?
 	bool mWindowed = false;
@@ -75,8 +87,8 @@ private:
 	//a function to call when we ALT+ENTER or drag the window
 	//two parameters are width/height of the new window and this
 	void(*mpOnResize)(int, int, MyD3D&) = nullptr;
-	//gpu description
-	std::wstring mGPUDesc;
+
+	ID3D11SamplerState* mpWrapSampler = nullptr;
 
 	//heavy lifting to start D3D11
 	void CreateD3D(D3D_FEATURE_LEVEL desiredFeatureLevel = D3D_FEATURE_LEVEL_11_0);
@@ -96,7 +108,11 @@ private:
 	void CreateSwapChainDescription(DXGI_SWAP_CHAIN_DESC& sd, HWND hMainWnd, bool windowed, int screenWidth, int screenHeight);
 	//once you have a description you can create the swapchain needed
 	void CreateSwapChain(DXGI_SWAP_CHAIN_DESC& sd);
+
+	void CreateWrapSampler(ID3D11SamplerState*& pSampler);
+
 };
+
 
 
 

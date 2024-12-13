@@ -1,5 +1,11 @@
 #pragma once
 #include "game.h"
+#include "WindowUtils.h"
+#include "D3D.h"
+#include "GeometryBuilder.h"
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
 
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
@@ -106,7 +112,7 @@ void Game::Update(float dTime)
 }
 void Game::Render(float dTime)
 {
-	md3d.BeginRender(Vector4(0.1843137254901961, 0.5058823529411764, 0.21176470588235294, 1)); //hexcode for background colour
+	md3d.BeginRender(Vector4(0.1843f, 0.5058f, 0.2117f, 1)); //hexcode for background colour
 
 
 	CommonStates dxstate(&md3d.GetDevice());

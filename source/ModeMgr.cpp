@@ -3,7 +3,6 @@
 #include "game.h"
 
 
-
 void ModeMgr::SwitchMode(GAMEMODE newMode) {
 	int idx = 0;
 	assert(!mModes.empty());
@@ -57,6 +56,20 @@ void ModeMgr::DeleteMode(GAMEMODE modeToDelete) {
 
 }
 
+void Setup(Model& m, Mesh& source, const Vector3& scale, const Vector3& pos, const Vector3& rot)
+{
+	m.Initialise(source);
+	m.GetScale() = scale;
+	m.GetPosition() = pos;
+	m.GetRotation() = rot;
+}
+
+void Setup(Model& m, Mesh& source, float scale, const Vector3& pos, const Vector3& rot)
+{
+	Setup(m, source, Vector3(scale, scale, scale), pos, rot);
+}
+
+
 MenuMode::MenuMode() 
 {
 	Sprite _bg("Background", "map4.dds", Game::Get().GetD3D());
@@ -86,6 +99,23 @@ MenuMode::MenuMode()
 	Logo.Init(Vector2(230, 75), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,502,89 });
 	logoSprite = Logo;
 
+	//init 3d
+	Model m;
+	mModels.insert(mModels.begin(), 2, m);
+
+	Mesh& quadMesh = BuildQuad(Game::Get().GetD3D().GetMeshMgr());
+	Mesh& cubeMesh = BuildCube(Game::Get().GetD3D().GetMeshMgr());
+
+	Mesh& br = Game::Get().GetD3D().GetMeshMgr().CreateMesh("Breloom");
+	br.CreateFrom("../bin/data/Breloom/model.obj", Game::Get().GetD3D());
+	Setup(mModels[0], br, .5f, Vector3(1.2, 0.5f, -2.5f), Vector3(PI*2, 0, 0));
+	Game::Get().GetD3D().GetFX().SetupDirectionalLight(0, true, Vector3(-0.7f, -0.7f, 0.7f), Vector3(0.47f, 0.47f, 0.47f), Vector3(0.15f, 0.15f, 0.15f), Vector3(0.25f, 0.25f, 0.25f));
+
+	Mesh& sk = Game::Get().GetD3D().GetMeshMgr().CreateMesh("Skitty");
+	sk.CreateFrom("../bin/data/Skitty/model.obj", Game::Get().GetD3D());
+	Setup(mModels[1], sk, .5f, Vector3(-0.4, -0.5f, -2.5f), Vector3(PI * 2, 0, 0));
+	Game::Get().GetD3D().GetFX().SetupDirectionalLight(0, true, Vector3(-0.7f, -0.7f, 0.7f), Vector3(0.47f, 0.47f, 0.47f), Vector3(0.15f, 0.15f, 0.15f), Vector3(0.25f, 0.25f, 0.25f));
+
 }
 
 void MenuMode::Update(float dTime)
@@ -95,7 +125,7 @@ void MenuMode::Update(float dTime)
 	}
 	Mouse& mouse = Game::Get().mouse;
 	//UPDATE UI
-	for (int i = 0; i < uiSprites.size(); i++)
+	for (size_t i = 0; i < uiSprites.size(); i++)
 	{
 		uiSprites[i].Update(dTime);
 		if (isSpriteClickReleased(uiSprites[i], mouse))
@@ -105,17 +135,45 @@ void MenuMode::Update(float dTime)
 			}
 		}
 	}
+
+	//Update 3D models
+	for (size_t i = 0; i < mModels.size(); ++i) {
+		mModels[i].GetPosition().y = (sinf(2 * GetClock() + (PI / 4) * i)) * 0.2f;
+		mModels[i].GetRotation().y += (i < 2) ? dTime : -dTime;
+	}
 }
 
 void MenuMode::Render(float dTime, SpriteBatch& batch) 
 {
-	bgSprite.Render(&batch);
+
 	logoSprite.Render(&batch);
-	for (int i = 0; i < uiSprites.size(); i++) {
+	for (size_t i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render(&batch);
 	}
-}
 
+
+	//3d rendering begin
+	mCamPos = Vector3(1, 1, -5);
+	float alpha = 0.5f + sinf(gAngle * 2) * 0.5f;
+
+	Game::Get().GetD3D().GetFX().SetPerFrameConsts(Game::Get().GetD3D().GetDeviceCtx(), mCamPos);
+
+	CreateViewMatrix(Game::Get().GetD3D().GetFX().GetViewMatrix(), mCamPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
+	CreateProjectionMatrix(Game::Get().GetD3D().GetFX().GetProjectionMatrix(), 0.25f * PI, WinUtil::Get().GetAspectRatio(), 1, 1000.f);
+	Matrix w = Matrix::CreateRotationY(sinf(gAngle));
+	Game::Get().GetD3D().GetFX().SetPerObjConsts(Game::Get().GetD3D().GetDeviceCtx(), w);
+
+	Vector3 dir = Vector3(1, 0, 0);
+	Matrix m = Matrix::CreateRotationY(gAngle);
+	dir = dir.TransformNormal(dir, m);
+	dir *= -1;
+	float d = sinf(gAngle) * 0.5f + 0.5f;
+
+
+	for (auto& mod : mModels)
+		Game::Get().GetD3D().GetFX().Render(mod);
+	//3d rendering end
+}
 
 void MenuMode::UIAction(UISprite& sprite)
 {

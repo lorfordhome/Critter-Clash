@@ -28,8 +28,8 @@ protected:
 	float animSpeed = 0.8f; //lower value = faster animation
 	float Rotation = 0;
 	RECT spriteRect={ 0,0,0,0 };
-	bool isAnim = false;
 	RECT frameSize = { 0,0,0,0 };
+	bool isAnim = false;
 	unsigned char totalFrames=0;
 	unsigned char frameCount=0;
 	float animTime = 0; 
@@ -41,6 +41,7 @@ protected:
 	friend class Creature;
 public:
 	bool isHover = false;
+	bool active = true;
 	~Sprite() {
 		texture = nullptr;
 		delete texture;
@@ -51,7 +52,6 @@ public:
 	};
 	spriteTYPE type = spriteTYPE::CREATURE;
 	Vector2 previousGridPos = Vector2(0, 0);
-	bool active = true;
 	Vector2 Position{ 400,400 };
 	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
 	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
@@ -74,7 +74,7 @@ public:
 		dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
 		return dim;
 	}
-	const RECT getspriteRect() {
+	const RECT getSpriteRect() {
 		return spriteRect;
 	}
 	const RECT getFrameSize() {

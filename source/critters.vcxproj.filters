@@ -43,6 +43,24 @@
     <ClCompile Include="WindowUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderTypes.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioMgr.h">
@@ -66,9 +84,6 @@
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="miniaudio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModeMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -87,6 +102,18 @@
     <ClInclude Include="D3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -95,5 +122,34 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{12f54644-95df-4fb0-a614-dc6e6751ac1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FX">
+      <UniqueIdentifier>{bddecf0d-2da8-41f2-82ad-0c47dc05fff4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\FX\TextureVS.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\Constants.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\LightHelper.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\PSCore.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\PSLitNoTex.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\PSLitTex.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\PSUnlitNoTex.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\FX\PSUnlitTex.hlsl">
+      <Filter>FX</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

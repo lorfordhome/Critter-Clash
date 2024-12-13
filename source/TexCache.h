@@ -26,7 +26,7 @@ public:
 	void SetAssetPath(const std::string& path) {
 		mAssetPath = path;
 	}
-
+	const std::string& GetAssetPath() const { return mAssetPath; }
 	//pull out a texture by nickname = fast
 	Data& Get(const std::string& texName) {
 		return mCache.at(texName);

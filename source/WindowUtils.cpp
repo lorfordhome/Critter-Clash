@@ -7,8 +7,35 @@
 
 using namespace std;
 
+//__int64 WinUtil::sTime1 = 0;
 
-LRESULT WinUtil::DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+
+HINSTANCE WinUtil::GetAppInst()
+{
+	return mWinData.hAppInst;
+}
+
+HWND WinUtil::GetMainWnd()
+{
+	return mWinData.hMainWnd;
+}
+
+void WinUtil::GetClientExtents(int& width, int& height) const
+{
+	width = mWinData.clientWidth;
+	height = mWinData.clientHeight;
+}
+
+float WinUtil::GetAspectRatio()
+{
+	int w, h;
+	GetClientExtents(w, h);
+	return (float)w / h;
+}
+
+
+
+LRESULT WinUtil::RealDefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -54,7 +81,7 @@ LRESULT WinUtil::DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 				{
 					mWinData.appPaused = false;
 					mWinData.minimized = false;
-					mpMyD3D->OnResize(mWinData.clientWidth, mWinData.clientHeight,*mpMyD3D);
+					mpMyD3D->OnResize(mWinData.clientWidth, mWinData.clientHeight, *mpMyD3D);
 				}
 
 				// Restoring from maximized state?
@@ -62,7 +89,7 @@ LRESULT WinUtil::DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 				{
 					mWinData.appPaused = false;
 					mWinData.maximized = false;
-					mpMyD3D->OnResize(mWinData.clientWidth, mWinData.clientHeight,*mpMyD3D);
+					mpMyD3D->OnResize(mWinData.clientWidth, mWinData.clientHeight, *mpMyD3D);
 				}
 				else if (mWinData.resizing)
 				{
@@ -94,7 +121,7 @@ LRESULT WinUtil::DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	case WM_EXITSIZEMOVE:
 		mWinData.appPaused = false;
 		mWinData.resizing = false;
-		if(mpMyD3D)
+		if (mpMyD3D)
 			mpMyD3D->OnResize(mWinData.clientWidth, mWinData.clientHeight, *mpMyD3D);
 		return 0;
 
@@ -111,8 +138,8 @@ LRESULT WinUtil::DefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 		// Catch this message so to prevent the window from becoming too small.
 	case WM_GETMINMAXINFO:
-		((MINMAXINFO*)lParam)->ptMinTrackSize.x = mWinData.minClientWidth;
-		((MINMAXINFO*)lParam)->ptMinTrackSize.y = mWinData.minClientHeight;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
 		return 0;
 
 	}
@@ -187,17 +214,17 @@ bool WinUtil::BeginLoop(bool& canUpdateRender)
 	canUpdateRender = false;
 
 	// If there are Window messages then process them.
-	if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+	while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 		if (msg.message == WM_QUIT)
 			return false;
-		return true;
 	}
 
 	if (!mWinData.appPaused)
 	{
+		//QueryPerformanceCounter((LARGE_INTEGER*)&sTime1);
 		canUpdateRender = true;
 	}
 
@@ -215,12 +242,14 @@ float WinUtil::EndLoop(bool didUpdateRender)
 		__int64 countsPerSec;
 		QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
 		double secondsPerCount = 1.0 / (double)countsPerSec;
+		static __int64 sTime1 = 0;
 		__int64 time2;
 		QueryPerformanceCounter((LARGE_INTEGER*)&time2);
-		static __int64 sTime1 = time2;
-		deltaTime = (float)((time2 - sTime1)*secondsPerCount);
-		AddSecToClock(deltaTime);
+		if (sTime1 != 0)
+			deltaTime = (float)((time2 - sTime1) * secondsPerCount);
 		sTime1 = time2;
+		AddSecToClock(deltaTime);
+
 	}
 	else
 	{
@@ -229,9 +258,49 @@ float WinUtil::EndLoop(bool didUpdateRender)
 	return deltaTime;
 }
 
-HWND WinUtil::GetMainWnd()
+int WinUtil::Run(void(*pUpdate)(float), void(*pRender)(float))
 {
-	return mWinData.hMainWnd;
+	MSG msg = { 0 };
+	assert(pUpdate && pRender);
+
+	__int64 countsPerSec;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
+	double secondsPerCount = 1.0 / (double)countsPerSec;
+
+	float deltaTime = 0;
+	while (msg.message != WM_QUIT)
+	{
+		// If there are Window messages then process them.
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		// Otherwise, do animation/game stuff.
+		else
+		{
+			if (!mWinData.appPaused)
+			{
+
+				if (!mWinData.appPaused)
+					pUpdate(deltaTime);
+				pRender(deltaTime);
+
+				static __int64 sTime1 = 0;
+				__int64 time2;
+				QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+				if (sTime1 != 0)
+					deltaTime = (float)((time2 - sTime1) * secondsPerCount);
+				sTime1 = time2;
+				AddSecToClock(deltaTime);
+			}
+			else
+			{
+				Sleep(100);
+			}
+		}
+	}
+	return (int)msg.wParam;
 }
 
 void WinUtil::ChooseRes(int& w, int& h, int defaults[], int numPairs)
@@ -245,7 +314,7 @@ void WinUtil::ChooseRes(int& w, int& h, int defaults[], int numPairs)
 	h = 0;
 	for (int i = 0; i < numPairs; ++i)
 	{
-		int newW = defaults[i * 2], newH = defaults[i*2+1];
+		int newW = defaults[i * 2], newH = defaults[i * 2 + 1];
 
 		if (w < newW && newW < sw && newH < sh)
 		{
@@ -255,4 +324,3 @@ void WinUtil::ChooseRes(int& w, int& h, int defaults[], int numPairs)
 	}
 	assert(w > 0);
 }
-

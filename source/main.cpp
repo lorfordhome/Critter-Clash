@@ -66,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 		assert(false);
 
 	MyD3D d3d;
-	if (!d3d.InitDirect3D(OnResize))
+	if (!d3d.InitDirect3D())
 		assert(false);
 	WinUtil::Get().SetD3D(d3d);
 	new Game (d3d);

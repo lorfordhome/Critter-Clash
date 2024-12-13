@@ -11,16 +11,14 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 
-TexCache& MyD3D:: GetCache() {
-	return mTexCache;
-}
-
 float MyD3D::GetAspectRatio()
 {
-	return static_cast<float>(WinUtil::Get().GetData().clientWidth) / WinUtil::Get().GetData().clientHeight;
+	int w, h;
+	WinUtil::Get().GetClientExtents(w, h);
+	return w / (float)h;
 }
 
-void MyD3D::BeginRender(const Vector4 & colour)
+void MyD3D::BeginRender(const Vector4& colour)
 {
 	mpd3dImmediateContext->ClearRenderTargetView(mpRenderTargetView, reinterpret_cast<const float*>(&colour));
 	mpd3dImmediateContext->ClearDepthStencilView(mpDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -31,11 +29,21 @@ void MyD3D::EndRender()
 	HR(mpSwapChain->Present(0, 0));
 }
 
+void MyD3D::InitInputAssembler(ID3D11InputLayout* pInputLayout, ID3D11Buffer* pVBuffer, UINT szVertex, ID3D11Buffer* pIBuffer, D3D_PRIMITIVE_TOPOLOGY topology)
+{
+	UINT offset = 0;
+	assert(mpd3dImmediateContext);
+	mpd3dImmediateContext->IASetVertexBuffers(0, 1, &pVBuffer, &szVertex, &offset);
+	mpd3dImmediateContext->IASetInputLayout(pInputLayout);
+	mpd3dImmediateContext->IASetIndexBuffer(pIBuffer, DXGI_FORMAT_R32_UINT, 0);
+	mpd3dImmediateContext->IASetPrimitiveTopology(topology);
+}
+
 
 // Resize the swap chain and recreate the render target view.
 void MyD3D::ResizeSwapChain(int screenWidth, int screenHeight)
 {
-	HR(mpSwapChain->ResizeBuffers(2, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+	HR(mpSwapChain->ResizeBuffers(1, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 	ID3D11Texture2D* backBuffer;
 	HR(mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
 	HR(mpd3dDevice->CreateRenderTargetView(backBuffer, 0, &mpRenderTargetView));
@@ -83,10 +91,6 @@ void MyD3D::BindRenderTargetViewAndDepthStencilView()
 	mpd3dImmediateContext->OMSetRenderTargets(1, &mpRenderTargetView, mpDepthStencilView);
 }
 
-const SimpleMath::Rectangle MyD3D::GetViewportRect() {
-	SimpleMath::Rectangle rect(mScreenViewport.TopLeftX, mScreenViewport.TopLeftY, mScreenViewport.Width, mScreenViewport.Height);
-	return rect;
-}
 // Set the viewport transform.
 void MyD3D::SetViewportDimensions(int screenWidth, int screenHeight)
 {
@@ -102,32 +106,32 @@ void MyD3D::SetViewportDimensions(int screenWidth, int screenHeight)
 
 
 //start your engines!
-void MyD3D::CreateD3D( D3D_FEATURE_LEVEL desiredFeatureLevel)
+void MyD3D::CreateD3D(D3D_FEATURE_LEVEL desiredFeatureLevel)
 {
 	UINT createDeviceFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)  
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	md3dDriverType = D3D_DRIVER_TYPE_UNKNOWN;// D3D_DRIVER_TYPE_HARDWARE;
+	md3dDriverType = D3D_DRIVER_TYPE_UNKNOWN;
+	//md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 
 	//figure out how many gpus we have
-	IDXGIAdapter * pAdapter;
+	IDXGIAdapter* pAdapter;
 	std::vector <IDXGIAdapter*> vAdapters;
-	IDXGIFactory * pFactory = NULL;
-	SIZE_T useIdx = -1, mostRam=-1;
+	IDXGIFactory* pFactory = NULL;
+	SIZE_T useIdx = -1, mostRam = -1;
 	HR(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&pFactory));
 	for (UINT i = 0; pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
 	{
 		vAdapters.push_back(pAdapter);
-		DXGI_ADAPTER_DESC desc; 
+		DXGI_ADAPTER_DESC desc;
 		HR(pAdapter->GetDesc(&desc));
 		WDBOUT(L"Found adapter=(" << i << ") " << desc.Description << L" VRAM=" << desc.DedicatedVideoMemory);
-		if (desc.DedicatedVideoMemory > mostRam || mostRam==-1)
+		if (desc.DedicatedVideoMemory > mostRam || mostRam == -1)
 		{
 			useIdx = i;
 			mostRam = desc.DedicatedVideoMemory;
-			mGPUDesc = desc.Description;
 		}
 	}
 	if (pFactory)
@@ -152,7 +156,6 @@ void MyD3D::CreateD3D( D3D_FEATURE_LEVEL desiredFeatureLevel)
 		assert(false);
 	}
 
-	mTexCache.SetAssetPath("data/");
 }
 
 
@@ -164,7 +167,7 @@ void MyD3D::CheckMultiSamplingSupport(UINT& quality4xMsaa)
 	// 4XMSAA looks good!
 	HR(mpd3dDevice->CheckMultisampleQualityLevels(
 		DXGI_FORMAT_R8G8B8A8_UNORM, 4, &quality4xMsaa));
-	
+
 	//if zero was returned then the hardware cannot do it
 	assert(quality4xMsaa > 0);
 }
@@ -256,21 +259,18 @@ void MyD3D::OnResize_Default(int clientWidth, int clientHeight)
 }
 
 
-bool MyD3D::InitDirect3D(void(*pOnResize)(int,int,MyD3D&))
+bool MyD3D::InitDirect3D()
 {
-	assert(pOnResize);
-	mpOnResize = pOnResize;
 
 	// Create the device and device context.
 	CreateD3D();
 
 	CheckMultiSamplingSupport(m4xMsaaQuality);
-	m4xMsaaQuality = 0;
 
-	WinUtil& wu = WinUtil::Get();
-	int w = wu.GetData().clientWidth, h = wu.GetData().clientHeight;
+	int w, h;
+	WinUtil::Get().GetClientExtents(w, h);
 	DXGI_SWAP_CHAIN_DESC sd;
-	CreateSwapChainDescription(sd, wu.GetData().hMainWnd, true, w, h);
+	CreateSwapChainDescription(sd, WinUtil::Get().GetMainWnd(), true, w, h);
 	CreateSwapChain(sd);
 
 
@@ -278,7 +278,11 @@ bool MyD3D::InitDirect3D(void(*pOnResize)(int,int,MyD3D&))
 	// also need to be executed every time the window is resized.  So
 	// just call the OnResize method here to avoid code duplication.
 
-	mpOnResize(w, h, *this);
+	OnResize(w, h, *this);
+
+	CreateWrapSampler(mpWrapSampler);
+
+	mFX.Init();
 
 	return true;
 }
@@ -286,6 +290,8 @@ bool MyD3D::InitDirect3D(void(*pOnResize)(int,int,MyD3D&))
 void MyD3D::ReleaseD3D(bool extraReporting)
 {
 	mTexCache.Release();
+	mFX.Release();
+	mMeshMgr.Release();
 	//check if full screen - not advisable to exit in full screen mode
 	if (mpSwapChain)
 	{
@@ -299,7 +305,7 @@ void MyD3D::ReleaseD3D(bool extraReporting)
 	ReleaseCOM(mpDepthStencilView);
 	ReleaseCOM(mpSwapChain);
 	ReleaseCOM(mpDepthStencilBuffer);
-
+	ReleaseCOM(mpWrapSampler);
 	// Restore all default settings.
 	if (mpd3dImmediateContext)
 	{
@@ -312,8 +318,23 @@ void MyD3D::ReleaseD3D(bool extraReporting)
 	{
 		ID3D11Debug* pd3dDebug;
 		HR(mpd3dDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&pd3dDebug)));
+		ReleaseCOM(mpd3dDevice);
 		HR(pd3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY));
 		ReleaseCOM(pd3dDebug);
 	}
 	ReleaseCOM(mpd3dDevice);
+}
+
+void MyD3D::CreateWrapSampler(ID3D11SamplerState*& pSampler)
+{
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	HR(mpd3dDevice->CreateSamplerState(&sampDesc, &pSampler));
 }

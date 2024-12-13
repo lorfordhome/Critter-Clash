@@ -6,6 +6,7 @@
 #include "D3D.h"
 #include "SpriteBatch.h"
 #include "sprite.h"
+#include "GeometryBuilder.h"
 enum class GAMEMODE { INTRO, MENU, PLAY, OVER };
 /*
 ABC representing a game mode like intro, game, gameOver, highScores, etc.
@@ -40,6 +41,10 @@ class MenuMode : public AMode
 	std::vector<UISprite> uiSprites;
 	Sprite bgSprite;
 	Sprite logoSprite;
+	std::vector<Model> mModels;
+	const DirectX::SimpleMath::Vector3 mDefCamPos = DirectX::SimpleMath::Vector3(0, 2, -5);
+	DirectX::SimpleMath::Vector3 mCamPos = DirectX::SimpleMath::Vector3(0, 2, -5);
+	float gAngle = 0;
 public:
 	~MenuMode() {
 		uiSprites.clear();

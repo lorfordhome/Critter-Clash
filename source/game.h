@@ -1,17 +1,16 @@
 #pragma once
 #include "WindowUtils.h"
-#include "D3DUtil.h"
-#include "D3D.h"
 #include "SimpleMath.h"
 #include "SpriteFont.h"
 #include "CommonStates.h"
-#include "sprite.h"
 #include <stdexcept>
 #include "Input.h"
 #include "Singleton.h"
 #include "creature.h"
 #include "ModeMgr.h"
 #include "AudioMgrFMOD.h"
+#include "Mesh.h"
+#include "Model.h"
 
 struct Tile {
 	enum Container {NONE=0,CREATURE=1,ABILITY=2};
@@ -32,11 +31,10 @@ public:
 	bool visible = true;
 	Grid(MyD3D& d3d);
 	Grid();
-      void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
-	  Tile Get(int x, int y);
-	  void updateTile(int x, int y, Tile::Container Value);
-
-	  void ResetTiles();
+    void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
+	Tile Get(int x, int y);
+	void updateTile(int x, int y, Tile::Container Value);
+	void ResetTiles();
 
 };
 
