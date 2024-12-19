@@ -84,14 +84,8 @@ MenuMode::MenuMode()
 	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
 
-	UISprite Button2("optionsButton", "optionButton.dds", Game::Get().GetD3D());
-	Button2.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
-	Button2.uiType = UISprite::UITYPE::options;
-	uiSprites.push_back(Button2);
-
-
 	UISprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
-	Button3.Init(Vector2(400, 400), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	Button3.Init(Vector2(400, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
 	Button3.uiType = UISprite::UITYPE::quit;
 	uiSprites.push_back(Button3);
 
