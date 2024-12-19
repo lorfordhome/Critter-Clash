@@ -276,9 +276,9 @@ const char* Creature::getName()
 		return "Skitty";
 		break;
 	case NONE:
-		return "Invalid";
 		break;
 	}
+	return "Invalid";
 }
 
 const char* Creature::getDescriptor()
@@ -295,9 +295,9 @@ const char* Creature::getDescriptor()
 		return "Ranged Attacker";
 		break;
 	case NONE:
-		return "Invalid";
 		break;
 	}
+	return "Invalid";
 }
 
 // make sure to c_str() this! 

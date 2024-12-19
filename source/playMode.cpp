@@ -708,6 +708,7 @@ bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 		}
 		return false;
 	}
+	return false;
 }
 
 bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)

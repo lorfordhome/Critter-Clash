@@ -56,7 +56,7 @@
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\Release;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath);..\..\..\DirectXTK\Bin\Desktop_2022\Win32\Release</LibraryPath>
+    <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\release;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath);..\..\..\DirectXTK\Bin\Desktop_2022\Win32\Release</LibraryPath>
     <OutDir>$(SolutionDir)\bin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
