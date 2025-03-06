@@ -114,6 +114,9 @@
     <ClInclude Include="GeometryBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LuaHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -124,6 +127,9 @@
     </Filter>
     <Filter Include="FX">
       <UniqueIdentifier>{bddecf0d-2da8-41f2-82ad-0c47dc05fff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lua Scripts">
+      <UniqueIdentifier>{5e3ac865-bbc4-45d2-91cd-cee2e64e57a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
