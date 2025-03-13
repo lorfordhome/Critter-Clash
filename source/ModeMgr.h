@@ -86,6 +86,10 @@ public:
 
 	void DeleteMode(GAMEMODE modeToDelete);
 
+	GAMEMODE GetModeName();
+
+	AMode* GetMode();
+
 private:
 	std::vector<AMode*> mModes;	//container of modes
 	int mCurrentMIdx = -1;		//the one that is active

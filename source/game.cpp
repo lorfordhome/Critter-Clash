@@ -3,6 +3,7 @@
 #include "WindowUtils.h"
 #include "D3D.h"
 #include "GeometryBuilder.h"
+#include "LuaHelper.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -123,5 +124,28 @@ void Game::Render(float dTime)
 
 	md3d.EndRender();
 	mouse.PostProcess();
+}
+
+void Game::ApplyLua() {
+	//init lua
+	lua_State* L = luaL_newstate();
+	//open main libraries for scripts
+	luaL_openlibs(L);
+	//load and parse the lua file - could script this to a button to execute it at runtime? just need to close the state and run this again
+	if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
+		assert(false);
+
+	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
+		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
+		playMode->coins = (LuaGetInt(L, "coins"));
+		Vector2L pos;
+		pos.Fromlua(L, "enemyBuizel");
+		int type = GetType(L, "enemyBuizel");
+		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});
+
+	}
+
+
+	lua_close(L);
 }
 

@@ -2,6 +2,12 @@
 #include "sprite.h"
 #include "game.h"
 
+GAMEMODE ModeMgr::GetModeName() {
+	return (mModes[mCurrentMIdx]->GetMName());
+}
+AMode* ModeMgr::GetMode() {
+	return (mModes[mCurrentMIdx]);
+}
 
 void ModeMgr::SwitchMode(GAMEMODE newMode) {
 	int idx = 0;

@@ -15,6 +15,7 @@
 #include "sprite.h"
 #include "game.h"
 #include "Input.h"
+#include "LuaHelper.h"
 
 using namespace std;
 using namespace DirectX;
@@ -45,6 +46,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'Q':
 			PostQuitMessage(0);
 			break;
+		case 'L':
+		case 'l':
+			Game::Get().ApplyLua();
 		}
 		break;
 	case WM_INPUT:
@@ -72,6 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	new Game (d3d);
 	bool canUpdateRender;
 	float dTime = 0;
+
 	while (WinUtil::Get().BeginLoop(canUpdateRender))
 	{
 		if (canUpdateRender)

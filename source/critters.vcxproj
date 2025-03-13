@@ -106,6 +106,7 @@
     <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="Fx.cpp" />
     <ClCompile Include="GeometryBuilder.cpp" />
+    <ClCompile Include="LuaHelper.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="playMode.cpp" />
@@ -188,6 +189,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\Script.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

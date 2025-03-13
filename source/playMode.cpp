@@ -11,6 +11,7 @@
 #include "CommonStates.h"
 #include "sprite.h"
 #include "game.h"
+#include "LuaHelper.h"
 
 
 Vector2 MoveTowards(Vector2 current, Vector2 target, float maxDistanceDelta)
@@ -110,6 +111,7 @@ PlayMode::PlayMode() {
 	pixelFontSmall = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelTextSmall.spritefont");
 	assert(pixelFontSmall);
 
+	
 
 	InitBuild();
 
@@ -873,4 +875,9 @@ void PlayMode::ResetBoard()
 	teamAlive = 0;
 	shopCreatures.clear();
 	uiSprites.clear();
+}
+
+void PlayMode::GenerateScriptEnemies(creatureType type, Vector2 pos)
+{
+	spawnEnemy(type,pos);
 }

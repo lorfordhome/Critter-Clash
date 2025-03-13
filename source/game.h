@@ -57,7 +57,7 @@ public:
 	void ProcessKey(char key) {
 		mModeMgr.ProcessKey(key);
 	}
-
+	void ApplyLua();
 	//getters
 	MyD3D& GetD3D() { return md3d; }
 	ModeMgr& GetModeMgr() { return mModeMgr; }
@@ -124,6 +124,7 @@ public:
 	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev=false);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
+	void GenerateScriptEnemies(creatureType type, Vector2 pos);
 	SpriteFont& GetFont() {
 		assert(pixelFont);
 		return *pixelFont;
@@ -132,6 +133,8 @@ public:
 		assert(pixelFontSmall);
 		return *pixelFontSmall;
 	}
+
+	int coins = 20;
 private:
 	void SetShopPositions();
 	void SpawnShopCreatures();
@@ -153,7 +156,6 @@ private:
 	unsigned char maxShopSlots = 4;
 	unsigned char currentRound = 1;
 	int movedSprite = 0; //index of creature being moved
-	int coins = 20;
 };
 
 bool isSpriteClicked(Sprite& sprite, Mouse& mouse);
