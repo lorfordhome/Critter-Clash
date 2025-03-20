@@ -4,6 +4,7 @@
 #include "D3D.h"
 #include "GeometryBuilder.h"
 #include "LuaHelper.h"
+#include <fstream>
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -143,9 +144,24 @@ void Game::ApplyLua() {
 		int type = GetType(L, "enemyBuizel");
 		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});
 
+		lua_close(L);
+
+		for (int i = 0; i < playMode->gameCreatures.size();i++) 
+		{
+			//look at the creatures the player has placed
+			if (playMode->gameCreatures[i].isEnemy == false) 
+			{
+				std::ofstream LuaFile;
+				LuaFile.open("Script.lua",ios::app);
+				Vector2 creatureGridPos = getGridPosition(playMode->grid, playMode->gameCreatures[i].sprite.Position);
+				LuaFile << "\n creature" << i << "={x=" << creatureGridPos.x << ",y=" << creatureGridPos.y << ",type=" << static_cast<int>(playMode->gameCreatures[i].type) << "}";
+				LuaFile.close();
+			}
+		}
+
 	}
 
 
-	lua_close(L);
+	//lua_close(L);
 }
 

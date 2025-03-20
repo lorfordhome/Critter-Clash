@@ -81,7 +81,6 @@ class PlayMode : public AMode {
 	SpriteFont* pixelFontSmall = nullptr;
 	State state = State::BUILD;
 
-	std::vector<Creature> gameCreatures{};
 	std::vector<Creature> shopCreatures{};
 	std::vector<UISprite> uiSprites{};
 	Sprite bgSprite{};
@@ -89,6 +88,7 @@ class PlayMode : public AMode {
 	Sprite shopSprite{};
 	Sprite logoSprite{};
 public:
+	std::vector<Creature> gameCreatures{};
 	~PlayMode() 
 	{
 		delete pixelFont;
