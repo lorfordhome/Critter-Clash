@@ -35,10 +35,6 @@ struct Vector2L {
 };
 
 
-struct EnemyDetails {
-	Vector2L position;
-	creatureType type;
-};
 
 //check for errors
 bool LuaOK(lua_State* L, int id);
@@ -47,3 +43,4 @@ int LuaGetInt(lua_State* L, const std::string& name);
 //get string from lua by name
 std::string LuaGetStr(lua_State* L, const std::string& name);
 int GetType(lua_State* L, const std::string& name);
+void CallAddGroup(lua_State* L, const char* difGroup, const char* troopName);

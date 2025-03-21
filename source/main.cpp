@@ -49,6 +49,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'L':
 		case 'l':
 			Game::Get().ApplyLua();
+			break;
+		case 'G':
+		case 'g':
+			Game::Get().CreateEnemyGroup();
+			break;
 		}
 		break;
 	case WM_INPUT:

@@ -38,3 +38,13 @@ int GetType(lua_State* L, const std::string& name)
 	lua_settop(L, 0);
 	return Type;
 }
+
+void CallAddGroup(lua_State* L, const char* difGroup, const char* troopName) {
+	lua_getglobal(L, "AddGroup");
+	if (!lua_isfunction(L, 1))
+		assert(false);
+	lua_pushstring(L, difGroup);
+	lua_pushstring(L, troopName);
+	if (!LuaOK(L, lua_pcall(L, 2, 0, 0)))
+		assert(false);
+}

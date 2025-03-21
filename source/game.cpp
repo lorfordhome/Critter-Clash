@@ -5,6 +5,7 @@
 #include "GeometryBuilder.h"
 #include "LuaHelper.h"
 #include <fstream>
+#include <ctime>
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -132,7 +133,7 @@ void Game::ApplyLua() {
 	lua_State* L = luaL_newstate();
 	//open main libraries for scripts
 	luaL_openlibs(L);
-	//load and parse the lua file - could script this to a button to execute it at runtime? just need to close the state and run this again
+	//load and parse the lua file 
 	if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
 		assert(false);
 
@@ -143,25 +144,61 @@ void Game::ApplyLua() {
 		pos.Fromlua(L, "enemyBuizel");
 		int type = GetType(L, "enemyBuizel");
 		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});
-
-		lua_close(L);
-
-		for (int i = 0; i < playMode->gameCreatures.size();i++) 
-		{
-			//look at the creatures the player has placed
-			if (playMode->gameCreatures[i].isEnemy == false) 
-			{
-				std::ofstream LuaFile;
-				LuaFile.open("Script.lua",ios::app);
-				Vector2 creatureGridPos = getGridPosition(playMode->grid, playMode->gameCreatures[i].sprite.Position);
-				LuaFile << "\n creature" << i << "={x=" << creatureGridPos.x << ",y=" << creatureGridPos.y << ",type=" << static_cast<int>(playMode->gameCreatures[i].type) << "}";
-				LuaFile.close();
-			}
-		}
-
 	}
 
 
-	//lua_close(L);
+	lua_close(L);
+}
+
+void Game::CreateEnemyGroup() {
+	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
+		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
+		int creatureCount = 0;
+		time_t timestamp;
+		time(&timestamp);
+		//go through creatures, check if there are any to save
+		for (int i = 0; i < playMode->gameCreatures.size(); i++)
+		{
+			//look at the creatures the player has placed
+			if (playMode->gameCreatures[i].isEnemy == false)
+			{
+				std::ofstream LuaFile;
+				LuaFile.open("Script.lua", ios::app);
+				Vector2 creatureGridPos = getGridPosition(playMode->grid, playMode->gameCreatures[i].sprite.Position);
+				LuaFile << "\n"<<timestamp<<"creature" << creatureCount << " = {x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
+				LuaFile.close();
+				creatureCount++;
+			}
+		}
+		//create troop
+		if (creatureCount != 0) {
+
+			std::string troopName = "Troop";
+			troopName.std::string::append(to_string(timestamp));
+			std::ofstream LuaFile;
+			LuaFile.open("Script.lua", ios::app);
+			LuaFile << "\n"<<troopName<< "={";
+			for (int i = 0; i < creatureCount; i++) {
+				LuaFile <<timestamp<< "creature" << i;
+				if (i + 1 < creatureCount)
+					LuaFile << ",";
+
+			}
+			LuaFile << "}";
+			LuaFile.close();
+
+			//calculate difficulty
+
+			//save difficulty
+			lua_State* L = luaL_newstate();
+			luaL_openlibs(L);
+			if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
+				assert(false);
+			CallAddGroup(L, "dif1_groups", troopName.c_str());
+			//close lua
+			lua_close(L);
+
+		}
+	}
 }
 

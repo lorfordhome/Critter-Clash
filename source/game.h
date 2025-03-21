@@ -58,6 +58,7 @@ public:
 		mModeMgr.ProcessKey(key);
 	}
 	void ApplyLua();
+	void CreateEnemyGroup();
 	//getters
 	MyD3D& GetD3D() { return md3d; }
 	ModeMgr& GetModeMgr() { return mModeMgr; }
