@@ -157,46 +157,49 @@ void Game::CreateEnemyGroup() {
 		time_t timestamp;
 		time(&timestamp);
 		//go through creatures, check if there are any to save
+		stringstream toWrite;
+		string troopName = "Troop";
+		troopName.std::string::append(to_string(timestamp));
+		toWrite << "\n" << troopName << "={\n";
+
+		vector<Creature> creaturesToWrite;
 		for (int i = 0; i < playMode->gameCreatures.size(); i++)
 		{
 			//look at the creatures the player has placed
 			if (playMode->gameCreatures[i].isEnemy == false)
 			{
-				std::ofstream LuaFile;
-				LuaFile.open("Script.lua", ios::app);
-				Vector2 creatureGridPos = getGridPosition(playMode->grid, playMode->gameCreatures[i].sprite.Position);
-				LuaFile << "\n"<<timestamp<<"creature" << creatureCount << " = {x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
-				LuaFile.close();
-				creatureCount++;
+				creaturesToWrite.push_back(playMode->gameCreatures[i]);
 			}
 		}
 		//create troop
-		if (creatureCount != 0) {
+		if (creaturesToWrite.size() != 0) {
 
-			std::string troopName = "Troop";
-			troopName.std::string::append(to_string(timestamp));
-			std::ofstream LuaFile;
-			LuaFile.open("Script.lua", ios::app);
-			LuaFile << "\n"<<troopName<< "={";
-			for (int i = 0; i < creatureCount; i++) {
-				LuaFile <<timestamp<< "creature" << i;
-				if (i + 1 < creatureCount)
-					LuaFile << ",";
+			for (int i = 0; i < creaturesToWrite.size(); i++) {
+				Vector2 creatureGridPos = getGridPosition(playMode->grid, creaturesToWrite[i].sprite.Position);
+				toWrite << "creature" << creatureCount << " = {x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
+				if (i + 1 < creaturesToWrite.size())
+					toWrite << ",";
 
 			}
-			LuaFile << "}";
-			LuaFile.close();
-
-			//calculate difficulty
-
-			//save difficulty
+			toWrite << "\n}";
+			//write to file
 			lua_State* L = luaL_newstate();
 			luaL_openlibs(L);
 			if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
 				assert(false);
-			CallAddGroup(L, "dif1_groups", troopName.c_str());
-			//close lua
+			CallWriteTroops(L, toWrite.str().c_str());
 			lua_close(L);
+
+			//calculate difficulty
+
+			//save difficulty
+			lua_State* J = luaL_newstate();
+			luaL_openlibs(J);
+			Execute(J, "troops.lua");
+			//CallAddGroup(J, 1, troopName.c_str());
+			CallAddGroup(J, 1, "poopoo");
+			//close lua
+			lua_close(J);
 
 		}
 	}

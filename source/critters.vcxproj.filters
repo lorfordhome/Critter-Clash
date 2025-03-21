@@ -162,6 +162,9 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\bin\troops.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
     <None Include="..\bin\Script.lua">
       <Filter>Lua Scripts</Filter>
     </None>
