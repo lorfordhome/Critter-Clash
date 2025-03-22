@@ -39,8 +39,6 @@ public:
 };
 
 
-
-
 class Game : public Singleton<Game> {
 public:
 	Game();
@@ -51,6 +49,7 @@ public:
 	Mouse mouse;
 
 	Game(MyD3D& md3d);
+	void CountTroops();
 	void Release();
 	void Update(float dTime);
 	void Render(float dTime);

@@ -10,6 +10,22 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 
+void removeLastCharFromFile(string fileToChange) {
+	std::ifstream fileIn(fileToChange);                   // Open for reading
+
+	std::stringstream buffer;                             // Store contents in a std::string
+	buffer << fileIn.rdbuf();
+	std::string contents = buffer.str();
+
+	fileIn.close();
+	contents.pop_back();                                  // Remove last character
+
+
+	std::ofstream fileOut(fileToChange, std::ios::trunc); // Open for writing (while also clearing file)
+	fileOut << contents;                                  // Output contents with removed character
+	fileOut.close();
+}
+
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
 	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
 	for (int i = 0; i < grid.gridWidth; i++) {
@@ -98,20 +114,24 @@ Game::Game(MyD3D& d3d) :md3d(d3d)
 	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
 	audioManager.GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &musicHdl, audioManager.GetSongMgr()->GetVolume());
 
+	CountTroops();
+
+}
+
+void Game::CountTroops() {
 	//initialise troop count
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
-	Execute(L, "Script.lua");
 	for (int i = 0; i < maxDifficulty; i++) {
-		troopCounts.push_back(CallCountTroops(L, i + 1));
+		Execute(L, "Difficulty" + to_string(i + 1) + ".lua");
+		troopCounts.push_back(GetTableLength(L, "Troops"));
 	}
 	lua_close(L);
 }
-
-
 void Game::Release() {
 	delete mySpriteBatch;
 	mySpriteBatch = nullptr;
+	troopCounts.clear();
 	mModeMgr.Release();
 	md3d.GetCache().Release();
 	audioManager.Shutdown();
@@ -165,8 +185,6 @@ void Game::CreateEnemyGroup() {
 	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
 		int creatureCount = 0;
-		time_t timestamp;
-		time(&timestamp);
 
 		//go through creatures, check if there are any to save
 		vector<Creature> creaturesToWrite;
@@ -182,29 +200,31 @@ void Game::CreateEnemyGroup() {
 		if (creaturesToWrite.size() != 0) {
 			int difficulty = CalculateDifficulty(creaturesToWrite);
 			stringstream toWrite;
-			string troopName = "Troop";
-			troopName.std::string::append(to_string(timestamp));
-			if (troopCounts[difficulty - 1] > 0)
-				toWrite << "\n";
-			toWrite << troopName << "={";
+			if (troopCounts[difficulty-1] != 0)
+				toWrite << ",\n";
+			toWrite << "{";
 
 
 			for (int i = 0; i < creaturesToWrite.size(); i++) {
 				Vector2 creatureGridPos = getGridPosition(playMode->grid, creaturesToWrite[i].sprite.Position);
-				toWrite << "creature" << creatureCount << " = {x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
+				toWrite <<"{x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
 				if (i + 1 < creaturesToWrite.size())
 					toWrite << ",";
 
 			}
-			toWrite << "}";
-
+			toWrite << "}}";
 			//write to file
 			lua_State* L = luaL_newstate();
 			luaL_openlibs(L);
+			Execute(L, "Difficulty" + to_string(difficulty) + ".lua");
+			//need to remove last char from file so the Troops table will be closed correctly
+			removeLastCharFromFile(("Difficulty" + to_string(difficulty) + ".lua"));
+			//need to open Script.lua as it contains the WriteTroops function
 			Execute(L, "Script.lua");
 			CallWriteTroops(L,difficulty, toWrite.str().c_str());
 			//now update the count of troops
-			troopCounts[difficulty-1]=CallCountTroops(L, difficulty);
+			Execute(L, "Difficulty" + to_string(difficulty) + ".lua");
+			troopCounts[difficulty-1]=GetTableLength(L, "Troops");
 			lua_close(L);
 
 		}

@@ -47,16 +47,32 @@ void CallWriteTroops(lua_State* L, int difficulty, const char* stringToWrite) {
 		assert(false);
 }
 
-int CallCountTroops(lua_State* L, int difficulty) {
-	lua_getglobal(L, "CountTroops");
-	if (!lua_isfunction(L, -1))
+int GetTableLength(lua_State* L, const char* tableToCheck) {
+	lua_getglobal(L, tableToCheck);
+	if (!lua_istable(L, -1))
 		assert(false);
-	lua_pushinteger(L, difficulty);
-	if (!LuaOK(L, lua_pcall(L, 1, 1, 0)))
+	lua_len(L, -1);
+	int length = lua_tointeger(L, -1);
+	lua_pop(L, 2); //remove both the table and the length value off the stack
+	return length;
+}
+
+int Get2DTableLength(lua_State* L, const char* tableToCheck, int subTableIndex) {
+	lua_getglobal(L, tableToCheck);  // Push the table "Troops" onto the stack
+
+	if (!lua_istable(L, -1))
 		assert(false);
-	int result = (int)lua_tointeger(L, -1);
-	lua_pop(L, 1);
-	return result;
+
+	lua_pushinteger(L, subTableIndex);  // Push index
+	lua_gettable(L, -2);    // Get Troops[subTable]
+	if (!lua_istable(L, -1))
+		assert(false);
+	lua_len(L, -1);
+	int length = lua_tointeger(L, -1);
+
+	lua_pop(L, 3); //remove both tables and the length value off the stack
+	return length;
+
 }
 
 void Execute(lua_State* L, std::string szScript)

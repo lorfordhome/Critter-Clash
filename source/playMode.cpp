@@ -86,6 +86,7 @@ PlayMode::PlayMode() {
 	gameCreatures.reserve(10);
 	shopCreatures.reserve(4);
 	uiSprites.reserve(4);
+	playedTroops.resize(5);
 
 	srand(GetTickCount64());
 
@@ -111,7 +112,6 @@ PlayMode::PlayMode() {
 	pixelFontSmall = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelTextSmall.spritefont");
 	assert(pixelFontSmall);
 
-	
 
 	InitBuild();
 
@@ -181,23 +181,59 @@ void PlayMode::SpawnShopCreatures()
 void PlayMode::GenerateEnemies() //generate all enemies
 {
 	int desiredDifficulty = currentRound / 2;
-	if (desiredDifficulty > 1)
-		desiredDifficulty = 1;
-	if (desiredDifficulty > 5)
-		desiredDifficulty = 5;
-	if ()
-	while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
-	{
-		GenerateRandomEnemy();
-		if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
-			return;
+	desiredDifficulty -= 1;
+	if (desiredDifficulty < 0)
+		desiredDifficulty = 0;
+	//if there are no valid saved troops to fight, randomly generate
+	if (Game::Get().troopCounts.empty()||Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
+			Game::Get().CountTroops(); //count troops again just to make sure
+			//if it still fails
+		if (Game::Get().troopCounts.empty() || Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
+			while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
+			{
+				GenerateRandomEnemy();
+				if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
+					return;
+			}
+		}
 	}
-
+	//since there are valid troops  we can fight, generate them from the script
+	GenerateScriptEnemies(desiredDifficulty);
 }
 
-void PlayMode::GenerateScriptEnemies(creatureType type, Vector2 pos)
+void PlayMode::GenerateScriptEnemies(int difficulty)
 {
-	spawnEnemy(type, pos);
+	//generate number, from which the troop will be selected
+	int rand = std::rand() % Game::Get().troopCounts[difficulty];
+
+	if (!playedTroops[difficulty].empty()) {
+		//make sure this troop hasnt been fought before
+		bool uniqueTroop = false;
+		while (!uniqueTroop) {
+			rand = std::rand() % Game::Get().troopCounts[difficulty];
+			for (auto it = playedTroops[difficulty].begin(); it != playedTroops[difficulty].end(); ++it) {
+				if (rand == *it) {
+					uniqueTroop = false;
+					break;
+				}
+				else {
+					uniqueTroop = true;
+				}
+			}
+		}
+	}
+
+	lua_State* L = luaL_newstate();
+	luaL_openlibs(L);
+	Execute(L, "Difficulty" + to_string(difficulty+1) + ".lua");
+	int creatureCount = Get2DTableLength(L, "Troops", difficulty + 1);
+	for (int i = 0; i < creatureCount; ++i) {
+		creatureDetails creatureToSpawn;
+		creatureToSpawn.fromLua(L, rand+1, i + 1);
+		spawnEnemy(creatureToSpawn.type, creatureToSpawn.position);
+	}
+	playedTroops[difficulty].push_back(rand);
+	lua_close(L);
 }
 
 void PlayMode::GenerateRandomEnemy() 
