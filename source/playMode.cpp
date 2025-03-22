@@ -122,6 +122,7 @@ void PlayMode::InitShop()
 {
 	if (resetShop) //only reset shop between rounds
 	{
+		shopCreatures.clear();
 		SpawnShopCreatures();
 		SetShopPositions();
 		resetShop = false;
@@ -179,17 +180,27 @@ void PlayMode::SpawnShopCreatures()
 
 void PlayMode::GenerateEnemies() //generate all enemies
 {
-	
+	int desiredDifficulty = currentRound / 2;
+	if (desiredDifficulty > 1)
+		desiredDifficulty = 1;
+	if (desiredDifficulty > 5)
+		desiredDifficulty = 5;
+	if ()
 	while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
 	{
-		GenerateEnemy();
+		GenerateRandomEnemy();
 		if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
 			return;
 	}
 
 }
 
-void PlayMode::GenerateEnemy() 
+void PlayMode::GenerateScriptEnemies(creatureType type, Vector2 pos)
+{
+	spawnEnemy(type, pos);
+}
+
+void PlayMode::GenerateRandomEnemy() 
 {
 	int rand2 = std::rand() % 3; //randomly generate x pos to place enemy in
 	int rand3 = std::rand() % 4;//randomly generate y pos to place enemy in
@@ -877,7 +888,3 @@ void PlayMode::ResetBoard()
 	uiSprites.clear();
 }
 
-void PlayMode::GenerateScriptEnemies(creatureType type, Vector2 pos)
-{
-	spawnEnemy(type,pos);
-}

@@ -168,5 +168,20 @@
     <None Include="..\bin\Script.lua">
       <Filter>Lua Scripts</Filter>
     </None>
+    <None Include="..\bin\Difficulty1.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
+    <None Include="..\bin\Difficulty2.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
+    <None Include="..\bin\Difficulty3.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
+    <None Include="..\bin\Difficulty4.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
+    <None Include="..\bin\Difficulty5.lua">
+      <Filter>Lua Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

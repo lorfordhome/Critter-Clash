@@ -43,8 +43,8 @@ int LuaGetInt(lua_State* L, const std::string& name);
 //get string from lua by name
 std::string LuaGetStr(lua_State* L, const std::string& name);
 int GetType(lua_State* L, const std::string& name);
-void CallAddGroup(lua_State* L, int difficulty, const char* troopName);
-void CallWriteTroops(lua_State* L, const char* stringToWrite);
+void CallWriteTroops(lua_State* L, int difficulty, const char* stringToWrite);
 void Execute(lua_State* L, std::string szScript);
 void CallFunction(lua_State* L, std::string szName);
 void Error(lua_State* L, int nStatus);
+int CallCountTroops(lua_State* L, int difficulty);

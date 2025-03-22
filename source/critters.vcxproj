@@ -191,6 +191,11 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\bin\Difficulty1.lua" />
+    <None Include="..\bin\Difficulty2.lua" />
+    <None Include="..\bin\Difficulty3.lua" />
+    <None Include="..\bin\Difficulty4.lua" />
+    <None Include="..\bin\Difficulty5.lua" />
     <None Include="..\bin\Script.lua" />
     <None Include="..\bin\troops.lua" />
   </ItemGroup>

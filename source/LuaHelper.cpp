@@ -37,26 +37,26 @@ int GetType(lua_State* L, const std::string& name)
 	return Type;
 }
 
-void CallAddGroup(lua_State* L, int difficulty, const char* troopName) {
-	lua_getglobal(L, "AddGroup");
-	if (!lua_isfunction(L, -1))
-		assert(false);
-	lua_pushnumber(L, difficulty);
-	lua_pushstring(L, troopName);
-	if (!LuaOK(L, lua_pcall(L, 2, 0, 0)))
-		assert(false);
-	//int nStatus = 0;
-	//nStatus = lua_pcall(L, 2, LUA_MULTRET, 0);
-	//Error(L, nStatus);
-}
-
-void CallWriteTroops(lua_State* L, const char* stringToWrite) {
+void CallWriteTroops(lua_State* L, int difficulty, const char* stringToWrite) {
 	lua_getglobal(L, "WriteTroops");
 	if (!lua_isfunction(L, -1))
 		assert(false);
+	lua_pushinteger(L, difficulty);
 	lua_pushstring(L, stringToWrite);
-	if (!LuaOK(L, lua_pcall(L, 1, 0, 0)))
+	if (!LuaOK(L, lua_pcall(L, 2, 0, 0)))
 		assert(false);
+}
+
+int CallCountTroops(lua_State* L, int difficulty) {
+	lua_getglobal(L, "CountTroops");
+	if (!lua_isfunction(L, -1))
+		assert(false);
+	lua_pushinteger(L, difficulty);
+	if (!LuaOK(L, lua_pcall(L, 1, 1, 0)))
+		assert(false);
+	int result = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+	return result;
 }
 
 void Execute(lua_State* L, std::string szScript)

@@ -59,12 +59,16 @@ public:
 	}
 	void ApplyLua();
 	void CreateEnemyGroup();
+	int CalculateDifficulty(vector<Creature> creatureGroup);
 	//getters
 	MyD3D& GetD3D() { return md3d; }
 	ModeMgr& GetModeMgr() { return mModeMgr; }
 	AudioMgrFMOD& getAudioMgr() { return audioManager; }
 	unsigned int musicHdl = 1;
 	unsigned int sfxHdl = 2;
+	//number of saved troops
+	int maxDifficulty = 5;
+	vector<int> troopCounts;
 private:
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
@@ -89,6 +93,7 @@ class PlayMode : public AMode {
 	Sprite shopSprite{};
 	Sprite logoSprite{};
 public:
+	bool resetShop = true;
 	std::vector<Creature> gameCreatures{};
 	~PlayMode() 
 	{
@@ -125,7 +130,7 @@ public:
 	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev=false);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
-	void GenerateScriptEnemies(creatureType type, Vector2 pos);
+	void GenerateScriptEnemies(int difficulty);
 	SpriteFont& GetFont() {
 		assert(pixelFont);
 		return *pixelFont;
@@ -140,14 +145,13 @@ private:
 	void SetShopPositions();
 	void SpawnShopCreatures();
 	void GenerateEnemies();
-	void GenerateEnemy();
+	void GenerateRandomEnemy();
 	//call when placing creature
 	void PlaceCreatureSFX(Creature& creature);
 
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;
-	bool resetShop = true;
 	bool draggingShop = false;
 	const unsigned char shopCreatureOffset = 45;
 	const unsigned char pixelsBetweenTilesX = 250;
@@ -157,6 +161,7 @@ private:
 	unsigned char maxShopSlots = 4;
 	unsigned char currentRound = 1;
 	int movedSprite = 0; //index of creature being moved
+	vector<vector<int>> playedTroops;
 };
 
 bool isSpriteClicked(Sprite& sprite, Mouse& mouse);

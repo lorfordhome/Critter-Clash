@@ -97,6 +97,15 @@ Game::Game(MyD3D& d3d) :md3d(d3d)
 	mModeMgr.AddMode(new MenuMode());
 	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
 	audioManager.GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &musicHdl, audioManager.GetSongMgr()->GetVolume());
+
+	//initialise troop count
+	lua_State* L = luaL_newstate();
+	luaL_openlibs(L);
+	Execute(L, "Script.lua");
+	for (int i = 0; i < maxDifficulty; i++) {
+		troopCounts.push_back(CallCountTroops(L, i + 1));
+	}
+	lua_close(L);
 }
 
 
@@ -141,9 +150,11 @@ void Game::ApplyLua() {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
 		playMode->coins = (LuaGetInt(L, "coins"));
 		Vector2L pos;
-		pos.Fromlua(L, "enemyBuizel");
+	/*	pos.Fromlua(L, "enemyBuizel");
 		int type = GetType(L, "enemyBuizel");
-		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});
+		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});*/
+		playMode->resetShop = true;
+		playMode->InitShop();
 	}
 
 
@@ -156,12 +167,8 @@ void Game::CreateEnemyGroup() {
 		int creatureCount = 0;
 		time_t timestamp;
 		time(&timestamp);
-		//go through creatures, check if there are any to save
-		stringstream toWrite;
-		string troopName = "Troop";
-		troopName.std::string::append(to_string(timestamp));
-		toWrite << "\n" << troopName << "={\n";
 
+		//go through creatures, check if there are any to save
 		vector<Creature> creaturesToWrite;
 		for (int i = 0; i < playMode->gameCreatures.size(); i++)
 		{
@@ -173,6 +180,14 @@ void Game::CreateEnemyGroup() {
 		}
 		//create troop
 		if (creaturesToWrite.size() != 0) {
+			int difficulty = CalculateDifficulty(creaturesToWrite);
+			stringstream toWrite;
+			string troopName = "Troop";
+			troopName.std::string::append(to_string(timestamp));
+			if (troopCounts[difficulty - 1] > 0)
+				toWrite << "\n";
+			toWrite << troopName << "={";
+
 
 			for (int i = 0; i < creaturesToWrite.size(); i++) {
 				Vector2 creatureGridPos = getGridPosition(playMode->grid, creaturesToWrite[i].sprite.Position);
@@ -181,27 +196,33 @@ void Game::CreateEnemyGroup() {
 					toWrite << ",";
 
 			}
-			toWrite << "\n}";
+			toWrite << "}";
+
 			//write to file
 			lua_State* L = luaL_newstate();
 			luaL_openlibs(L);
-			if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
-				assert(false);
-			CallWriteTroops(L, toWrite.str().c_str());
+			Execute(L, "Script.lua");
+			CallWriteTroops(L,difficulty, toWrite.str().c_str());
+			//now update the count of troops
+			troopCounts[difficulty-1]=CallCountTroops(L, difficulty);
 			lua_close(L);
-
-			//calculate difficulty
-
-			//save difficulty
-			lua_State* J = luaL_newstate();
-			luaL_openlibs(J);
-			Execute(J, "troops.lua");
-			//CallAddGroup(J, 1, troopName.c_str());
-			CallAddGroup(J, 1, "poopoo");
-			//close lua
-			lua_close(J);
 
 		}
 	}
+}
+
+int Game::CalculateDifficulty(vector<Creature> creatureGroup) {
+	if (creatureGroup.size() < 1)
+		return 0;
+	float difficulty = 0;
+	for (int i = 0; i < creatureGroup.size(); i++) {
+		difficulty+=creatureGroup[i].upgradeLevel;
+	}
+	difficulty /= 2;
+	if (difficulty < 1)
+		difficulty = 1;
+	else if (difficulty > 5)
+		difficulty = 5;
+	return difficulty;
 }
 
