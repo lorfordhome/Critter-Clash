@@ -9,6 +9,19 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+//if ALT+ENTER or resize or drag window we might want do
+//something like pause the game perhaps, but we definitely
+//need to let D3D know what's happened (OnResize_Default).
+int OnResize(lua_State* L)
+{
+	int screenWidth = lua_tointeger(L, 1);
+	int screenHeight = lua_tointeger(L, 2);
+	Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
+	WinUtil::Get().ResizeWindow(screenWidth, screenHeight);
+	//d3d.OnResize_Default(screenWidth, screenHeight);
+	lua_pop(L, 2);
+	return 1;
+}
 
 void removeLastCharFromFile(string fileToChange) {
 	std::ifstream fileIn(fileToChange);                   // Open for reading
@@ -162,17 +175,18 @@ void Game::ApplyLua() {
 	lua_State* L = luaL_newstate();
 	//open main libraries for scripts
 	luaL_openlibs(L);
+
+	
 	//load and parse the lua file 
 	if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
 		assert(false);
+	lua_register(L, "OnResize", OnResize);
 
+	CallVoidVoidCFunc(L, "CallResize");
 	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
 		playMode->coins = (LuaGetInt(L, "coins"));
 		Vector2L pos;
-	/*	pos.Fromlua(L, "enemyBuizel");
-		int type = GetType(L, "enemyBuizel");
-		playMode->GenerateScriptEnemies(static_cast<creatureType>(type),{pos.x,pos.y});*/
 		playMode->resetShop = true;
 		playMode->InitShop();
 	}

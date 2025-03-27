@@ -33,7 +33,10 @@ float WinUtil::GetAspectRatio()
 	return (float)w / h;
 }
 
-
+void WinUtil::ResizeWindow(int width, int height) {
+	SetWindowPos(mWinData.hMainWnd, 0, 0, 0, width, height, SWP_FRAMECHANGED | WS_VISIBLE);
+	UpdateWindow(WinUtil::Get().GetMainWnd());
+}
 
 LRESULT WinUtil::RealDefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

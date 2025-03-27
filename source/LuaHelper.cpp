@@ -3,6 +3,14 @@
 #include "LuaHelper.h"
 using namespace std;
 
+void CallVoidVoidCFunc(lua_State* L, const std::string& fname) {
+	lua_getglobal(L, fname.c_str());
+	if (!lua_isfunction(L, -1))
+		assert(false);
+	if (!LuaOK(L, lua_pcall(L, 0, 0, 0)))
+		assert(false);
+}
+
 bool LuaOK(lua_State* L, int id) {
 	if (id != LUA_OK) {
 		cout << lua_tostring(L, -1) << endl; //print out error
@@ -104,4 +112,23 @@ void Error(lua_State* L, int nStatus)
 		MessageBox(NULL, szError.c_str(), "Error", MB_OK | MB_ICONERROR);
 		lua_pop(L, 1);
 	}
+}
+std::map<string, Dispatcher::Command> Dispatcher::library;
+//calling c++ funcs from lua
+int Dispatcher::LuaCall(lua_State* L) {
+
+	string name = lua_tostring(L, 1);
+	std::map<string, Command>::iterator it = library.find(name);
+	assert(it != library.end());
+	Command& cmd = (*it).second;
+	if (cmd.voidintfunct) {
+		int param = lua_tointeger(L, 2);
+		cmd.voidintfunct(param);
+		lua_pop(L, 1);
+	}
+	else //add more cases...
+	{
+		MessageBox(NULL, "Dispatcher Command Not Found", "Error", MB_OK | MB_ICONERROR);
+	}
+	return 1;
 }

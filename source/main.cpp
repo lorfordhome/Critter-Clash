@@ -23,13 +23,6 @@ using namespace DirectX::SimpleMath;
 
 const int ASCII_ESC = 27;
 
-//if ALT+ENTER or resize or drag window we might want do
-//something like pause the game perhaps, but we definitely
-//need to let D3D know what's happened (OnResize_Default).
-void OnResize(int screenWidth, int screenHeight, MyD3D& d3d)
-{
-	d3d.OnResize_Default(screenWidth, screenHeight);
-}
 
 //messages come from windows all the time, should we respond to any specific ones?
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

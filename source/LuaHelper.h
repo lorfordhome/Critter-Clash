@@ -75,6 +75,29 @@ struct creatureDetails {
 	}
 };
 
+class Dispatcher {
+public:
+	//capture game functions here
+	struct Command {
+		typedef std::function<void(int)> voidintfunc; //created sig for a function which returns nothing and takes an int
+		voidintfunc voidintfunct;
+		//add any other function signatures here
+	};
+	//call once at start
+	void Init(lua_State* L) {
+		lua_register(L, "CDispatcher", LuaCall);
+	}
+	//register game functions
+	void Register(const std::string& name, Command cmd) {
+		assert(library.find(name) == library.end());
+			library[name] = cmd;
+	}
+	//lua calls this then the data gets dispatched to the named function
+	//lua is C based so cannot call class member function swithout help
+	static int LuaCall(lua_State* L);
+private:
+	static std::map<std::string, Command> library; //where game functions are stored
+};
 
 
 //check for errors
@@ -90,3 +113,4 @@ void CallFunction(lua_State* L, std::string szName);
 void Error(lua_State* L, int nStatus);
 int GetTableLength(lua_State* L, const char* TableToCheck);
 int Get2DTableLength(lua_State* L, const char* tableToCheck, int subTableIndex);
+void CallVoidVoidCFunc(lua_State* L, const std::string& fname);

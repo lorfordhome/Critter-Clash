@@ -54,6 +54,7 @@ public:
 		return mWinData.clientHeight;
 	}
 	float GetAspectRatio();
+	void ResizeWindow(int width, int height);
 	void ChooseRes(int& w, int& h, int defaults[], int numPairs);
 
 private:
