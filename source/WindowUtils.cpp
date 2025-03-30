@@ -33,11 +33,6 @@ float WinUtil::GetAspectRatio()
 	return (float)w / h;
 }
 
-void WinUtil::ResizeWindow(int width, int height) {
-	SetWindowPos(mWinData.hMainWnd, 0, 0, 0, width, height, SWP_FRAMECHANGED | WS_VISIBLE);
-	UpdateWindow(WinUtil::Get().GetMainWnd());
-}
-
 LRESULT WinUtil::RealDefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -144,6 +139,9 @@ LRESULT WinUtil::RealDefaultMssgHandler(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
 		return 0;
+	case WM_CLOSE:
+		DestroyWindow(hwnd);
+		break;
 
 	}
 

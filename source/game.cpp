@@ -16,9 +16,8 @@ int OnResize(lua_State* L)
 {
 	int screenWidth = lua_tointeger(L, 1);
 	int screenHeight = lua_tointeger(L, 2);
-	Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
 	WinUtil::Get().ResizeWindow(screenWidth, screenHeight);
-	//d3d.OnResize_Default(screenWidth, screenHeight);
+	Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
 	lua_pop(L, 2);
 	return 1;
 }

@@ -58,12 +58,16 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return WinUtil::Get().DefaultMssgHandler(hwnd, msg, wParam, lParam);
 }
 
+void WinUtil::ResizeWindow(int width, int height) {
+	SetWindowPos(mWinData.hMainWnd, 0, 0, 0, width, height, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+}
+
 //main entry point for the game
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
 
-	int w(1024), h(768);
+	int w(640), h(360);
 	if (!WinUtil::Get().InitMainWindow(w, h, hInstance, "Critter Clash", MainWndProc, true))
 		assert(false);
 

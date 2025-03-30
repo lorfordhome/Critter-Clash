@@ -8,7 +8,7 @@ function WriteTroops(difficulty,stringToWrite)
 end
 
 function CallResize()
-	OnResize(1000,1000)
+	OnResize(1920,1080)
 end
 
 
