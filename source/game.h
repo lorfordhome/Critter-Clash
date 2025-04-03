@@ -11,6 +11,7 @@
 #include "AudioMgrFMOD.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "LuaHelper.h"
 
 struct Tile {
 	enum Container {NONE=0,CREATURE=1,ABILITY=2};
@@ -57,6 +58,7 @@ public:
 		mModeMgr.ProcessKey(key);
 	}
 	void ApplyLua();
+	void ApplyLuaCheats();
 	void CreateEnemyGroup();
 	int CalculateDifficulty(vector<Creature> creatureGroup);
 	//getters
@@ -80,10 +82,8 @@ Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize, int gri
 //GAME MODES
 
 class PlayMode : public AMode {
-	enum class State{BUILD,SHOP, FIGHT, WIN, LOSE};
 	SpriteFont* pixelFont = nullptr;
 	SpriteFont* pixelFontSmall = nullptr;
-	State state = State::BUILD;
 
 	std::vector<Creature> shopCreatures{};
 	std::vector<UISprite> uiSprites{};
@@ -92,6 +92,8 @@ class PlayMode : public AMode {
 	Sprite shopSprite{};
 	Sprite logoSprite{};
 public:
+	enum class State { BUILD, SHOP, FIGHT, WIN, LOSE };
+	State state = State::BUILD;
 	bool resetShop = true;
 	std::vector<Creature> gameCreatures{};
 	~PlayMode() 
@@ -100,6 +102,7 @@ public:
 		delete pixelFontSmall;
 		gameCreatures.clear();
 		uiSprites.clear();
+		lua_close(L);
 	}
 	int findClosest(int idx,bool Enemy);
 	PlayMode();
@@ -130,6 +133,8 @@ public:
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
 	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
 	void GenerateScriptEnemies(int difficulty);
+	void InitLuaFunctions(Dispatcher& disp);
+	void ApplyLuaCheats();
 	SpriteFont& GetFont() {
 		assert(pixelFont);
 		return *pixelFont;
@@ -140,6 +145,11 @@ public:
 	}
 
 	int coins = 20;
+	unsigned char shopCreatureOffsetX = 20;
+	unsigned char shopCreatureOffsetY = 0;
+	//for lua stuff
+	Dispatcher disp;
+	lua_State* L;
 private:
 	void SetShopPositions();
 	void SpawnShopCreatures();
@@ -152,7 +162,6 @@ private:
 	bool wasClickReleased = false;
 	bool spriteDragging = false;
 	bool draggingShop = false;
-	const unsigned char shopCreatureOffset = 45;
 	const unsigned char pixelsBetweenTilesX = 250;
 	const unsigned char pixelsBetweenTilesY = 245;
 	unsigned char enemiesAlive = 0;

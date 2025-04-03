@@ -82,6 +82,8 @@ public:
 		typedef std::function<void(int)> voidintfunc; //created sig for a function which returns nothing and takes an int
 		voidintfunc voidintfunct;
 		//add any other function signatures here
+		typedef std::function<void(void)> voidvoidfunc; //created sig for a void func that takes nothing
+		voidvoidfunc voidvoidfunct;
 	};
 	//call once at start
 	void Init(lua_State* L) {

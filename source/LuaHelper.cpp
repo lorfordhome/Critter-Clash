@@ -4,11 +4,12 @@
 using namespace std;
 
 void CallVoidVoidCFunc(lua_State* L, const std::string& fname) {
-	lua_getglobal(L, fname.c_str());
-	if (!lua_isfunction(L, -1))
-		assert(false);
-	if (!LuaOK(L, lua_pcall(L, 0, 0, 0)))
-		assert(false);
+	//lua_getglobal(L, fname.c_str());
+	//if (!lua_isfunction(L, -1))
+	//	assert(false);
+	CallFunction(L, fname);
+	//if (!LuaOK(L, lua_pcall(L, 0, 0, 0)))
+	//	assert(false);
 }
 
 bool LuaOK(lua_State* L, int id) {
@@ -126,6 +127,10 @@ int Dispatcher::LuaCall(lua_State* L) {
 		cmd.voidintfunct(param);
 		lua_pop(L, 1);
 	}
+	else if (cmd.voidvoidfunct){
+		cmd.voidvoidfunct();
+		lua_pop(L, 1);
+		}
 	else //add more cases...
 	{
 		MessageBox(NULL, "Dispatcher Command Not Found", "Error", MB_OK | MB_ICONERROR);

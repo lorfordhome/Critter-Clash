@@ -24,7 +24,7 @@ public:
 	ACTION currAction = ACTION::IDLE;
 	bool active = true;
 	bool isEnemy = false;
-	bool facingLeft = false; //false if creature is facing right
+	bool facingLeft = true; //false if creature is facing right
 	int targetIndex = 0; //index of creature it is targeting within the gameCreatures array
 
 	Vector2 lastPos = { 0,0 };
