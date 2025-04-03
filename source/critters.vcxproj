@@ -141,6 +141,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="TexCache.h" />
+    <ClInclude Include="Viewport.h" />
     <ClInclude Include="WindowUtils.h" />
   </ItemGroup>
   <ItemGroup>

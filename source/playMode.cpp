@@ -90,7 +90,7 @@ PlayMode::PlayMode() {
 
 	srand(GetTickCount64());
 
-	Sprite _bg("Background", "map4.dds", Game::Get().GetD3D()); //temp for initialising
+	Sprite _bg("Background", "map6.dds", Game::Get().GetD3D()); //temp for initialising
 	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
 	bgSprite = _bg;
 

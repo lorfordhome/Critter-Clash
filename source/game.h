@@ -22,8 +22,8 @@ class Grid {
 public: 
 	int gridOriginX = 128;
 	int gridOriginY = 128;
-	int XOFFSET = 15;
-	int YOFFSET = 20;
+	int XOFFSET = 0;
+	int YOFFSET = 0;
 	static constexpr int gridWidth = 3;
 	static constexpr int gridHeight = 4;
 	static constexpr int cellSize = 128;

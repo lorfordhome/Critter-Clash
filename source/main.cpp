@@ -67,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
 
-	int w(640), h(360);
+	int w(1024), h(768);
 	if (!WinUtil::Get().InitMainWindow(w, h, hInstance, "Critter Clash", MainWndProc, true))
 		assert(false);
 
