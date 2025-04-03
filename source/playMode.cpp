@@ -90,7 +90,7 @@ PlayMode::PlayMode() {
 
 	srand(GetTickCount64());
 
-	Sprite _bg("Background", "map4.dds", Game::Get().GetD3D()); //temp for initialising
+	Sprite _bg("Background", "map6.dds", Game::Get().GetD3D()); //temp for initialising
 	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
 	bgSprite = _bg;
 
@@ -111,8 +111,10 @@ PlayMode::PlayMode() {
 
 	pixelFontSmall = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelTextSmall.spritefont");
 	assert(pixelFontSmall);
+	L = luaL_newstate();
+	luaL_openlibs(L);
 
-
+	InitLuaFunctions(disp);
 	InitBuild();
 
 
@@ -140,7 +142,7 @@ void PlayMode::InitShop()
 
 void PlayMode::SetShopPositions() 
 {
-	Vector2 Pos = { baseTilePos.x + shopCreatureOffset,baseTilePos.y + shopCreatureOffset };
+	Vector2 Pos = { baseTilePos.x + shopCreatureOffsetX,baseTilePos.y+shopCreatureOffsetY };
 	for (int i = 0; i < shopCreatures.size(); ++i) {
 		//messy solution - fix later?
 		if (i == 0)
@@ -270,6 +272,7 @@ void PlayMode::GenerateRandomEnemy()
 
 void PlayMode::InitBuild() 
 {
+
 	//check if music is playing - if no, load music
 	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
 		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
@@ -336,6 +339,7 @@ void PlayMode::InitWin()
 		Game::Get().getAudioMgr().GetSongMgr()->Stop();
 	}
 	Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Victory"), false, false, &Game::Get().sfxHdl);
+
 }
 
 void PlayMode::InitBattle()
@@ -924,3 +928,17 @@ void PlayMode::ResetBoard()
 	uiSprites.clear();
 }
 
+void PlayMode::InitLuaFunctions(Dispatcher& disp) {
+	Execute(L, "Script.lua");
+	//if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
+	//	assert(false);
+	//initialising dispatcher here
+	disp.Init(L);
+	//tell dispatcher we have a function for lua
+	Dispatcher::Command::voidvoidfunc f{ [this](void) {return InitWin(); } };
+	disp.Register("InitWin", Dispatcher::Command{nullptr, f });
+}
+void PlayMode::ApplyLuaCheats() {
+	Execute(L, "Script.lua");
+	CallVoidVoidCFunc(L, "InitWin");
+}

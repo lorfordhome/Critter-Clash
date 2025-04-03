@@ -25,39 +25,39 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 {
 	if (typeToMake == creatureType::BRELOOM) 
 	{
-		Sprite _sprite("Breloom", "breloomIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("chunkyIdle", "chunkyIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(3, 3), false, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 12, 0.1f,isShop);
+		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.8f, isShop);
 		//set stats
 		maxHealth = 125;
 		attackCooldown = 1.15f;
 		//set other animations
-		Sprite wSprite("breloomWalk", "breloomWalk.dds", Game::Get().GetD3D());
+		Sprite wSprite("chunkyWalk", "chunkyWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(3, 3), true, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 4, 0.1f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.5f);
 	}
 	if (typeToMake == creatureType::BUIZEL)
 	{
-		Sprite _sprite("Buizel", "buizelIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("Buizel", "mouseIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(3, 3), true, RECT{ 0,96,32,144 }, RECT{ 0,0,32,48 }, 9, 0.2f, isShop);
+		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.6f, isShop);
 		//set other animations
-		Sprite wSprite("buizelWalk", "buizelWalk.dds", Game::Get().GetD3D());
+		Sprite wSprite("buizelWalk", "mouseIdle.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.2f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.6f);
 	}
 	if (typeToMake == creatureType::SKITTY) 
 	{
-		Sprite _sprite("Skitty", "skittyIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("Skitty", "mothfoxIdle.dds", Game::Get().GetD3D());
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(3, 3), true, RECT{ 0,80,32,120 }, RECT{ 0,0,32,40 }, 4, 0.4f, isShop);
+		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.7f, isShop);
 		//set stats
 		attackRange = 300.f;
 		maxHealth = 75;
 		//set other animations
-		Sprite wSprite("skittyWalk", "skittyWalk.dds", Game::Get().GetD3D());
+		Sprite wSprite("skittyWalk", "mothfoxWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(3, 3), true, RECT{ 0,96,40,144 }, RECT{ 0,0,40,48 }, 7, 0.2f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.5f);
 	}
 	health = maxHealth;
 	idleSprite = sprite;
@@ -87,7 +87,7 @@ void Creature::ResetCreature()
 	flashTimer = 0.f;
 	ChangeAnimation(ACTION::IDLE);
 	UpdateHealthBar();
-	if (facingLeft && !isEnemy)
+	if (!facingLeft && !isEnemy)
 		ChangeDirection();
 }
 
@@ -120,14 +120,14 @@ void Creature::ChangeDirection()
 	RECT _rect2 = walkSprite.getSpriteRect();
 	if (!facingLeft) 
 	{
-		idleSprite.setSpriteRect(RECT{ _rect.left,idleSprite.getFrameSize().bottom * 6,_rect.right, idleSprite.getFrameSize().bottom * 7 });
-		walkSprite.setSpriteRect(RECT{ _rect2.left,walkSprite.getFrameSize().bottom * 6,_rect2.right, walkSprite.getFrameSize().bottom * 7 });
+		idleSprite.setSpriteRect(RECT{ _rect.left,0,_rect.right, idleSprite.getFrameSize().bottom });
+		walkSprite.setSpriteRect(RECT{ _rect2.left,0,_rect2.right, walkSprite.getFrameSize().bottom });
 		facingLeft = true;
 	}
 	else 
 	{
-		idleSprite.setSpriteRect(RECT{ _rect.left,idleSprite.getFrameSize().bottom * 2,_rect.right, idleSprite.getFrameSize().bottom * 3 });
-		walkSprite.setSpriteRect(RECT{ _rect2.left,walkSprite.getFrameSize().bottom * 2,_rect2.right, walkSprite.getFrameSize().bottom * 3 });
+		idleSprite.setSpriteRect(RECT{ _rect.left,idleSprite.getFrameSize().bottom,_rect.right, idleSprite.getFrameSize().bottom * 2 });
+		walkSprite.setSpriteRect(RECT{ _rect2.left,walkSprite.getFrameSize().bottom,_rect2.right, walkSprite.getFrameSize().bottom * 2 });
 		facingLeft = false;
 	}
 	ChangeAnimation(currAction);
@@ -160,21 +160,21 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 		//check direction sprite should face
 		if (currAction == ACTION::WALK) 
 		{
-			if ((sprite.Position.x > lastPos.x) && facingLeft) //if creature has moved to the right
+			if ((sprite.Position.x > lastPos.x) && !facingLeft) //if creature has moved to the right
 			{
 				ChangeDirection();
 			}
-			else if ((sprite.Position.x < lastPos.x) && !facingLeft) //if creature has moved to the left
+			else if ((sprite.Position.x < lastPos.x) && facingLeft) //if creature has moved to the left
 			{
 				ChangeDirection();
 			}
 		}
-		else if (!isEnemy && facingLeft)
+		else if (isEnemy && facingLeft)
 			ChangeDirection();
 
 		sprite.Update(dTime);
 		lastPos = sprite.Position;
-		healthBar.Position = Vector2(sprite.Position.x, sprite.Position.y + 100);
+		healthBar.Position = Vector2(sprite.Position.x+15, sprite.Position.y + 135);
 
 		//attack
 		if (fightMode) {

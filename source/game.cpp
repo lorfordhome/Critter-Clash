@@ -179,11 +179,15 @@ void Game::ApplyLua() {
 	//load and parse the lua file 
 	if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
 		assert(false);
+	//set up and call OnResize function
 	lua_register(L, "OnResize", OnResize);
-
 	CallVoidVoidCFunc(L, "CallResize");
+
+	//apply values from lua
 	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
+		playMode->shopCreatureOffsetX = (LuaGetInt(L, "shopCreatureOffsetX"));
+		playMode->shopCreatureOffsetY = (LuaGetInt(L, "shopCreatureOffsetY"));
 		playMode->coins = (LuaGetInt(L, "coins"));
 		Vector2L pos;
 		playMode->resetShop = true;
@@ -192,6 +196,32 @@ void Game::ApplyLua() {
 
 
 	lua_close(L);
+}
+
+void Game::ApplyLuaCheats() {
+	////init lua
+	//lua_State* L = luaL_newstate();
+	////open main libraries for scripts
+	//luaL_openlibs(L);
+
+
+	////load and parse the lua file 
+	//if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
+	//	assert(false);
+
+	//PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
+	//if (playMode->state == PlayMode::State::FIGHT) {
+	//	CallVoidVoidCFunc(L, "InitWin");
+	//}
+
+	//lua_close(L);
+
+	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
+		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
+		if (playMode->state == PlayMode::State::FIGHT) {
+			playMode->ApplyLuaCheats();
+		}
+	}
 }
 
 void Game::CreateEnemyGroup() {

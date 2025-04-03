@@ -11,12 +11,11 @@ function CallResize()
 	OnResize(1920,1080)
 end
 
-
-dif1Troops=0
-dif2Troops=0
-dif3Troops=0
-dif4Troops=0
-dif5Troops=0
+function InitWin()
+	CDispatcher("InitWin")
+end
 
 coins=100
 currentRound=2
+shopCreatureOffsetX=20
+shopCreatureOffsetY=20
