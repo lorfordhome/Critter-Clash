@@ -93,6 +93,7 @@ class PlayMode : public AMode {
 	Sprite shopSprite{};
 	Sprite logoSprite{};
 public:
+	bool hasSavedTeam = false;
 	enum class State { BUILD, SHOP, FIGHT, WIN, LOSE };
 	State state = State::BUILD;
 	bool resetShop = true;
@@ -160,6 +161,8 @@ private:
 	//call when placing creature
 	void PlaceCreatureSFX(Creature& creature);
 
+	float timeToDisplaySaveText = 1.f;
+	float textTimer = 0.f;
 	bool flagRestart = false;
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;

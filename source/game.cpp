@@ -210,23 +210,6 @@ void Game::ApplyLua() {
 }
 
 void Game::ApplyLuaCheats() {
-	////init lua
-	//lua_State* L = luaL_newstate();
-	////open main libraries for scripts
-	//luaL_openlibs(L);
-
-
-	////load and parse the lua file 
-	//if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
-	//	assert(false);
-
-	//PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
-	//if (playMode->state == PlayMode::State::FIGHT) {
-	//	CallVoidVoidCFunc(L, "InitWin");
-	//}
-
-	//lua_close(L);
-
 	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
 		if (playMode->state == PlayMode::State::FIGHT) {
@@ -281,6 +264,7 @@ void Game::CreateEnemyGroup() {
 			troopCounts[difficulty-1]=GetTableLength(L, "Troops");
 			lua_close(L);
 
+			playMode->hasSavedTeam = true;
 		}
 	}
 }

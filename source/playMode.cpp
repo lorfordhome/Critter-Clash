@@ -651,6 +651,14 @@ void PlayMode::BuildRender(float dTime, SpriteBatch& batch) {
 	for (int i = 0; i < gameCreatures.size(); i++) {
 		gameCreatures[i].sprite.Render(&batch);
 	}
+	if (hasSavedTeam) {
+		GetFontSmall().DrawString(&batch, "Successfully Saved Team To File", Vector2(300, 20));
+		textTimer += dTime;
+		if (textTimer >= timeToDisplaySaveText) {
+			hasSavedTeam = false;
+			textTimer = 0.f;
+		}
+	}
 }
 
 void PlayMode::FightRender(float dTime, SpriteBatch& batch)
