@@ -52,6 +52,7 @@ public:
 	Game(MyD3D& md3d);
 	void CountTroops();
 	void Release();
+	void RestartGame();
 	void Update(float dTime);
 	void Render(float dTime);
 	void ProcessKey(char key) {
@@ -103,6 +104,7 @@ public:
 		gameCreatures.clear();
 		uiSprites.clear();
 		lua_close(L);
+		L = NULL;
 	}
 	int findClosest(int idx,bool Enemy);
 	PlayMode();
@@ -158,6 +160,7 @@ private:
 	//call when placing creature
 	void PlaceCreatureSFX(Creature& creature);
 
+	bool flagRestart = false;
 	const Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;

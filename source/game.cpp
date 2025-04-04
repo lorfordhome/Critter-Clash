@@ -149,6 +149,17 @@ void Game::Release() {
 	audioManager.Shutdown();
 }
 
+void Game::RestartGame() {
+	GetModeMgr().DeleteMode(GAMEMODE::PLAY);
+	GetModeMgr().AddMode(new PlayMode());
+	GetModeMgr().SwitchMode(GAMEMODE::PLAY);
+	//reset music
+	if (getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		getAudioMgr().GetSongMgr()->Stop();
+		getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
+}
+
 void Game::Update(float dTime)
 {
 	audioManager.Update();

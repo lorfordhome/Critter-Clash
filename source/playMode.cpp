@@ -186,6 +186,8 @@ void PlayMode::GenerateEnemies() //generate all enemies
 	desiredDifficulty -= 1;
 	if (desiredDifficulty < 0)
 		desiredDifficulty = 0;
+	if (desiredDifficulty > 4)
+		desiredDifficulty = 4;
 	//if there are no valid saved troops to fight, randomly generate
 	if (Game::Get().troopCounts.empty()||Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
 			Game::Get().CountTroops(); //count troops again just to make sure
@@ -197,6 +199,7 @@ void PlayMode::GenerateEnemies() //generate all enemies
 				if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
 					return;
 			}
+			return;
 		}
 	}
 	//since there are valid troops  we can fight, generate them from the script
@@ -228,7 +231,7 @@ void PlayMode::GenerateScriptEnemies(int difficulty)
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
 	Execute(L, "Difficulty" + to_string(difficulty+1) + ".lua");
-	int creatureCount = Get2DTableLength(L, "Troops", difficulty + 1);
+	int creatureCount = Get2DTableLength(L, "Troops", rand+1);
 	for (int i = 0; i < creatureCount; ++i) {
 		creatureDetails creatureToSpawn;
 		creatureToSpawn.fromLua(L, rand+1, i + 1);
@@ -538,30 +541,33 @@ void PlayMode::FightUpdate(float dTime)
 {
 	for (int i = 0; i < gameCreatures.size(); i++) 
 	{
-		//update returns false if the creature has died
-		if (!gameCreatures[i].Update(dTime, true))
+		if (gameCreatures[i].active) 
 		{
-			if (gameCreatures[i].isEnemy) {
-				enemiesAlive--;
+			//update returns false if the creature has died
+			if (!gameCreatures[i].Update(dTime, true))
+			{
+				if (gameCreatures[i].isEnemy) {
+					enemiesAlive--;
+				}
+				else
+					teamAlive--;
+			}
+			gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
+
+			if (!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
+			{
+				Vector2 posToMove = MoveTowards(gameCreatures[i].sprite.Position,
+					gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
+					gameCreatures[i].speed);
+				posToMove.x / dTime;
+				posToMove.y / dTime;
+				gameCreatures[i].sprite.setPos(posToMove);
 			}
 			else
-				teamAlive--;
-		}
-		gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
-
-		if(!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
-		{
-			Vector2 posToMove= MoveTowards(gameCreatures[i].sprite.Position,
-				gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
-				gameCreatures[i].speed);
-			posToMove.x* dTime;
-			posToMove.y* dTime;
-			gameCreatures[i].sprite.setPos(posToMove);
-		}
-		else
-		{
-			if (gameCreatures[i].readyToAttack)
-				gameCreatures[i].Attack(gameCreatures[gameCreatures[i].targetIndex]);
+			{
+				if (gameCreatures[i].readyToAttack)
+					gameCreatures[i].Attack(gameCreatures[gameCreatures[i].targetIndex]);
+			}
 		}
 	}
 	//check for end
@@ -588,6 +594,8 @@ void PlayMode::OverUpdate(float dTime)
 			UIAction(uiSprites[i]);
 		}
 	}
+	if(flagRestart)
+		Game::Get().RestartGame();
 }
 
 
@@ -850,16 +858,7 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::UITYPE::restart)
 		{
-			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
-			Game::Get().GetModeMgr().AddMode(new PlayMode());
-			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::PLAY);
-			//reset music
-			if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
-				Game::Get().getAudioMgr().GetSongMgr()->Stop();
-				Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
-			}
-
-
+			flagRestart = true;
 		}
 		else if (sprite.uiType == UISprite::UITYPE::menu)
 		{
@@ -930,8 +929,6 @@ void PlayMode::ResetBoard()
 
 void PlayMode::InitLuaFunctions(Dispatcher& disp) {
 	Execute(L, "Script.lua");
-	//if (!LuaOK(L, luaL_dofile(L, "Script.lua")))
-	//	assert(false);
 	//initialising dispatcher here
 	disp.Init(L);
 	//tell dispatcher we have a function for lua

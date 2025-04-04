@@ -31,7 +31,7 @@ public:
 	unsigned char upgradeLevel = 1;
 	//combat stats
 	float attackDmg = 20;
-	float attackRange = 76;
+	float attackRange = 100;
 	float attackCooldown = 1;
 	float attackTimer = 0.f;
 	bool readyToAttack = true;

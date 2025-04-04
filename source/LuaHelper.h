@@ -77,6 +77,9 @@ struct creatureDetails {
 
 class Dispatcher {
 public:
+	~Dispatcher() {
+		library.clear();
+	}
 	//capture game functions here
 	struct Command {
 		typedef std::function<void(int)> voidintfunc; //created sig for a function which returns nothing and takes an int
@@ -91,8 +94,9 @@ public:
 	}
 	//register game functions
 	void Register(const std::string& name, Command cmd) {
-		assert(library.find(name) == library.end());
-			library[name] = cmd;
+		if (library.find(name) != library.end())
+			return;
+		library[name] = cmd;
 	}
 	//lua calls this then the data gets dispatched to the named function
 	//lua is C based so cannot call class member function swithout help
