@@ -3,10 +3,28 @@
 #include <io.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <sstream>
 
 #include "FileUtils.h"
 
 using namespace std;
+
+//used for editing the DifficultyX.lua files
+void RemoveLastCharFromFile(string fileToChange) {
+	std::ifstream fileIn(fileToChange);                   // open for reading
+
+	std::stringstream buffer;                             // store contents in a std::string
+	buffer << fileIn.rdbuf();
+	std::string contents = buffer.str();
+
+	fileIn.close();
+	contents.pop_back();                                  // remove last character
+
+
+	std::ofstream fileOut(fileToChange, std::ios::trunc); // open for writing (while also clearing file)
+	fileOut << contents;                                  // output contents with removed character
+	fileOut.close();
+}
 
 
 //some of the file handling functions are 16bit unicode, some are 8 bit so we need to support both

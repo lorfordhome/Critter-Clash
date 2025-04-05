@@ -59,7 +59,7 @@ public:
 		mModeMgr.ProcessKey(key);
 	}
 	void ApplyLua();
-	void ApplyLuaCheats();
+	void ApplyLuaCheats(bool defeat);
 	void CreateEnemyGroup();
 	int CalculateDifficulty(vector<Creature> creatureGroup);
 	//getters
@@ -72,6 +72,7 @@ public:
 	int maxDifficulty = 5;
 	vector<int> troopCounts;
 private:
+	const float difficultyDivisor = 2;
 	MyD3D& md3d;
 	SpriteBatch* mySpriteBatch = nullptr;
 	ModeMgr mModeMgr;
@@ -137,7 +138,7 @@ public:
 	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
 	void GenerateScriptEnemies(int difficulty);
 	void InitLuaFunctions(Dispatcher& disp);
-	void ApplyLuaCheats();
+	void ApplyLuaCheats(bool defeat);
 	SpriteFont& GetFont() {
 		assert(pixelFont);
 		return *pixelFont;
@@ -150,6 +151,7 @@ public:
 	int coins = 20;
 	unsigned char shopCreatureOffsetX = 20;
 	unsigned char shopCreatureOffsetY = 0;
+	unsigned char currentRound = 1;
 	//for lua stuff
 	Dispatcher disp;
 	lua_State* L;
@@ -173,7 +175,6 @@ private:
 	unsigned char enemiesAlive = 0;
 	unsigned char teamAlive = 0;
 	unsigned char maxShopSlots = 4;
-	unsigned char currentRound = 1;
 	int movedSprite = 0; //index of creature being moved
 	vector<vector<int>> playedTroops;
 };

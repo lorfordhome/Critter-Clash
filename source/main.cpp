@@ -30,7 +30,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	//do something game specific here
 	switch (msg)
 	{
-	// Respond to a keyboard event.
+	// respond to a keyboard event
 	case WM_CHAR:
 		switch (wParam)
 		{
@@ -47,9 +47,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'g':
 			Game::Get().CreateEnemyGroup();
 			break;
-		case 'C':
-		case 'c':
-			Game::Get().ApplyLuaCheats();
+		case 'W':
+		case 'w':
+			Game::Get().ApplyLuaCheats(false);
+		case 'D':
+		case 'd':
+			Game::Get().ApplyLuaCheats(true);
 		}
 		break;
 	case WM_INPUT:
@@ -94,9 +97,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 	#ifdef _DEBUG
 	d3d.ReleaseD3D(true);	
-	delete& Game::Get();
 	#else
 	d3d.ReleaseD3D(false);
 	#endif
+	delete& Game::Get();
 	return 0;
 }

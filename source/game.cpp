@@ -9,33 +9,18 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-//if ALT+ENTER or resize or drag window we might want do
-//something like pause the game perhaps, but we definitely
-//need to let D3D know what's happened (OnResize_Default).
 int OnResize(lua_State* L)
 {
+	//get values from lua
 	int screenWidth = lua_tointeger(L, 1);
 	int screenHeight = lua_tointeger(L, 2);
+	//resize the window
 	WinUtil::Get().ResizeWindow(screenWidth, screenHeight);
+	//need to let d3d know whats happened
 	Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
+	//clear stack
 	lua_pop(L, 2);
 	return 1;
-}
-
-void removeLastCharFromFile(string fileToChange) {
-	std::ifstream fileIn(fileToChange);                   // Open for reading
-
-	std::stringstream buffer;                             // Store contents in a std::string
-	buffer << fileIn.rdbuf();
-	std::string contents = buffer.str();
-
-	fileIn.close();
-	contents.pop_back();                                  // Remove last character
-
-
-	std::ofstream fileOut(fileToChange, std::ios::trunc); // Open for writing (while also clearing file)
-	fileOut << contents;                                  // Output contents with removed character
-	fileOut.close();
 }
 
 Vector2 getGridPosition(Grid& grid, Vector2 Position) {
@@ -200,20 +185,22 @@ void Game::ApplyLua() {
 		playMode->shopCreatureOffsetX = (LuaGetInt(L, "shopCreatureOffsetX"));
 		playMode->shopCreatureOffsetY = (LuaGetInt(L, "shopCreatureOffsetY"));
 		playMode->coins = (LuaGetInt(L, "coins"));
-		Vector2L pos;
-		playMode->resetShop = true;
-		playMode->InitShop();
+		playMode->currentRound = (LuaGetInt(L, "currentRound"));
+		if (playMode->state == PlayMode::State::SHOP) {
+			playMode->resetShop = true;
+			playMode->InitShop();
+		}
 	}
 
 
 	lua_close(L);
 }
 
-void Game::ApplyLuaCheats() {
+void Game::ApplyLuaCheats(bool defeat) {
 	if (mModeMgr.GetModeName() == GAMEMODE::PLAY) {
 		PlayMode* playMode = dynamic_cast<PlayMode*>(mModeMgr.GetMode());
 		if (playMode->state == PlayMode::State::FIGHT) {
-			playMode->ApplyLuaCheats();
+			playMode->ApplyLuaCheats(defeat);
 		}
 	}
 }
@@ -255,7 +242,7 @@ void Game::CreateEnemyGroup() {
 			luaL_openlibs(L);
 			Execute(L, "Difficulty" + to_string(difficulty) + ".lua");
 			//need to remove last char from file so the Troops table will be closed correctly
-			removeLastCharFromFile(("Difficulty" + to_string(difficulty) + ".lua"));
+			RemoveLastCharFromFile(("Difficulty" + to_string(difficulty) + ".lua"));
 			//need to open Script.lua as it contains the WriteTroops function
 			Execute(L, "Script.lua");
 			CallWriteTroops(L,difficulty, toWrite.str().c_str());
@@ -276,11 +263,11 @@ int Game::CalculateDifficulty(vector<Creature> creatureGroup) {
 	for (int i = 0; i < creatureGroup.size(); i++) {
 		difficulty+=creatureGroup[i].upgradeLevel;
 	}
-	difficulty /= 2;
+	difficulty /= difficultyDivisor;
 	if (difficulty < 1)
 		difficulty = 1;
-	else if (difficulty > 5)
-		difficulty = 5;
+	else if (difficulty > maxDifficulty)
+		difficulty = maxDifficulty;
 	return difficulty;
 }
 

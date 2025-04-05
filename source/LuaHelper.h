@@ -45,11 +45,11 @@ struct creatureDetails {
 			assert(false);
 
 		
-		lua_rawgeti(L, -1,subTable);    // Get Troops[subTable]
+		lua_rawgeti(L, -1,subTable);    // get Troops[subTable]
 		if (!lua_istable(L, -1))
 			assert(false);
 
-		lua_rawgeti(L, -1, creatureIndex);   // Get Troops[subTable][creatureIndex]
+		lua_rawgeti(L, -1, creatureIndex);   // get Troops[subTable][creatureIndex]
 
 		if (!lua_istable(L, -1))
 			assert(false);
@@ -71,7 +71,7 @@ struct creatureDetails {
 		type = static_cast<creatureType>(lua_tointeger(L, -1));
 		lua_pop(L, 1);
 
-		lua_pop(L, 2);  // Remove Troops[1][1], Troops[1], and Troops
+		lua_pop(L, 2);  // remove Troops[1][1], Troops[1], and Troops
 	}
 };
 

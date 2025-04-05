@@ -15,7 +15,13 @@ function InitWin()
 	CDispatcher("InitWin")
 end
 
+
+function InitLose()
+	CDispatcher("InitLose")
+end
+
+--basic variables to change
 coins=100
-currentRound=2
+currentRound=1
 shopCreatureOffsetX=20
 shopCreatureOffsetY=20

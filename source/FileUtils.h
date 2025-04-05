@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+
 //use our own names for basic types, quicker and we might change them later
 //some of the file handling functions are 16bit unicode, some are 8 bit so we need to support both
 typedef char utf8char;
@@ -24,6 +25,9 @@ Remaining parameters are optional containers for different things:
 */
 bool splitFileName(const utf8string &fileName, utf8string *pNameAndPath = nullptr, utf8string *pExt = nullptr,
 					utf8string *pPath = nullptr, utf8string *pName = nullptr);
+
+//remove last char from file
+void RemoveLastCharFromFile(std::string fileToChange);
 
 
 /*

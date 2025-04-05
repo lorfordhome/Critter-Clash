@@ -4,12 +4,7 @@
 using namespace std;
 
 void CallVoidVoidCFunc(lua_State* L, const std::string& fname) {
-	//lua_getglobal(L, fname.c_str());
-	//if (!lua_isfunction(L, -1))
-	//	assert(false);
 	CallFunction(L, fname);
-	//if (!LuaOK(L, lua_pcall(L, 0, 0, 0)))
-	//	assert(false);
 }
 
 bool LuaOK(lua_State* L, int id) {
@@ -84,7 +79,7 @@ int Get2DTableLength(lua_State* L, const char* tableToCheck, int subTableIndex) 
 
 }
 
-void Execute(lua_State* L, std::string szScript)
+void Execute(lua_State* L, std::string szScript) //for returning error message if something goes wrong.
 {
 	int nStatus = 0;
 
@@ -94,7 +89,7 @@ void Execute(lua_State* L, std::string szScript)
 	Error(L, nStatus);
 }
 
-void CallFunction(lua_State* L, std::string szName)
+void CallFunction(lua_State* L, std::string szName) //for returning error message if something goes wrong. only works for void void functions.
 {
 	int nStatus = 0;
 

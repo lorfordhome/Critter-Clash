@@ -189,18 +189,14 @@ void PlayMode::GenerateEnemies() //generate all enemies
 	if (desiredDifficulty > 4)
 		desiredDifficulty = 4;
 	//if there are no valid saved troops to fight, randomly generate
-	if (Game::Get().troopCounts.empty()||Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
-			Game::Get().CountTroops(); //count troops again just to make sure
-			//if it still fails
-		if (Game::Get().troopCounts.empty() || Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
-			while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
-			{
-				GenerateRandomEnemy();
-				if (enemiesAlive >= grid.gridHeight * grid.gridWidth)
-					return;
-			}
-			return;
+	if (Game::Get().troopCounts.empty() || Game::Get().troopCounts[desiredDifficulty] == 0 || playedTroops[desiredDifficulty].size() >= Game::Get().troopCounts[desiredDifficulty]) {
+		while (enemiesAlive < (currentRound + 1)) //will run until number of enemies reaches desired amount
+		{
+			GenerateRandomEnemy();
+			if (enemiesAlive >= grid.gridHeight * grid.gridWidth) //if the number of enemies has exceeded the grid capacity, stop
+				return;
 		}
+		return;
 	}
 	//since there are valid troops  we can fight, generate them from the script
 	GenerateScriptEnemies(desiredDifficulty);
@@ -211,8 +207,8 @@ void PlayMode::GenerateScriptEnemies(int difficulty)
 	//generate number, from which the troop will be selected
 	int rand = std::rand() % Game::Get().troopCounts[difficulty];
 
+	//if we've fought at this difficulty before, make sure you don't repeat a fight
 	if (!playedTroops[difficulty].empty()) {
-		//make sure this troop hasnt been fought before
 		bool uniqueTroop = false;
 		while (!uniqueTroop) {
 			rand = std::rand() % Game::Get().troopCounts[difficulty];
@@ -743,6 +739,7 @@ void PlayMode::StoreRender(float dTime, SpriteBatch& batch)
 
 void PlayMode::RenderShopTile(Creature& creature,Vector2 tilePosition,SpriteBatch& batch) //pass in upper-right corner of tile
 {
+	//need to fix these magic numbers
 	GetFontSmall().DrawString(&batch, creature.getName(), Vector2(tilePosition.x+70,tilePosition.y+5));
 	GetFontSmall().DrawString(&batch, creature.getDescriptor(), Vector2(tilePosition.x+30, tilePosition.y + 150));
 	GetFontSmall().DrawString(&batch, to_string(creature.getValue()).c_str(), Vector2(tilePosition.x+15, tilePosition.y+5));
@@ -942,8 +939,13 @@ void PlayMode::InitLuaFunctions(Dispatcher& disp) {
 	//tell dispatcher we have a function for lua
 	Dispatcher::Command::voidvoidfunc f{ [this](void) {return InitWin(); } };
 	disp.Register("InitWin", Dispatcher::Command{nullptr, f });
+	Dispatcher::Command::voidvoidfunc fn{ [this](void) {return InitLose(); } };
+	disp.Register("InitLose", Dispatcher::Command{ nullptr, fn });
 }
-void PlayMode::ApplyLuaCheats() {
+void PlayMode::ApplyLuaCheats(bool defeat) {
 	Execute(L, "Script.lua");
-	CallVoidVoidCFunc(L, "InitWin");
+	if (!defeat)
+		CallVoidVoidCFunc(L, "InitWin");
+	else
+		CallVoidVoidCFunc(L, "InitLose");
 }
