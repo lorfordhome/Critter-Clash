@@ -1,9 +1,9 @@
+#pragma once
 #ifndef FX_H
 #define FX_H
 
 #include <string>
 #include <d3d11.h>
-
 #include "D3DUtil.h"
 #include "ShaderTypes.h"
 #include "Mesh.h"

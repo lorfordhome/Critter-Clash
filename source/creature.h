@@ -16,33 +16,36 @@ private:
 	Sprite healthBar;
 	void ChangeDirection();
 	void PlayDeathSFX();
+	void DamageFlash(float dTime);
 public:
-	creatureType type=creatureType::NONE;
 	Sprite sprite; //active sprite
 	Sprite idleSprite;
 	enum ACTION{IDLE=0,WALK=1,ATTACK=2,DEAD=3};
 	ACTION currAction = ACTION::IDLE;
-	bool active = true;
-	bool isEnemy = false;
-	bool facingLeft = true; //false if creature is facing right
 	int targetIndex = 0; //index of creature it is targeting within the gameCreatures array
-
 	Vector2 lastPos = { 0,0 };
-	unsigned char upgradeLevel = 1;
 	//combat stats
 	float attackDmg = 20;
 	float attackRange = 100;
 	float attackCooldown = 1;
 	float attackTimer = 0.f;
-	bool readyToAttack = true;
+
 	float health = 100;
 	float maxHealth = 100;
-	float speed = 0.03f;
+	float speed = 100.f;
+
+	creatureType type = creatureType::NONE;
 
 	//damage flash effect
-	bool flashing = false;
 	float damageFlashDuration = 0.25;
 	float flashTimer = 0.f;
+	bool flashing = false;
+
+	bool active = true;
+	bool isEnemy = false;
+	bool facingLeft = true; //false if creature is facing right
+	bool readyToAttack = true;
+	unsigned char upgradeLevel = 1;
 
 	//functions
 	void SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect, RECT framerect, int totalframes, float animspeed, bool isShop=false);

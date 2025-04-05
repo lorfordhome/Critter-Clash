@@ -1,3 +1,4 @@
+#pragma once
 #ifndef GEOMETRYBUILDER_H
 #define GEOMETRYBUILDER_H
 

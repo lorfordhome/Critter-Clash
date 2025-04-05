@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "D3D.h"
 #include "FX.h"
 #include "WindowUtils.h"
 #include "Model.h"

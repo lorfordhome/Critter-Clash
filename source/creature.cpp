@@ -34,7 +34,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 		//set other animations
 		Sprite wSprite("chunkyWalk", "chunkyWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.5f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.3f);
 	}
 	if (typeToMake == creatureType::BUIZEL)
 	{
@@ -44,7 +44,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 		//set other animations
 		Sprite wSprite("buizelWalk", "mouseIdle.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.6f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.3f);
 	}
 	if (typeToMake == creatureType::SKITTY) 
 	{
@@ -57,7 +57,7 @@ Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool is
 		//set other animations
 		Sprite wSprite("skittyWalk", "mothfoxWalk.dds", Game::Get().GetD3D());
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.5f);
+		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.3f);
 	}
 	health = maxHealth;
 	idleSprite = sprite;
@@ -133,7 +133,7 @@ void Creature::ChangeDirection()
 	ChangeAnimation(currAction);
 }
 
-bool Creature::Update(float dTime, bool fightMode, bool isShop) 
+bool Creature::Update(float dTime, bool fightMode, bool isShop) //update returns false if the creature has died
 {
 	if (isShop) 
 	{
@@ -141,11 +141,7 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 		//damage flash
 		if (flashing)
 		{
-			flashTimer += dTime;
-			if (flashTimer >= damageFlashDuration) {
-				sprite.colour = Colours::White;
-				flashing = false;
-			}
+			DamageFlash(dTime);
 		}
 		return true;
 	}
@@ -182,13 +178,9 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop)
 			readyToAttack = (attackTimer >= attackCooldown); //returns true if the cooldown is ready
 		}
 		//damage flash
-		if (flashing) 
+		if (flashing)
 		{
-			flashTimer += dTime;
-			if (flashTimer >= damageFlashDuration) {
-				sprite.colour = Colours::White;
-				flashing = false;
-			}
+			DamageFlash(dTime);
 		}
 
 		if (health <= 0) {
@@ -224,7 +216,13 @@ void Creature::PlayDeathSFX()
 		}
 	}
 }
-
+void Creature::DamageFlash(float dTime) {
+	flashTimer += dTime;
+	if (flashTimer >= damageFlashDuration) {
+		sprite.colour = Colours::White;
+		flashing = false;
+	}
+}
 
 void Creature::Attack(Creature& target)
 {

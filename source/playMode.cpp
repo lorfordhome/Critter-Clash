@@ -554,9 +554,7 @@ void PlayMode::FightUpdate(float dTime)
 			{
 				Vector2 posToMove = MoveTowards(gameCreatures[i].sprite.Position,
 					gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
-					gameCreatures[i].speed);
-				posToMove.x / dTime;
-				posToMove.y / dTime;
+					gameCreatures[i].speed*dTime);
 				gameCreatures[i].sprite.setPos(posToMove);
 			}
 			else
