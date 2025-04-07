@@ -51,6 +51,17 @@ void CallWriteTroops(lua_State* L, int difficulty, const char* stringToWrite) {
 		assert(false);
 }
 
+int CallRandomNumber(lua_State* L) {
+	lua_getglobal(L, "randomNumber");
+	if (!lua_isfunction(L, -1))
+		assert(false);
+	if (!LuaOK(L, lua_pcall(L, 0, 1, 0)))
+		assert(false);
+	int result = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+	return result;
+}
+
 int GetTableLength(lua_State* L, const char* tableToCheck) {
 	lua_getglobal(L, tableToCheck);
 	if (!lua_istable(L, -1))

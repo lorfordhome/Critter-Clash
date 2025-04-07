@@ -1,3 +1,4 @@
+math.randomseed(os.time())
 
 function WriteTroops(difficulty,stringToWrite)
 	local filename="Difficulty"..difficulty
@@ -5,6 +6,10 @@ function WriteTroops(difficulty,stringToWrite)
 	file=io.open(filename..fileEnding,"a")
 	file:write(stringToWrite)
 	file:close()
+end
+
+function randomNumber()
+	return math.random(1,1000)
 end
 
 function CallResize()

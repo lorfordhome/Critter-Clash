@@ -114,6 +114,7 @@ int LuaGetInt(lua_State* L, const std::string& name);
 std::string LuaGetStr(lua_State* L, const std::string& name);
 int GetType(lua_State* L, const std::string& name);
 void CallWriteTroops(lua_State* L, int difficulty, const char* stringToWrite);
+int CallRandomNumber(lua_State* L);
 void Execute(lua_State* L, std::string szScript);
 void CallFunction(lua_State* L, std::string szName);
 void Error(lua_State* L, int nStatus);
