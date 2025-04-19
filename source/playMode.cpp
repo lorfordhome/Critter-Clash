@@ -1,22 +1,14 @@
 #pragma once
-#include <windows.h>
 #include <string>
 #include <cassert>
-#include <d3d11.h>
-#include "WindowUtils.h"
-#include "D3DUtil.h"
-#include "D3D.h"
-#include "SpriteFont.h"
-#include "DDSTextureLoader.h"
-#include "CommonStates.h"
 #include "sprite.h"
 #include "game.h"
 #include "LuaHelper.h"
 
 
-Vector2 MoveTowards(Vector2 current, Vector2 target, float maxDistanceDelta)
+Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
 {
-	Vector2 a = target - current;
+	raylib::Vector2 a = target - current;
 	a.Normalize();
 	float magnitude = (a.x * a.x + a.y * a.y);
 	if (magnitude <= maxDistanceDelta || magnitude == 0.f)

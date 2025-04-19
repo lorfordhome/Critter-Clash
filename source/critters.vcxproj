@@ -48,14 +48,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
-    <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath);..\..\..\raylib-cpp-5.5.0\include</IncludePath>
     <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\debug;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath);..\..\..\DirectXTK\Bin\Desktop_2022\Win32\Debug</LibraryPath>
     <OutDir>$(SolutionDir)\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
-    <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath);..\..\..\raylib-cpp-5.5.0\include</IncludePath>
     <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\release;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath);..\..\..\DirectXTK\Bin\Desktop_2022\Win32\Release</LibraryPath>
     <OutDir>$(SolutionDir)\bin\</OutDir>
   </PropertyGroup>
@@ -68,7 +68,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/wd4005 %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\DirectXTK\Inc;../lua-5.4.4/liblua54.a</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../lua-5.4.4/liblua54.a</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -87,7 +87,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\DirectXTK\Inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -107,42 +108,27 @@
     <ClCompile Include="Fx.cpp" />
     <ClCompile Include="GeometryBuilder.cpp" />
     <ClCompile Include="LuaHelper.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="playMode.cpp" />
     <ClCompile Include="creature.cpp" />
-    <ClCompile Include="D3D.cpp" />
-    <ClCompile Include="D3DUtil.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModeMgr.cpp" />
-    <ClCompile Include="ShaderTypes.cpp" />
-    <ClCompile Include="ShaderTypes.h" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="TexCache.cpp" />
-    <ClCompile Include="WindowUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioMgr.h" />
     <ClInclude Include="AudioMgrFMOD.h" />
     <ClInclude Include="creature.h" />
-    <ClInclude Include="D3D.h" />
-    <ClInclude Include="D3DUtil.h" />
     <ClInclude Include="FileUtils.h" />
-    <ClInclude Include="Fx.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="GeometryBuilder.h" />
-    <ClInclude Include="Input.h" />
     <ClInclude Include="LuaHelper.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
     <ClInclude Include="ModeMgr.h" />
+    <ClInclude Include="rango.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="TexCache.h" />
     <ClInclude Include="Viewport.h" />
-    <ClInclude Include="WindowUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\FX\Constants.hlsl">
@@ -199,8 +185,16 @@
     <None Include="..\bin\Difficulty5.lua" />
     <None Include="..\bin\Script.lua" />
     <None Include="..\bin\troops.lua" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\raylib.5.5.0\build\native\raylib.targets" Condition="Exists('..\packages\raylib.5.5.0\build\native\raylib.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\raylib.5.5.0\build\native\raylib.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\raylib.5.5.0\build\native\raylib.targets'))" />
+  </Target>
 </Project>

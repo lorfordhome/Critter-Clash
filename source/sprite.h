@@ -1,21 +1,11 @@
 #pragma once
-#include <windows.h>
 #include <string>
 #include <cassert>
-#include <d3d11.h>
 #include <iomanip>
 #include <vector>
+#include "raylib-cpp.hpp"
 
-#include "WindowUtils.h"
-#include "D3DUtil.h"
-#include "D3D.h"
-#include "SimpleMath.h"
-#include "SpriteFont.h"
-#include "DDSTextureLoader.h"
-#include "CommonStates.h"
 using namespace std;
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
 
 class Grid;
 
@@ -27,17 +17,17 @@ protected:
 	float depth=0; //for sorting
 	float animSpeed = 0.8f; //lower value = faster animation
 	float Rotation = 0;
-	RECT spriteRect={ 0,0,0,0 };
-	RECT frameSize = { 0,0,0,0 };
+	raylib::Rectangle spriteRect={ 0,0,0,0 };
+	raylib::Rectangle frameSize = { 0,0,0,0 };
 	bool isAnim = false;
 	unsigned char totalFrames=0;
 	unsigned char frameCount=0;
 	float animTime = 0; 
-	XMVECTOR colour = Colours::White;
+	raylib::Color colour = WHITE;
 	string spriteName="";//this is used for finding the texture within the texcache
 	string filePath="";
-	ID3D11ShaderResourceView* texture=nullptr;
-	RECT dim{ 0,0,0,0 };
+	raylib::Texture2D* texture=nullptr;
+	raylib::Rectangle dim{ 0,0,0,0 };
 	friend class Creature;
 public:
 	bool isHover = false;
@@ -51,36 +41,37 @@ public:
 		CREATURE = 0, UI = 1
 	};
 	spriteTYPE type = spriteTYPE::CREATURE;
-	Vector2 previousGridPos = Vector2(0, 0);
+	Vector2 previousGridPos{ 0,0 };
 	Vector2 Position{ 400,400 };
-	void Init(Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect,RECT framerect,int totalframes, float animspeed);
-	void Init(Vector2 position, Vector2 scale, Vector2 origin, RECT spriterect);
+	void Init(Vector2 position, Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect,raylib::Rectangle framerect,int totalframes, float animspeed);
+	void Init(Vector2 position, Vector2 scale, Vector2 origin, raylib::Rectangle spriterect);
 	virtual void Update(float dTime);
-	virtual void Render(SpriteBatch* Batch);
-	Sprite(string spriteName, string path, MyD3D& d3d);
+	void PlayAnimation(float dTime);
+	virtual void Render();
+	Sprite(string spriteName, string path);
 	Sprite();
-	void setTex(ID3D11ShaderResourceView* tex, const RECT& texRect);
-	void setTex(ID3D11ShaderResourceView* tex);
+	void setTex(raylib::Texture2D* tex, const raylib::Rectangle& texRect);
+	void setTex(raylib::Texture2D* tex);
 	void setPos(Vector2& pos) {
 		Position = pos;
 	}
 	bool setGridPosition(Grid& grid,int x, int y, bool checkCol=true);
 	//change grid pos without resetting previous pos to empty
 	bool setGridPositionNoPrev(Grid& grid, int x, int y, bool checkCol=true); 
-	void setSpriteRect(RECT& SpriteRect) {
+	void setSpriteRect(raylib::Rectangle& SpriteRect) {
 		spriteRect = SpriteRect;
 	}
-	RECT getDim() {
-		dim = (RECT{ long(spriteRect.left * Scale.x), long(spriteRect.top * Scale.y), long(spriteRect.right * Scale.x), long(spriteRect.bottom * Scale.y) });
+	raylib::Rectangle getDim() {
+		dim = (raylib::Rectangle{ (spriteRect.x * Scale.x), (spriteRect.y * Scale.y), (spriteRect.width * Scale.x), (spriteRect.height * Scale.y) });
 		return dim;
 	}
-	const RECT getSpriteRect() {
+	const raylib::Rectangle getSpriteRect() {
 		return spriteRect;
 	}
-	const RECT getFrameSize() {
+	const raylib::Rectangle getFrameSize() {
 		return frameSize;
 	}
-	void setColour(XMVECTOR newCol) {
+	void setColour(Color newCol) {
 		colour = newCol;
 	}
 	void setScale(Vector2 newScale) {
@@ -93,7 +84,7 @@ public:
 		animTime = 0;
 		frameCount = 0;
 	}
-	void setAnimValues(int totalframes, float animspeed, RECT frameRect) {
+	void setAnimValues(int totalframes, float animspeed, raylib::Rectangle frameRect) {
 		frameSize = frameRect;
 		totalFrames = totalframes;
 		animSpeed = animspeed;
@@ -112,7 +103,7 @@ public:
 	~UISprite() {
 		texture = nullptr;
 	}
-	UISprite(string spriteName, string path, MyD3D& d3d);
+	UISprite(string spriteName, string path);
 	UISprite();
 	enum UITYPE {
 		none, start, options, next, restart, menu, quit, store,sell

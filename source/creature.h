@@ -48,9 +48,9 @@ public:
 	unsigned char upgradeLevel = 1;
 
 	//functions
-	void SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, RECT spriteRect, RECT framerect, int totalframes, float animspeed, bool isShop=false);
-	Creature(string SpriteName, string path, MyD3D& d3d, bool Enemy = false):isEnemy(Enemy) {
-		Sprite _sprite(SpriteName, path, d3d);
+	void SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect, raylib::Rectangle framerect, int totalframes, float animspeed, bool isShop=false);
+	Creature(string SpriteName, string path,bool Enemy = false):isEnemy(Enemy) {
+		Sprite _sprite(SpriteName, path);
 		sprite = _sprite;
 	}
 	Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool isShop=false, bool Enemy = false);
@@ -63,7 +63,7 @@ public:
 	bool Update(float dTime, bool fightMode, bool isShop=false);
 	void Attack(Creature& target);
 	void TakeDamage(float damage);
-	void Render(SpriteBatch* Batch,bool renderHealth=true);
+	void Render(bool renderHealth=true);
 	void ResetCreature();
 
 

@@ -28,9 +28,9 @@ void ModeMgr::Update(float dTime) {
 	mModes[mCurrentMIdx]->Update(dTime);
 }
 
-void ModeMgr::Render(float dTime, DirectX::SpriteBatch& batch) {
+void ModeMgr::Render(float dTime) {
 	if (mCurrentMIdx >= 0 && mCurrentMIdx < (int)mModes.size())
-		mModes[mCurrentMIdx]->Render(dTime, batch);
+		mModes[mCurrentMIdx]->Render(dTime);
 }
 
 void ModeMgr::ProcessKey(char key) {

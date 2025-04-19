@@ -1,17 +1,12 @@
 #pragma once
-#include "WindowUtils.h"
-#include "SimpleMath.h"
-#include "SpriteFont.h"
-#include "CommonStates.h"
 #include <stdexcept>
-#include "Input.h"
 #include "Singleton.h"
 #include "creature.h"
 #include "ModeMgr.h"
 #include "AudioMgrFMOD.h"
-#include "Mesh.h"
-#include "Model.h"
 #include "LuaHelper.h"
+#include "raylib-cpp.hpp"
+#include "rango.h"
 
 struct Tile {
 	enum Container {NONE=0,CREATURE=1,ABILITY=2};
@@ -30,9 +25,8 @@ public:
 	static constexpr int cellSize = 128;
 	Tile grid[gridWidth][gridHeight];
 	bool visible = true;
-	Grid(MyD3D& d3d);
 	Grid();
-    void RenderGrid(float dTime, SpriteBatch* mySpriteBatch);
+    void RenderGrid(float dTime);
 	Tile Get(int x, int y);
 	void updateTile(int x, int y, Tile::Container Value);
 	void ResetTiles();
@@ -47,9 +41,7 @@ public:
 		Release();
 	}
 
-	Mouse mouse;
-
-	Game(MyD3D& md3d);
+	Game(Rango& rango);
 	void CountTroops();
 	void Release();
 	void RestartGame();
@@ -63,7 +55,7 @@ public:
 	void CreateEnemyGroup();
 	int CalculateDifficulty(vector<Creature> creatureGroup);
 	//getters
-	MyD3D& GetD3D() { return md3d; }
+	Rango& GetRango() { return rango; }
 	ModeMgr& GetModeMgr() { return mModeMgr; }
 	AudioMgrFMOD& getAudioMgr() { return audioManager; }
 	unsigned int musicHdl = 1;
@@ -73,8 +65,7 @@ public:
 	vector<int> troopCounts;
 private:
 	const float difficultyDivisor = 2;
-	MyD3D& md3d;
-	SpriteBatch* mySpriteBatch = nullptr;
+	Rango& rango;
 	ModeMgr mModeMgr;
 	AudioMgrFMOD audioManager;
 };
@@ -84,8 +75,8 @@ Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize, int gri
 //GAME MODES
 
 class PlayMode : public AMode {
-	SpriteFont* pixelFont = nullptr;
-	SpriteFont* pixelFontSmall = nullptr;
+	//SpriteFont* pixelFont = nullptr;
+	//SpriteFont* pixelFontSmall = nullptr;
 
 	std::vector<Creature> shopCreatures{};
 	std::vector<UISprite> uiSprites{};
@@ -101,8 +92,8 @@ public:
 	std::vector<Creature> gameCreatures{};
 	~PlayMode() 
 	{
-		delete pixelFont;
-		delete pixelFontSmall;
+		//delete pixelFont;
+		//delete pixelFontSmall;
 		gameCreatures.clear();
 		uiSprites.clear();
 		lua_close(L);
@@ -114,11 +105,11 @@ public:
 	void InitBuild();
 	static const GAMEMODE MODE_NAME = GAMEMODE::PLAY;
 	void Update(float dTime) override;
-	void Render(float dTime, SpriteBatch& batch) override;
-	void StoreRender(float dtime, SpriteBatch& batch);
+	void Render(float dTime) override;
+	void StoreRender(float dtime);
 	void UIAction(UISprite& sprite);
 	void ResetBoard();
-	void BuildRender(float dTime, SpriteBatch& batch);
+	void BuildRender(float dTime);
 	GAMEMODE GetMName() const override {
 		return GAMEMODE::PLAY;
 	}
@@ -131,22 +122,22 @@ public:
 	void InitLose();
 	void InitWin();
 	void InitBattle();
-	void FightRender(float dTime,SpriteBatch& batch);
-	void dragSprite(Sprite& sprite, Mouse& mouse);
-	bool isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev=false);
+	void FightRender(float dTime);
+	void dragSprite(Sprite& sprite);
+	bool isGridClicked(Grid& Grid, Sprite& sprite, bool noPrev=false);
 	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
-	void RenderShopTile(Creature& creature, Vector2 tilePosition, SpriteBatch& batch);
+	void RenderShopTile(Creature& creature, Vector2 tilePosition);
 	void GenerateScriptEnemies(int difficulty);
 	void InitLuaFunctions(Dispatcher& disp);
 	void ApplyLuaCheats(bool defeat);
-	SpriteFont& GetFont() {
-		assert(pixelFont);
-		return *pixelFont;
-	}
-	SpriteFont& GetFontSmall() {
-		assert(pixelFontSmall);
-		return *pixelFontSmall;
-	}
+	//SpriteFont& GetFont() {
+	//	assert(pixelFont);
+	//	return *pixelFont;
+	//}
+	//SpriteFont& GetFontSmall() {
+	//	assert(pixelFontSmall);
+	//	return *pixelFontSmall;
+	//}
 
 	int coins = 20;
 	unsigned char shopCreatureOffsetX = 20;
@@ -179,5 +170,5 @@ private:
 	vector<vector<int>> playedTroops;
 };
 
-bool isSpriteClicked(Sprite& sprite, Mouse& mouse);
-bool isSpriteClickReleased(Sprite& sprite, Mouse& mouse);
+bool isSpriteClicked(Sprite& sprite);
+bool isSpriteClickReleased(Sprite& sprite);

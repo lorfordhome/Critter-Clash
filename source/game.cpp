@@ -56,7 +56,7 @@ Grid::Grid(MyD3D& d3d) {
 	Sprite GridSprite("gridLines", "gridSquare2.dds", d3d); //temporary to initialise grid sprite
 	gridSprite = GridSprite;
 	gridSprite.setScale(Vector2(4, 4));
-	gridSprite.setSpriteRect(RECT{ 0,0,33,33 });
+	gridSprite.setSpriteRect(raylib::Rectangle{ 0,0,33,33 });
 
 	for (int i = 0; i < gridWidth; i++) {
 		for (int j = 0; j < gridHeight; j++) {
@@ -152,17 +152,12 @@ void Game::Update(float dTime)
 }
 void Game::Render(float dTime)
 {
-	md3d.BeginRender(Vector4(0.1843f, 0.5058f, 0.2117f, 1)); //hexcode for background colour
+	BeginDrawing();
+	ClearBackground(GREEN);
 
+	mModeMgr.Render(dTime);
 
-	CommonStates dxstate(&md3d.GetDevice());
-	mySpriteBatch->Begin(SpriteSortMode_Deferred, dxstate.NonPremultiplied(), dxstate.PointWrap());
-	mModeMgr.Render(dTime, *mySpriteBatch);
-	mySpriteBatch->End();
-
-
-	md3d.EndRender();
-	mouse.PostProcess();
+	EndDrawing();
 }
 
 void Game::ApplyLua() {

@@ -116,7 +116,7 @@ void Error(lua_State* L, int nStatus)
 	{
 		std::string szError = lua_tostring(L, -1);
 		szError = "LUA:\n" + szError;
-		MessageBox(NULL, szError.c_str(), "Error", MB_OK | MB_ICONERROR);
+		//MessageBox(NULL, szError.c_str(), "Error", MB_OK | MB_ICONERROR);
 		lua_pop(L, 1);
 	}
 }
@@ -139,7 +139,7 @@ int Dispatcher::LuaCall(lua_State* L) {
 		}
 	else //add more cases...
 	{
-		MessageBox(NULL, "Dispatcher Command Not Found", "Error", MB_OK | MB_ICONERROR);
+	/*	MessageBox(NULL, "Dispatcher Command Not Found", "Error", MB_OK | MB_ICONERROR);*/
 	}
 	return 1;
 }

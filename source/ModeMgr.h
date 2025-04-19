@@ -3,10 +3,8 @@
 #include <vector>
 #include <string>
 
-#include "D3D.h"
-#include "SpriteBatch.h"
 #include "sprite.h"
-#include "GeometryBuilder.h"
+
 enum class GAMEMODE { INTRO, MENU, PLAY, OVER };
 /*
 ABC representing a game mode like intro, game, gameOver, highScores, etc.
@@ -27,7 +25,7 @@ public:
 	//once active this is called repeatedly, contains the logic of the mode
 	virtual void Update(float dTime) = 0;
 	//used by a mode to render itself
-	virtual void Render(float dTime, DirectX::SpriteBatch& batch) = 0;
+	virtual void Render(float dTime) = 0;
 	//get a mode's name
 	virtual GAMEMODE GetMName() const = 0;
 	//pass WM_CHAR key messages to a mode
@@ -41,17 +39,13 @@ class MenuMode : public AMode
 	std::vector<UISprite> uiSprites;
 	Sprite bgSprite;
 	Sprite logoSprite;
-	std::vector<Model> mModels;
-	const DirectX::SimpleMath::Vector3 mDefCamPos = DirectX::SimpleMath::Vector3(0, 2, -5);
-	DirectX::SimpleMath::Vector3 mCamPos = DirectX::SimpleMath::Vector3(0, 2, -5);
-	float gAngle = 0;
 public:
 	~MenuMode() {
 		uiSprites.clear();
 	}
 	MenuMode();
 	void Update(float dTime) override;
-	void Render(float dTime, SpriteBatch& batch) override;
+	void Render(float dTime) override;
 	void UIAction(UISprite& sprite) override;
 	static const GAMEMODE MODE_NAME = GAMEMODE::MENU;
 	GAMEMODE GetMName() const override {
@@ -75,7 +69,7 @@ public:
 	//update the current mode
 	void Update(float dTime);
 	//render the current mode
-	void Render(float dTime, DirectX::SpriteBatch& batch);
+	void Render(float dTime);
 	//send a key to the current mode
 	void ProcessKey(char key);
 	//add a new mode, these should be dynamically allocated
