@@ -4,7 +4,6 @@
 #include <vector>
 #include "sprite.h"
 #include "game.h"
-#include "Input.h"
 #include "LuaHelper.h"
 #include "raylib-cpp.hpp"
 
@@ -47,7 +46,7 @@ int main()
 	Rango rango;
 	new Game(rango);
 
-	while (!window.ShouldClose())
+	while (!window.ShouldClose()||!rango.windowShouldClose)
 	{
 		deltaTime = GetFrameTime();
 		//update
@@ -56,6 +55,7 @@ int main()
 		//render
 		Game::Get().Render(deltaTime);
 	}
+	CloseWindow();
 	delete& Game::Get();
 	return 0;
 }

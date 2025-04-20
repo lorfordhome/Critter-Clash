@@ -1,6 +1,7 @@
 #pragma once
 #include "sprite.h"
 #include "game.h"
+#include "ResourceManager.h"
 using namespace std;
 
 bool Sprite::setGridPosition(Grid& grid,int x,int y, bool checkCol) {
@@ -33,22 +34,20 @@ bool Sprite::setGridPositionNoPrev(Grid& grid, int x, int y, bool checkCol) {
 }
 
 Sprite::Sprite() {
-	texture = nullptr;
 };
 Sprite::Sprite(string SpriteName, string path) :spriteName(SpriteName),filePath(path) {
-	/*texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);*/
+	texture(filePath);
 }
 UISprite::UISprite() {
-	texture = nullptr;
 	type = Sprite::spriteTYPE::UI;
 }
 UISprite::UISprite(string SpriteName, string path) {
 	spriteName = SpriteName;
 	filePath = path;
-	//texture = d3d.GetCache().LoadTexture(&d3d.GetDevice(), filePath, spriteName, true);
+	texture = (Game::Get().GetRango().GetCache().LoadTexture(filePath, spriteName, true));
 	type = Sprite::spriteTYPE::UI;
 }
-void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, raylib::Rectangle spriterect)
+void Sprite::Init(raylib::Vector2 position, raylib::Vector2 scale, raylib::Vector2 origin, raylib::Rectangle spriterect)
 {
 	Position = position;
 	Scale = scale;
@@ -56,7 +55,7 @@ void Sprite::Init(Vector2 position, Vector2 scale, Vector2 origin, raylib::Recta
 	spriteRect = spriterect;
 
 }
-void Sprite::Init(Vector2 position, Vector2 scale, bool centerOrigin, raylib::Rectangle spriterect, raylib::Rectangle framerect, int totalframes, float animspeed) {
+void Sprite::Init(raylib::Vector2 position, raylib::Vector2 scale, bool centerOrigin, raylib::Rectangle spriterect, raylib::Rectangle framerect, int totalframes, float animspeed) {
 	Scale = scale;
 	spriteRect = spriterect;
 	frameSize = framerect;

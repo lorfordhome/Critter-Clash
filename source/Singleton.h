@@ -1,7 +1,7 @@
 // by Mark Featherstone (C) 2019 All Rights Reserved.
 #ifndef SINGLETON_H
 #define SINGLETON_H
-
+#include <cassert>
 /*
 We often want only one instance of an object, especially if we are creating manager classes
 to hold onto groups of objects and manage their lifetime. A singleton is a "design pattern"

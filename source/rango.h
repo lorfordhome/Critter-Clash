@@ -6,6 +6,7 @@
 class Rango {
 public:
 	TexCache& GetCache() { return mTexCache; }
+	bool windowShouldClose=false;
 private:
 	TexCache mTexCache;
 };

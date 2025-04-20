@@ -11,9 +11,9 @@ class Grid;
 
 class Sprite {
 protected:
-	Vector2 Dir{ 1,0 };
-	Vector2 Origin{ 0,0 };
-	Vector2 Scale{ 1,1 };
+	raylib::Vector2 Dir{ 1,0 };
+	raylib::Vector2 Origin{ 0,0 };
+	raylib::Vector2 Scale{ 1,1 };
 	float depth=0; //for sorting
 	float animSpeed = 0.8f; //lower value = faster animation
 	float Rotation = 0;
@@ -26,25 +26,24 @@ protected:
 	raylib::Color colour = WHITE;
 	string spriteName="";//this is used for finding the texture within the texcache
 	string filePath="";
-	raylib::Texture2D* texture=nullptr;
+	raylib::Texture2D texture;
 	raylib::Rectangle dim{ 0,0,0,0 };
 	friend class Creature;
 public:
 	bool isHover = false;
 	bool active = true;
 	~Sprite() {
-		texture = nullptr;
-		delete texture;
+		UnloadTexture(texture);
 	}
 	enum spriteTYPE
 	{
 		CREATURE = 0, UI = 1
 	};
 	spriteTYPE type = spriteTYPE::CREATURE;
-	Vector2 previousGridPos{ 0,0 };
-	Vector2 Position{ 400,400 };
-	void Init(Vector2 position, Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect,raylib::Rectangle framerect,int totalframes, float animspeed);
-	void Init(Vector2 position, Vector2 scale, Vector2 origin, raylib::Rectangle spriterect);
+	raylib::Vector2 previousGridPos{ 0,0 };
+	raylib::Vector2 Position{ 400,400 };
+	void Init(raylib::Vector2 position, raylib::Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect,raylib::Rectangle framerect,int totalframes, float animspeed);
+	void Init(raylib::Vector2 position, raylib::Vector2 scale, raylib::Vector2 origin, raylib::Rectangle spriterect);
 	virtual void Update(float dTime);
 	void PlayAnimation(float dTime);
 	virtual void Render();
@@ -52,7 +51,7 @@ public:
 	Sprite();
 	void setTex(raylib::Texture2D* tex, const raylib::Rectangle& texRect);
 	void setTex(raylib::Texture2D* tex);
-	void setPos(Vector2& pos) {
+	void setPos(raylib::Vector2& pos) {
 		Position = pos;
 	}
 	bool setGridPosition(Grid& grid,int x, int y, bool checkCol=true);
@@ -71,10 +70,10 @@ public:
 	const raylib::Rectangle getFrameSize() {
 		return frameSize;
 	}
-	void setColour(Color newCol) {
+	void setColour(raylib::Color newCol) {
 		colour = newCol;
 	}
-	void setScale(Vector2 newScale) {
+	void setScale(raylib::Vector2 newScale) {
 		Scale = newScale;
 	}
 	void setAnimValues(int totalframes, float animspeed) {

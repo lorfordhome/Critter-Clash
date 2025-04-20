@@ -72,7 +72,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>assimp-vc143-mtd.lib;directxtk.lib;dxgi.lib;d3d11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(SolutionDir)\bin\$(TargetName)$(TargetExt)</OutputFile>
@@ -92,7 +92,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
@@ -105,8 +105,6 @@
     <ClCompile Include="AudioMgr.cpp" />
     <ClCompile Include="AudioMgrFMOD.cpp" />
     <ClCompile Include="FileUtils.cpp" />
-    <ClCompile Include="Fx.cpp" />
-    <ClCompile Include="GeometryBuilder.cpp" />
     <ClCompile Include="LuaHelper.cpp" />
     <ClCompile Include="playMode.cpp" />
     <ClCompile Include="creature.cpp" />
@@ -125,6 +123,7 @@
     <ClInclude Include="LuaHelper.h" />
     <ClInclude Include="ModeMgr.h" />
     <ClInclude Include="rango.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="TexCache.h" />

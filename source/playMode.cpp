@@ -5,8 +5,7 @@
 #include "game.h"
 #include "LuaHelper.h"
 
-
-Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
+raylib::Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
 {
 	raylib::Vector2 a = target - current;
 	a.Normalize();
@@ -22,27 +21,27 @@ Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDi
 bool checkCol(Sprite& spriteA, Sprite& spriteB) 
 {
 	//intialise Rectangles
-	SimpleMath::Rectangle aRect = SimpleMath::Rectangle(spriteA.getDim());
+	raylib::Rectangle aRect = raylib::Rectangle(spriteA.getDim());
 	aRect.x = spriteA.Position.x;
 	aRect.y = spriteA.Position.y;
-	SimpleMath::Rectangle bRect = SimpleMath::Rectangle(spriteB.getDim());
+	raylib::Rectangle bRect = raylib::Rectangle(spriteB.getDim());
 	bRect.x = spriteB.Position.x;
 	bRect.y = spriteB.Position.y;
 
-	return(aRect.Intersects(bRect));
+	return(aRect.CheckCollision(bRect));
 
 }
 
 bool checkCol(Creature& attacker, Creature& target) 
 {
 	//create col rectangle for the creatures attack
-	SimpleMath::Rectangle aRect(attacker.sprite.Position.x, attacker.sprite.Position.y, attacker.attackRange, attacker.attackRange);
+	raylib::Rectangle aRect(attacker.sprite.Position.x, attacker.sprite.Position.y, attacker.attackRange, attacker.attackRange);
 	//create col rectangle for target
-	SimpleMath::Rectangle bRect = SimpleMath::Rectangle(target.sprite.getDim());
+	raylib::Rectangle bRect = raylib::Rectangle(target.sprite.getDim());
 	bRect.x = target.sprite.Position.x;
 	bRect.y = target.sprite.Position.y;
 
-	return(aRect.Intersects(bRect));
+	return(aRect.CheckCollision(bRect));
 
 }
 
@@ -80,29 +79,29 @@ PlayMode::PlayMode() {
 	uiSprites.reserve(4);
 	playedTroops.resize(5);
 
-	srand(GetTickCount64());
+	srand(time(NULL));
 
-	Sprite _bg("Background", "map6.dds", Game::Get().GetD3D()); //temp for initialising
-	_bg.Init(Vector2(0, 0), Vector2(2, 2), Vector2(0, 0), RECT{ 0,0,512,384 });
+	Sprite _bg("Background", "map6.dds"); //temp for initialising
+	_bg.Init(raylib::Vector2(0, 0), raylib::Vector2(2, 2), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,384 });
 	bgSprite = _bg;
 
-	Grid _grid(Game::Get().GetD3D()); 
-	grid = _grid;
+	//Grid _grid;
+	//grid = _grid;
 
-	Sprite _coin("coin", "coin.dds", Game::Get().GetD3D());
-	_coin.Init(Vector2(5, 20), Vector2(0.8, 0.8), Vector2(0, 0), RECT{ 0,0,45,48 });
+	Sprite _coin("coin", "coin.dds");
+	_coin.Init(raylib::Vector2(5, 20), raylib::Vector2(0.8, 0.8), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,45,48 });
 	coinSprite = _coin;
 
-	Sprite _sprite("store", "store.dds", Game::Get().GetD3D());
-	_sprite.Init(Vector2(525, 0), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,512,768 });
+	Sprite _sprite("store", "store.dds");
+	_sprite.Init(raylib::Vector2(525, 0), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,768 });
 	shopSprite = _sprite;
 
 
-	pixelFont = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelText.spritefont");
+	/*pixelFont = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelText.spritefont");
 	assert(pixelFont);
 
 	pixelFontSmall = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelTextSmall.spritefont");
-	assert(pixelFontSmall);
+	assert(pixelFontSmall);*/
 	L = luaL_newstate();
 	luaL_openlibs(L);
 
@@ -122,8 +121,8 @@ void PlayMode::InitShop()
 		resetShop = false;
 	}
 
-	UISprite _box("sellBox", "sellBox.dds", Game::Get().GetD3D());
-	_box.Init(Vector2(575, 590), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,416,146 });
+	UISprite _box("sellBox", "sellBox.dds");
+	_box.Init(raylib::Vector2(575, 590), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,416,146 });
 	_box.type = Sprite::spriteTYPE::UI;
 	_box.uiType = UISprite::UITYPE::sell;
 
@@ -134,17 +133,17 @@ void PlayMode::InitShop()
 
 void PlayMode::SetShopPositions() 
 {
-	Vector2 Pos = { baseTilePos.x + shopCreatureOffsetX,baseTilePos.y+shopCreatureOffsetY };
+	raylib::Vector2 Pos = { baseTilePos.x + shopCreatureOffsetX,baseTilePos.y+shopCreatureOffsetY };
 	for (int i = 0; i < shopCreatures.size(); ++i) {
 		//messy solution - fix later?
 		if (i == 0)
 			shopCreatures[i].sprite.setPos(Pos);
 		else if (i == 1)
-			shopCreatures[i].sprite.setPos(Vector2(Pos.x + pixelsBetweenTilesX, Pos.y));
+			shopCreatures[i].sprite.setPos(raylib::Vector2(Pos.x + pixelsBetweenTilesX, Pos.y));
 		else if (i == 2)
-			shopCreatures[i].sprite.setPos(Vector2(Pos.x, Pos.y + pixelsBetweenTilesY));
+			shopCreatures[i].sprite.setPos(raylib::Vector2(Pos.x, Pos.y + pixelsBetweenTilesY));
 		else if (i == 3)
-			shopCreatures[i].sprite.setPos(Vector2(Pos.x + pixelsBetweenTilesX, Pos.y + pixelsBetweenTilesY));
+			shopCreatures[i].sprite.setPos(raylib::Vector2(Pos.x + pixelsBetweenTilesX, Pos.y + pixelsBetweenTilesY));
 		shopCreatures[i].lastPos = shopCreatures[i].sprite.Position;
 	}
 }
@@ -156,17 +155,17 @@ void PlayMode::SpawnShopCreatures()
 
 		if (rand == 0) {
 			//spawn breloom
-			Creature breloom(creatureType::BRELOOM, Vector2(0, 0), grid,true,false);
+			Creature breloom(creatureType::BRELOOM, raylib::Vector2(0, 0), grid,true,false);
 			shopCreatures.push_back(breloom);
 		}
 		if (rand == 1) {
 			//spawn buizel
-			Creature buizel(creatureType::BUIZEL, Vector2(0, 0), grid,true,false);
+			Creature buizel(creatureType::BUIZEL, raylib::Vector2(0, 0), grid,true,false);
 			shopCreatures.push_back(buizel);
 		}
 		if (rand == 2) {
 			//spawn skitty
-			Creature skitty(creatureType::SKITTY, Vector2(0, 0), grid,true,false);
+			Creature skitty(creatureType::SKITTY, raylib::Vector2(0, 0), grid,true,false);
 			shopCreatures.push_back(skitty);
 		}
 	}
@@ -237,7 +236,7 @@ void PlayMode::GenerateRandomEnemy()
 
 	for (auto it = gameCreatures.begin(); it != gameCreatures.end();++it) {
 		if ((*it).isEnemy) {
-			if (getGridPosition((grid.gridWidth*2),grid.gridHeight,grid.cellSize,grid.gridOriginX,grid.gridOriginY, (*it).sprite.Position) == Vector2(rand2+grid.gridWidth, rand3) )
+			if (getGridPosition((grid.gridWidth*2),grid.gridHeight,grid.cellSize,grid.gridOriginX,grid.gridOriginY, (*it).sprite.Position) == raylib::Vector2(rand2+grid.gridWidth, rand3) )
 			{
 				return; //can't spawn enemy - will overlap
 			}
@@ -248,15 +247,15 @@ void PlayMode::GenerateRandomEnemy()
 	int rand = std::rand() % 3; //randomly generate creature
 	if (rand == 0) {
 		//spawn breloom
-		spawnEnemy(BRELOOM, Vector2(rand2, rand3));
+		spawnEnemy(BRELOOM, raylib::Vector2(rand2, rand3));
 	}
 	if (rand == 1) {
 		//spawn buizel
-		spawnEnemy(BUIZEL, Vector2(rand2, rand3));
+		spawnEnemy(BUIZEL, raylib::Vector2(rand2, rand3));
 	}
 	if (rand == 2) {
 		//spawn skitty
-		spawnEnemy(SKITTY, Vector2(rand2, rand3));
+		spawnEnemy(SKITTY, raylib::Vector2(rand2, rand3));
 	}
 	enemiesAlive++;
 }
@@ -275,14 +274,14 @@ void PlayMode::InitBuild()
 	GenerateEnemies();
 	
 	//init ui
-	UISprite Button("playButton", "playButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(550, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button("playButton", "playButton.dds");
+	Button.Init(raylib::Vector2(550, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
 
-	UISprite Button2("storeButton", "storeButton.dds", Game::Get().GetD3D());
-	Button2.Init(Vector2(300, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button2("storeButton", "storeButton.dds");
+	Button2.Init(raylib::Vector2(300, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button2.type = Sprite::spriteTYPE::UI;
 	Button2.uiType = UISprite::UITYPE::store;
 	uiSprites.push_back(Button2);
@@ -293,18 +292,18 @@ void PlayMode::InitLose()
 {
 	state = State::LOSE;
 	//init text
-	Sprite Logo("defeatText", "defeatText.dds", Game::Get().GetD3D());
-	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,313,73 });
+	Sprite Logo("defeatText", "defeatText.dds");
+	Logo.Init(raylib::Vector2(350, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,313,73 });
 	logoSprite = Logo;
 	//init ui
-	UISprite Button3("homeButton", "homeButton.dds", Game::Get().GetD3D());
-	Button3.Init(Vector2(410, 300), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button3("homeButton", "homeButton.dds");
+	Button3.Init(raylib::Vector2(410, 300), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button3.type = Sprite::spriteTYPE::UI;
 	Button3.uiType = UISprite::UITYPE::menu;
 	uiSprites.push_back(Button3);
 
-	UISprite Button("restartButton", "restartButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(410, 400), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button("restartButton", "restartButton.dds");
+	Button.Init(raylib::Vector2(410, 400), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::restart;
 	uiSprites.push_back(Button);
@@ -317,12 +316,12 @@ void PlayMode::InitWin()
 {
 	state = State::WIN;
 	//init text
-	Sprite Logo("victoryText", "victoryText.dds", Game::Get().GetD3D());
-	Logo.Init(Vector2(350, 50), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,316,91 });
+	Sprite Logo("victoryText", "victoryText.dds");
+	Logo.Init(raylib::Vector2(350, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,316,91 });
 	logoSprite = Logo;
 	//init ui
-	UISprite Button("nextButton", "nextButton.dds", Game::Get().GetD3D());
-	Button.Init(Vector2(420, 200), Vector2(1, 1), Vector2(0, 0), RECT{ 0,0,144,72 });
+	UISprite Button("nextButton", "nextButton.dds");
+	Button.Init(raylib::Vector2(420, 200), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::next;
 	uiSprites.push_back(Button);
@@ -356,13 +355,11 @@ void PlayMode::BuildUpdate(float dTime)
 	if (!Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
 		Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
 	}
-	//pull mouse now to save on performance
-	Mouse& _mouse = Game::Get().mouse;
 	//UPDATE UI
 	for (int i = 0; i < uiSprites.size(); i++)
 	{
 		uiSprites[i].Update(dTime);
-		if (isSpriteClickReleased(uiSprites[i], _mouse) && !spriteDragging)
+		if (isSpriteClickReleased(uiSprites[i]) && !spriteDragging)
 		{
 			if (uiSprites[i].Action()) {
 				UIAction(uiSprites[i]);
@@ -377,7 +374,7 @@ void PlayMode::BuildUpdate(float dTime)
 		gameCreatures[i].sprite.Update(dTime);
 		if (!spriteDragging) {
 			//has player clicked a sprite?
-			if (isSpriteClicked(gameCreatures[i].sprite, _mouse) && !spriteDragging && !gameCreatures[i].isEnemy) {
+			if (isSpriteClicked(gameCreatures[i].sprite) && !spriteDragging && !gameCreatures[i].isEnemy) {
 				gameCreatures[i].sprite.previousGridPos = getGridPosition(grid, gameCreatures[i].sprite.Position);//store grid position in case it needs to be reset
 				spriteDragging = true;
 				movedSprite = i; //store the sprite that is being moved
@@ -386,9 +383,9 @@ void PlayMode::BuildUpdate(float dTime)
 	}
 	//is player currently trying to move a sprite?
 	if (spriteDragging) {
-		dragSprite(gameCreatures[movedSprite].sprite, _mouse);
-		if (_mouse.isClickRelease()) {
-			if (isGridClicked(grid, gameCreatures[movedSprite].sprite, _mouse))
+		dragSprite(gameCreatures[movedSprite].sprite);
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+			if (isGridClicked(grid, gameCreatures[movedSprite].sprite))
 			{
 				//pressed
 				spriteDragging = false;
@@ -421,15 +418,13 @@ void PlayMode::PlaceCreatureSFX(Creature& creature)
 
 void PlayMode::StoreUpdate(float dTime) 
 {
-	//pull mouse now to save on performance
-	Mouse& _mouse = Game::Get().mouse;
 	//UPDATE UI
 	for (int i = 0; i < uiSprites.size(); i++)
 	{
 		if (uiSprites[i].uiType != UISprite::start) //we dont want the play button to function while we're in the shop menu
 		{
 			uiSprites[i].Update(dTime);
-			if (isSpriteClickReleased(uiSprites[i], _mouse) && ((!spriteDragging&&uiSprites[i].uiType != UISprite::sell)||(uiSprites[i].uiType==UISprite::sell&&!draggingShop&&spriteDragging)))
+			if (isSpriteClickReleased(uiSprites[i]) && ((!spriteDragging&&uiSprites[i].uiType != UISprite::sell)||(uiSprites[i].uiType==UISprite::sell&&!draggingShop&&spriteDragging)))
 			{
 				if (uiSprites[i].Action()) {
 					UIAction(uiSprites[i]);
@@ -445,7 +440,7 @@ void PlayMode::StoreUpdate(float dTime)
 		gameCreatures[i].sprite.Update(dTime);
 		if (!spriteDragging) {
 			//has player clicked a sprite?
-			if (isSpriteClicked(gameCreatures[i].sprite, _mouse) && !spriteDragging && !gameCreatures[i].isEnemy) {
+			if (isSpriteClicked(gameCreatures[i].sprite) && !spriteDragging && !gameCreatures[i].isEnemy) {
 				gameCreatures[i].sprite.previousGridPos = getGridPosition(grid, gameCreatures[i].sprite.Position);//store grid position in case it needs to be reset
 				spriteDragging = true;
 				movedSprite = i; //store the sprite that is being moved
@@ -458,7 +453,7 @@ void PlayMode::StoreUpdate(float dTime)
 		shopCreatures[i].Update(dTime, false, true);
 		if (!spriteDragging) {
 			//has player clicked a sprite?
-			if (isSpriteClicked(shopCreatures[i].sprite, _mouse) && !spriteDragging) 
+			if (isSpriteClicked(shopCreatures[i].sprite) && !spriteDragging) 
 			{
 				if (coins < shopCreatures[i].getValue()) //if player can't afford, flash red to indicate it
 				{
@@ -479,9 +474,9 @@ void PlayMode::StoreUpdate(float dTime)
 
 		//check if they're dragging a shop creature
 		if (draggingShop){
-			dragSprite(shopCreatures[movedSprite].sprite, _mouse);
-			if (_mouse.isClickRelease()) {
-				if (isGridClicked(grid, shopCreatures[movedSprite].sprite, _mouse, true))
+			dragSprite(shopCreatures[movedSprite].sprite);
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+				if (isGridClicked(grid, shopCreatures[movedSprite].sprite, true))
 				{
 
 					//player placed shop creature into their team
@@ -505,9 +500,9 @@ void PlayMode::StoreUpdate(float dTime)
 		}
 		else //player is dragging team creature
 		{
-			dragSprite(gameCreatures[movedSprite].sprite, _mouse);
-			if (_mouse.isClickRelease()) {
-				if (isGridClicked(grid, gameCreatures[movedSprite].sprite, _mouse))
+			dragSprite(gameCreatures[movedSprite].sprite);
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+				if (isGridClicked(grid, gameCreatures[movedSprite].sprite))
 				{
 					//pressed
 					spriteDragging = false;
@@ -544,7 +539,7 @@ void PlayMode::FightUpdate(float dTime)
 
 			if (!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
 			{
-				Vector2 posToMove = MoveTowards(gameCreatures[i].sprite.Position,
+				raylib::Vector2 posToMove = MoveTowards(gameCreatures[i].sprite.Position,
 					gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
 					gameCreatures[i].speed*dTime);
 				gameCreatures[i].sprite.setPos(posToMove);
@@ -570,12 +565,11 @@ void PlayMode::OverUpdate(float dTime)
 		gameCreatures[i].Update(dTime, true);
 	}
 
-	Mouse& _mouse = Game::Get().mouse;
 	//UPDATE UI
 	for (int i = 0; i < uiSprites.size(); i++)
 	{
 		uiSprites[i].Update(dTime);
-		if (isSpriteClickReleased(uiSprites[i], _mouse) && !spriteDragging)
+		if (isSpriteClickReleased(uiSprites[i]) && !spriteDragging)
 		{
 			UIAction(uiSprites[i]);
 		}
@@ -606,39 +600,39 @@ void PlayMode::Update(float dTime)
 	}
 }
 
-void PlayMode::Render(float dTime, SpriteBatch& batch) {
+void PlayMode::Render(float dTime) {
 	switch (state) {
 	case(State::BUILD):
-		BuildRender(dTime, batch);
+		BuildRender(dTime);
 		break;
 	case(State::FIGHT):
-		FightRender(dTime,batch);
+		FightRender(dTime);
 		break;
 	case(State::WIN):
-		FightRender(dTime, batch);
+		FightRender(dTime);
 		break;
 	case(State::LOSE):
-		FightRender(dTime, batch);
+		FightRender(dTime);
 		break;
 	case(State::SHOP):
-		StoreRender(dTime,batch);
+		StoreRender(dTime);
 		break;
 	}
 }
 
-void PlayMode::BuildRender(float dTime, SpriteBatch& batch) {
-	bgSprite.Render(&batch);
-	coinSprite.Render(&batch);
-	GetFont().DrawString(&batch, to_string(coins).c_str(), Vector2(35, 20));
-	grid.RenderGrid(dTime, &batch);
+void PlayMode::BuildRender(float dTime) {
+	bgSprite.Render();
+	coinSprite.Render();
+	//GetFont().DrawString(&batch, to_string(coins).c_str(), raylib::Vector2(35, 20));
+	grid.RenderGrid(dTime);
 	for (int i = 0; i < uiSprites.size(); i++) {
-		uiSprites[i].Render(&batch);
+		uiSprites[i].Render();
 	}
 	for (int i = 0; i < gameCreatures.size(); i++) {
-		gameCreatures[i].sprite.Render(&batch);
+		gameCreatures[i].sprite.Render();
 	}
 	if (hasSavedTeam) {
-		GetFontSmall().DrawString(&batch, "Successfully Saved Team To File", Vector2(300, 20));
+		//GetFontSmall().DrawString(&batch, "Successfully Saved Team To File", raylib::Vector2(300, 20));
 		textTimer += dTime;
 		if (textTimer >= timeToDisplaySaveText) {
 			hasSavedTeam = false;
@@ -647,26 +641,26 @@ void PlayMode::BuildRender(float dTime, SpriteBatch& batch) {
 	}
 }
 
-void PlayMode::FightRender(float dTime, SpriteBatch& batch)
+void PlayMode::FightRender(float dTime)
 {
 
-	bgSprite.Render(&batch);
+	bgSprite.Render();
 	for (int i = 0; i < gameCreatures.size(); i++) {
-		gameCreatures[i].Render(&batch);
+		gameCreatures[i].Render();
 	}
 	for (int i = 0; i < uiSprites.size(); i++) {
-		uiSprites[i].Render(&batch);
+		uiSprites[i].Render();
 	}
 	if (state == State::WIN || state == State::LOSE) {
-		logoSprite.Render(&batch);
+		logoSprite.Render();
 	}
 	if (state == State::LOSE) 
 	{
-		GetFont().DrawString(&batch, ("You got to Round " + to_string(currentRound)).c_str(), Vector2(265, 150));
+		//GetFont().DrawString(&batch, ("You got to Round " + to_string(currentRound)).c_str(), raylib::Vector2(265, 150));
 	}
 }
 
-void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
+void PlayMode::spawnEnemy(creatureType enemyToSpawn, raylib::Vector2 position)
 {
 
 	position.x += grid.gridWidth;
@@ -687,79 +681,80 @@ void PlayMode::spawnEnemy(creatureType enemyToSpawn, Vector2 position)
 
 }
 
-void PlayMode::StoreRender(float dTime, SpriteBatch& batch)
+void PlayMode::StoreRender(float dTime)
 {
-	bgSprite.Render(&batch);
-	coinSprite.Render(&batch);
-	GetFont().DrawString(&batch, to_string(coins).c_str(), Vector2(35, 20));
-	grid.RenderGrid(dTime, &batch);
-	shopSprite.Render(&batch);
+	bgSprite.Render();
+	coinSprite.Render();
+	//GetFont().DrawString(, to_string(coins).c_str(), raylib::Vector2(35, 20));
+	grid.RenderGrid(dTime);
+	shopSprite.Render();
 	for (int i = 0; i < uiSprites.size(); i++) {
 		//only need store button to render
 		if (uiSprites[i].uiType != UISprite::start)
-			uiSprites[i].Render(&batch);
+			uiSprites[i].Render();
 	}
 
-	coinSprite.setScale(Vector2(0.25, 0.25));  //set coinSprite for correct values to be rendered in shop
+	coinSprite.setScale(raylib::Vector2(0.25, 0.25));  //set coinSprite for correct values to be rendered in shop
 	//messy solution - fix later
 	for (int i = 0; i < shopCreatures.size(); i++) 
 	{
 		if (i == 0)
-			RenderShopTile(shopCreatures[i], baseTilePos, batch);
+			RenderShopTile(shopCreatures[i], baseTilePos);
 		if (i == 1)
-			RenderShopTile(shopCreatures[i], Vector2(baseTilePos.x + pixelsBetweenTilesX, baseTilePos.y),batch);
+			RenderShopTile(shopCreatures[i], raylib::Vector2(baseTilePos.x + pixelsBetweenTilesX, baseTilePos.y));
 		if (i == 2)
-			RenderShopTile(shopCreatures[i], Vector2(baseTilePos.x, baseTilePos.y + pixelsBetweenTilesY),batch);
+			RenderShopTile(shopCreatures[i], raylib::Vector2(baseTilePos.x, baseTilePos.y + pixelsBetweenTilesY));
 		if (i == 3)
-			RenderShopTile(shopCreatures[i], Vector2(baseTilePos.x + pixelsBetweenTilesX, baseTilePos.y + pixelsBetweenTilesY),batch);
+			RenderShopTile(shopCreatures[i], raylib::Vector2(baseTilePos.x + pixelsBetweenTilesX, baseTilePos.y + pixelsBetweenTilesY));
 	}
 
 	//reset coinsprite 
-	coinSprite.setScale(Vector2(0.8, 0.8)); 
-	coinSprite.setPos(Vector2(5, 20));
+	coinSprite.setScale(raylib::Vector2(0.8, 0.8)); 
+	coinSprite.setPos(raylib::Vector2(5, 20));
 
 	for (int i = 0; i < gameCreatures.size(); i++) {
 		//we don't want to render enemy creatures as they will overlap with the shop window
 		if (!gameCreatures[i].isEnemy)
-			gameCreatures[i].sprite.Render(&batch);
+			gameCreatures[i].sprite.Render();
 	}
 
 }
 
 
-void PlayMode::RenderShopTile(Creature& creature,Vector2 tilePosition,SpriteBatch& batch) //pass in upper-right corner of tile
+void PlayMode::RenderShopTile(Creature& creature,raylib::Vector2 tilePosition) //pass in upper-right corner of tile
 {
 	//need to fix these magic numbers
-	GetFontSmall().DrawString(&batch, creature.getName(), Vector2(tilePosition.x+70,tilePosition.y+5));
-	GetFontSmall().DrawString(&batch, creature.getDescriptor(), Vector2(tilePosition.x+30, tilePosition.y + 150));
-	GetFontSmall().DrawString(&batch, to_string(creature.getValue()).c_str(), Vector2(tilePosition.x+15, tilePosition.y+5));
-	coinSprite.setPos(Vector2(tilePosition.x + 5, tilePosition.y + 8));
-	coinSprite.Render(&batch);
-	creature.sprite.Render(&batch);
+	/*GetFontSmall().DrawString(&batch, creature.getName(), raylib::Vector2(tilePosition.x+70,tilePosition.y+5));
+	GetFontSmall().DrawString(&batch, creature.getDescriptor(), raylib::Vector2(tilePosition.x+30, tilePosition.y + 150));
+	GetFontSmall().DrawString(&batch, to_string(creature.getValue()).c_str(), raylib::Vector2(tilePosition.x+15, tilePosition.y+5));*/
+	coinSprite.setPos(raylib::Vector2(tilePosition.x + 5, tilePosition.y + 8));
+	coinSprite.Render();
+	creature.sprite.Render();
 
 }
 
-void PlayMode::dragSprite(Sprite& sprite,Mouse& mouse) {
-	sprite.setPos(mouse.GetMousePos(true));
+void PlayMode::dragSprite(Sprite& sprite) {
+	raylib::Vector2 mousePos=GetMousePosition();
+	sprite.setPos(mousePos);
 }
 
-bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
-	Vector2 mousepos = mouse.GetMousePos(true);
-	RECT sRect = sprite.getDim();
-	SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
+bool isSpriteClicked(Sprite& sprite) {
+	raylib::Vector2 mousepos = GetMousePosition();
+	raylib::Rectangle sRect = sprite.getDim();
+	raylib::Rectangle cRect = raylib::Rectangle(sRect);
 	cRect.x = sprite.Position.x;
 	cRect.y = sprite.Position.y;
 
-	if (cRect.Contains(mousepos))
+	if (cRect.CheckCollision(mousepos))
 	{
-		if (mouse.GetMouseButton(Mouse::LBUTTON)) {
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			//pressed
 			return true;
 		}
 		else {
 			//is hovering over sprite
 			if (sprite.type == Sprite::spriteTYPE::UI) {
-				sprite.setColour(Colors::DarkGray);
+				sprite.setColour(raylib::Color::DarkGray());
 			}
 		}
 		return false;
@@ -767,19 +762,18 @@ bool isSpriteClicked(Sprite& sprite, Mouse& mouse) {
 	return false;
 }
 
-bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
+bool isSpriteClickReleased(Sprite& sprite)
 {
-		Vector2 mousepos = mouse.GetMousePos(true);
-		RECT sRect = sprite.getDim();
-		SimpleMath::Rectangle cRect = SimpleMath::Rectangle(sRect);
+		raylib::Vector2 mousepos = GetMousePosition();
+		raylib::Rectangle sRect = sprite.getDim();
+		raylib::Rectangle cRect = raylib::Rectangle(sRect);
 		cRect.x = sprite.Position.x;
 		cRect.y = sprite.Position.y;
 
-		if (cRect.Contains(mousepos))
+		if (cRect.CheckCollision(mousepos))
 		{
-			if (mouse.isClickRelease()&&!mouse.clickedLastFrame) {
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
 				//pressed
-				mouse.clickedLastFrame = true;
 				return true;
 			}
 			else {
@@ -793,14 +787,14 @@ bool isSpriteClickReleased(Sprite& sprite,Mouse& mouse)
 	return false;
 }
 
-bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPrev) {
-	Vector2 gridPos = getGridPosition(grid, sprite.Position);
-
+bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, bool noPrev) {
+	raylib::Vector2 gridPos = getGridPosition(grid, sprite.Position);
+	raylib::Vector2 mousePos = GetMousePosition();
 	//has player clicked within the grid?
-	if (Game::Get().mouse.isClickRelease() && getGridPosition(grid, Game::Get().mouse.GetMousePos(true)) != Vector2(420, 420))
+	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && (mousePos != raylib::Vector2(420, 420)))
 	{
 		if (!noPrev) {
-			if (gridPos == getGridPosition(grid, mouse.GetMousePos(true)))
+			if (gridPos == getGridPosition(grid, mousePos))
 			{
 				if (sprite.setGridPosition(grid, gridPos.x, gridPos.y))
 					return true;
@@ -808,7 +802,7 @@ bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, Mouse& mouse, bool noPr
 		}
 		else
 		{
-			if (gridPos == getGridPosition(grid, mouse.GetMousePos(true)))
+			if (gridPos == getGridPosition(grid, mousePos))
 			{
 				if (sprite.setGridPositionNoPrev(grid, gridPos.x, gridPos.y))
 					return true;
@@ -841,7 +835,7 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::UITYPE::quit)
 		{
-			PostQuitMessage(0);
+			Game::Get().GetRango().windowShouldClose = true;
 		}
 		else if (sprite.uiType == UISprite::UITYPE::next)
 		{

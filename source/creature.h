@@ -23,7 +23,7 @@ public:
 	enum ACTION{IDLE=0,WALK=1,ATTACK=2,DEAD=3};
 	ACTION currAction = ACTION::IDLE;
 	int targetIndex = 0; //index of creature it is targeting within the gameCreatures array
-	Vector2 lastPos = { 0,0 };
+	raylib::Vector2 lastPos = { 0,0 };
 	//combat stats
 	float attackDmg = 20;
 	float attackRange = 100;
@@ -48,12 +48,12 @@ public:
 	unsigned char upgradeLevel = 1;
 
 	//functions
-	void SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect, raylib::Rectangle framerect, int totalframes, float animspeed, bool isShop=false);
+	void SpriteInit( Grid& grid, raylib::Vector2 position, raylib::Vector2 scale, bool centerOrigin, raylib::Rectangle spriteRect, raylib::Rectangle framerect, int totalframes, float animspeed, bool isShop=false);
 	Creature(string SpriteName, string path,bool Enemy = false):isEnemy(Enemy) {
 		Sprite _sprite(SpriteName, path);
 		sprite = _sprite;
 	}
-	Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool isShop=false, bool Enemy = false);
+	Creature(creatureType typeToMake, raylib::Vector2 gridPos, Grid& grid, bool isShop=false, bool Enemy = false);
 	void ChangeAnimation(ACTION toChangeTo);
 	void UpdateHealthBar();
 	Creature(bool Enemy = false) :isEnemy(Enemy){}

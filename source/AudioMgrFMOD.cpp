@@ -341,7 +341,7 @@ bool AudioGroupFMOD::Load( const utf8string &folder )
 				res = m_audioMgr.GetSystem()->createStream( names[ii].c_str(), FMOD_DEFAULT, 0, &data._pSound );
 				if( res != FMOD_OK ) 
 				{ 
-					DBOUT("FMOD ERROR code(" << res << ") " << FMOD_ErrorString(res));
+					/*DBOUT("FMOD ERROR code(" << res << ") " << FMOD_ErrorString(res));*/
 					assert(false);// , ;
 					success = false; 
 				}

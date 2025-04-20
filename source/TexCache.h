@@ -9,8 +9,8 @@ class TexCache {
 public:
 	struct Data {
 		Data(){}
-		Data(const std::string& Name, Texture2D p, Vector2& _dim):fileName(Name),pTex(p),dim(_dim){}
-		Texture2D pTex;
+		Data(const std::string& Name, raylib::Texture2D& p, Vector2& _dim):fileName(Name),pTex(p),dim(_dim){}
+		raylib::Texture2D pTex;
 		std::string fileName;
 		Vector2 dim;
 	};
@@ -20,7 +20,7 @@ public:
 	void Release();
 
 	//if this texture is new load it in, otherwise find it and return a handle
-	Texture2D LoadTexture(const std::string& fileName, const std::string& texName = "", bool appendPath = true);
+	raylib::Texture2D& LoadTexture(const std::string& fileName, const std::string& texName = "", bool appendPath = true);
 
 	//usually we just have a texture file name, but they're all in a sub folder
 	void SetAssetPath(const std::string& path) {
@@ -33,7 +33,7 @@ public:
 	}
 
 	//slowly find a texture by texture ID
-	Data& Get(Texture2D pTex);
+	Data& Get(raylib::Texture2D pTex);
 
 private:
 	typedef std::unordered_map<std::string, Data> MyMap;

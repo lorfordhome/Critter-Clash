@@ -1,13 +1,10 @@
 #pragma once
 #include "game.h"
-#include "WindowUtils.h"
-#include "D3D.h"
-#include "GeometryBuilder.h"
 #include "LuaHelper.h"
 #include <fstream>
 #include <ctime>
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
+#include <sstream>
+
 
 int OnResize(lua_State* L)
 {
@@ -15,47 +12,47 @@ int OnResize(lua_State* L)
 	int screenWidth = lua_tointeger(L, 1);
 	int screenHeight = lua_tointeger(L, 2);
 	//resize the window
-	WinUtil::Get().ResizeWindow(screenWidth, screenHeight);
+	//WinUtil::Get().ResizeWindow(screenWidth, screenHeight);
 	//need to let d3d know whats happened
-	Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
+	//Game::Get().GetD3D().OnResize_Default(screenWidth, screenHeight);
 	//clear stack
 	lua_pop(L, 2);
 	return 1;
 }
 
-Vector2 getGridPosition(Grid& grid, Vector2 Position) {
-	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,grid.cellSize,grid.cellSize });
+raylib::Vector2 getGridPosition(Grid& grid, raylib::Vector2 Position) {
+	raylib::Rectangle gRect(0, 0, grid.cellSize, grid.cellSize);
 	for (int i = 0; i < grid.gridWidth; i++) {
 		for (int j = 0; j < grid.gridHeight; j++) {
 			gRect.x = (i * grid.cellSize) + grid.gridOriginX;
 			gRect.y = (j * grid.cellSize)+grid.gridOriginY;
-			if (gRect.Contains(Position)) {
-				return Vector2(i, j);
+			if (gRect.CheckCollision(Position)) {
+				return raylib::Vector2(i, j);
 			}
 		}
 	}
-	return Vector2(420, 420);//can't find gridpos
+	return raylib::Vector2(420, 420);//can't find gridpos
 }
 
-Vector2 getGridPosition(int gridWidth,int gridHeight,int gridCellSize,int gridOriginX,int gridOriginY, Vector2 Position) {
-	SimpleMath::Rectangle gRect = SimpleMath::Rectangle({ 0,0,gridCellSize,gridCellSize });
+raylib::Vector2 getGridPosition(int gridWidth,int gridHeight,int gridCellSize,int gridOriginX,int gridOriginY, raylib::Vector2 Position) {
+	raylib::Rectangle gRect( 0,0,gridCellSize,gridCellSize );
 	for (int i = 0; i < gridWidth; i++) {
 		for (int j = 0; j < gridHeight; j++) {
 			gRect.x = (i * gridCellSize) + gridOriginX;
 			gRect.y = (j * gridCellSize) + gridOriginY;
-			if (gRect.Contains(Position)) {
-				return Vector2(i, j);
+			if (gRect.CheckCollision(Position)) {
+				return raylib::Vector2(i, j);
 			}
 		}
 	}
-	return Vector2(420, 420);//can't find gridpos
+	return raylib::Vector2(420, 420);//can't find gridpos
 }
 
 
-Grid::Grid(MyD3D& d3d) {
-	Sprite GridSprite("gridLines", "gridSquare2.dds", d3d); //temporary to initialise grid sprite
+Grid::Grid() {
+	Sprite GridSprite("gridLines", "gridSquare2.dds"); //temporary to initialise grid sprite
 	gridSprite = GridSprite;
-	gridSprite.setScale(Vector2(4, 4));
+	gridSprite.setScale(raylib::Vector2(4, 4));
 	gridSprite.setSpriteRect(raylib::Rectangle{ 0,0,33,33 });
 
 	for (int i = 0; i < gridWidth; i++) {
@@ -66,21 +63,17 @@ Grid::Grid(MyD3D& d3d) {
 }
 
 
-Grid::Grid() {
-
-}
-
 Tile Grid::Get(int x, int y) {
 	return grid[x][y];
 }
 
-void Grid::RenderGrid(float dTime,SpriteBatch* mySpriteBatch) {
+void Grid::RenderGrid(float dTime) {
 	if (visible) {
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j++) {
-				Vector2 pos((cellSize * i)+gridOriginX, (cellSize * j)+gridOriginY);
+				raylib::Vector2 pos((cellSize * i)+gridOriginX, (cellSize * j)+gridOriginY);
 				gridSprite.setPos(pos);
-				gridSprite.Render(mySpriteBatch);
+				gridSprite.Render();
 			}
 		}
 	}
@@ -98,13 +91,13 @@ void Grid::ResetTiles() {
 	}
 }
 
-Game::Game(MyD3D& d3d) :md3d(d3d)
+Game::Game(Rango& mrango):rango(mrango)
 {
 	File::initialiseSystem();
 	audioManager.Initialise();
-	mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
-	mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
-	md3d.GetCache().SetAssetPath("data/");
+	//mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
+	//mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
+	rango.GetCache().SetAssetPath("data/");
 	assert(mySpriteBatch);
 	mModeMgr.AddMode(new PlayMode());
 	mModeMgr.AddMode(new MenuMode());
@@ -126,11 +119,11 @@ void Game::CountTroops() {
 	lua_close(L);
 }
 void Game::Release() {
-	delete mySpriteBatch;
-	mySpriteBatch = nullptr;
+	/*delete mySpriteBatch;
+	mySpriteBatch = nullptr;*/
 	troopCounts.clear();
 	mModeMgr.Release();
-	md3d.GetCache().Release();
+	rango.GetCache().Release();
 	audioManager.Shutdown();
 }
 
@@ -225,7 +218,7 @@ void Game::CreateEnemyGroup() {
 
 
 			for (int i = 0; i < creaturesToWrite.size(); i++) {
-				Vector2 creatureGridPos = getGridPosition(playMode->grid, creaturesToWrite[i].sprite.Position);
+				raylib::Vector2 creatureGridPos = getGridPosition(playMode->grid, creaturesToWrite[i].sprite.Position);
 				toWrite <<"{x = " << creatureGridPos.x << ",y = " << creatureGridPos.y << ",type = " << static_cast<int>(playMode->gameCreatures[i].type) << "}";
 				if (i + 1 < creaturesToWrite.size())
 					toWrite << ",";

@@ -1,9 +1,8 @@
 #include "TexCache.h"
-#include <string>
-#include <filesystem>
-#include "raylib-cpp.hpp"
 
-Texture2D TexCache::LoadTexture( const std::string& fileName, const std::string& texName, bool appendPath) {
+#include <filesystem>
+
+raylib::Texture2D& TexCache::LoadTexture( const std::string& fileName, const std::string& texName, bool appendPath) {
 	std::string name = texName;
 	if (name.empty()) {
 		std::filesystem::path p(fileName);
@@ -26,14 +25,14 @@ Texture2D TexCache::LoadTexture( const std::string& fileName, const std::string&
 
 	//load texture
 	raylib::Texture2D pTex(ws);
-
+	raylib::Vector2 pSize = pTex.GetSize();
 	//save texture
 	assert(pTex);
-	mCache.insert(MyMap::value_type(name, Data(fileName, pTex, pTex.GetSize())));
+	mCache.insert(MyMap::value_type(name, Data(fileName, pTex, pSize)));
 	return pTex;
 }
 
-TexCache::Data& TexCache::Get(Texture2D pTex){
+TexCache::Data& TexCache::Get(raylib::Texture2D pTex){
 	MyMap::iterator it = mCache.begin();
 	Data* p = nullptr;
 	while (it != mCache.end() && !p)

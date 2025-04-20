@@ -69,8 +69,8 @@ private:
 	ModeMgr mModeMgr;
 	AudioMgrFMOD audioManager;
 };
-Vector2 getGridPosition(Grid& grid, Vector2 Position);
-Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize, int gridOriginX, int gridOriginY, Vector2 Position);
+raylib::Vector2 getGridPosition(Grid& grid, raylib::Vector2 Position);
+raylib::Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize, int gridOriginX, int gridOriginY, raylib::Vector2 Position);
 
 //GAME MODES
 
@@ -125,8 +125,8 @@ public:
 	void FightRender(float dTime);
 	void dragSprite(Sprite& sprite);
 	bool isGridClicked(Grid& Grid, Sprite& sprite, bool noPrev=false);
-	void spawnEnemy(creatureType enemyToSpawn, Vector2 position);
-	void RenderShopTile(Creature& creature, Vector2 tilePosition);
+	void spawnEnemy(creatureType enemyToSpawn, raylib::Vector2 position);
+	void RenderShopTile(Creature& creature, raylib::Vector2 tilePosition);
 	void GenerateScriptEnemies(int difficulty);
 	void InitLuaFunctions(Dispatcher& disp);
 	void ApplyLuaCheats(bool defeat);
@@ -157,7 +157,7 @@ private:
 	float timeToDisplaySaveText = 1.f;
 	float textTimer = 0.f;
 	bool flagRestart = false;
-	const Vector2 baseTilePos = { 561, 133 };
+	const raylib::Vector2 baseTilePos = { 561, 133 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;
 	bool draggingShop = false;

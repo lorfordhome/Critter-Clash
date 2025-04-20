@@ -2,7 +2,7 @@
 #include "sprite.h"
 #include "game.h"
 
-void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool centerOrigin, RECT spriterect, RECT framerect, int totalframes, float animspeed, bool isShop) {
+void Creature::SpriteInit( Grid& grid, raylib::Vector2 position, raylib::Vector2 scale, bool centerOrigin, raylib::Rectangle spriterect, raylib::Rectangle framerect, int totalframes, float animspeed, bool isShop) {
 	if (!isShop) {
 		if (isEnemy)
 			sprite.setGridPosition(grid, position.x, position.y, false);
@@ -15,64 +15,66 @@ void Creature::SpriteInit( Grid& grid, Vector2 position, Vector2 scale, bool cen
 	sprite.totalFrames = totalframes;
 	sprite.animSpeed = animspeed;
 	sprite.isAnim = true;
-	sprite.dim = (RECT{ long(sprite.spriteRect.left * sprite.Scale.x), long(sprite.spriteRect.top * sprite.Scale.y), long(sprite.spriteRect.right * sprite.Scale.x), long(sprite.spriteRect.bottom * sprite.Scale.y) });
+	sprite.dim = (raylib::Rectangle{ (sprite.spriteRect.x * sprite.Scale.x), (sprite.spriteRect.y * sprite.Scale.y), (sprite.spriteRect.width * sprite.Scale.x), (sprite.spriteRect.height * sprite.Scale.y) });
 
 	lastPos = sprite.Position;
 }
 
 
-Creature::Creature(creatureType typeToMake, Vector2 gridPos, Grid& grid, bool isShop, bool Enemy):isEnemy(Enemy),type(typeToMake)
+Creature::Creature(creatureType typeToMake, raylib::Vector2 gridPos, Grid& grid, bool isShop, bool Enemy):isEnemy(Enemy),type(typeToMake)
 {
 	if (typeToMake == creatureType::BRELOOM) 
 	{
-		Sprite _sprite("chunkyIdle", "chunkyIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("chunkyIdle", "chunkyIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.8f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.8f, isShop);
 		//set stats
 		maxHealth = 125;
 		attackCooldown = 1.15f;
 		//set other animations
-		Sprite wSprite("chunkyWalk", "chunkyWalk.dds", Game::Get().GetD3D());
+		Sprite wSprite("chunkyWalk", "chunkyWalk.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
 	}
 	if (typeToMake == creatureType::BUIZEL)
 	{
-		Sprite _sprite("Buizel", "mouseIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("Buizel", "mouseIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.6f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.6f, isShop);
 		//set other animations
-		Sprite wSprite("buizelWalk", "mouseIdle.dds", Game::Get().GetD3D());
+		Sprite wSprite("buizelWalk", "mouseIdle.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.3f);
 	}
 	if (typeToMake == creatureType::SKITTY) 
 	{
-		Sprite _sprite("Skitty", "mothfoxIdle.dds", Game::Get().GetD3D());
+		Sprite _sprite("Skitty", "mothfoxIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, Vector2(2, 2), false, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 2, 0.7f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.7f, isShop);
 		//set stats
 		attackRange = 300.f;
 		maxHealth = 75;
 		//set other animations
-		Sprite wSprite("skittyWalk", "mothfoxWalk.dds", Game::Get().GetD3D());
+		Sprite wSprite("skittyWalk", "mothfoxWalk.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, Vector2(2, 2), true, RECT{ 0,0,64,64 }, RECT{ 0,0,64,64 }, 4, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
 	}
 	health = maxHealth;
 	idleSprite = sprite;
 
 	//initialise healthbar
 	if (isEnemy) {
-		Sprite hSprite("enemyHealth", "Enemy Health Bar.dds", Game::Get().GetD3D());
+		Sprite hSprite("enemyHealth", "Enemy Health Bar.dds");
 		healthBar = hSprite;
-		healthBar.Init(Vector2(0, 0), Vector2(0.35, 0.5), Vector2(0, 0), RECT{ 0,0,277,11 });
+		healthBar.Init(raylib::Vector2(0, 0), raylib::Vector2(0.35, 0.5), raylib::Vector2(0, 0), 
+			
+			{ 0,0,277,11 });
 		ChangeDirection();
 	}
 	else {
-		Sprite hSprite("playerHealth", "Player Health Bar.dds", Game::Get().GetD3D());
+		Sprite hSprite("playerHealth", "Player Health Bar.dds");
 		healthBar = hSprite;
-		healthBar.Init(Vector2(0, 0), Vector2(0.35, 0.5), Vector2(0, 0), RECT{ 0,0,277,11 });
+		healthBar.Init(raylib::Vector2(0, 0), raylib::Vector2(0.35, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,277,11 });
 
 	}
 }
@@ -116,18 +118,18 @@ void Creature::UpdateHealthBar()
 
 void Creature::ChangeDirection() 
 {
-	RECT _rect = idleSprite.getSpriteRect();
-	RECT _rect2 = walkSprite.getSpriteRect();
+	raylib::Rectangle _rect = idleSprite.getSpriteRect();
+	raylib::Rectangle _rect2 = walkSprite.getSpriteRect();
 	if (!facingLeft) 
 	{
-		idleSprite.setSpriteRect(RECT{ _rect.left,0,_rect.right, idleSprite.getFrameSize().bottom });
-		walkSprite.setSpriteRect(RECT{ _rect2.left,0,_rect2.right, walkSprite.getFrameSize().bottom });
+		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,0,_rect.y, idleSprite.getFrameSize().height });
+		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,0,_rect2.y, walkSprite.getFrameSize().height });
 		facingLeft = true;
 	}
 	else 
 	{
-		idleSprite.setSpriteRect(RECT{ _rect.left,idleSprite.getFrameSize().bottom,_rect.right, idleSprite.getFrameSize().bottom * 2 });
-		walkSprite.setSpriteRect(RECT{ _rect2.left,walkSprite.getFrameSize().bottom,_rect2.right, walkSprite.getFrameSize().bottom * 2 });
+		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,idleSprite.getFrameSize().height,_rect.y, idleSprite.getFrameSize().height * 2 });
+		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,walkSprite.getFrameSize().height,_rect2.y, walkSprite.getFrameSize().height * 2 });
 		facingLeft = false;
 	}
 	ChangeAnimation(currAction);
@@ -170,7 +172,7 @@ bool Creature::Update(float dTime, bool fightMode, bool isShop) //update returns
 
 		sprite.Update(dTime);
 		lastPos = sprite.Position;
-		healthBar.Position = Vector2(sprite.Position.x+15, sprite.Position.y + 135);
+		healthBar.Position = raylib::Vector2(sprite.Position.x+15, sprite.Position.y + 135);
 
 		//attack
 		if (fightMode) {
@@ -219,7 +221,7 @@ void Creature::PlayDeathSFX()
 void Creature::DamageFlash(float dTime) {
 	flashTimer += dTime;
 	if (flashTimer >= damageFlashDuration) {
-		sprite.colour = Colours::White;
+		sprite.colour = raylib::Color::White();
 		flashing = false;
 	}
 }
@@ -245,17 +247,17 @@ void Creature::TakeDamage(float damage)
 {
 	health -= damage;
 	flashing = true;
-	sprite.colour = Colours::Red;
+	sprite.colour = raylib::Color::Red();
 	flashTimer = 0.f;
 	UpdateHealthBar();
 }
 
-void Creature::Render(SpriteBatch* Batch,bool renderHealth)
+void Creature::Render(bool renderHealth)
 {
 	if (active) {
-		sprite.Render(Batch);
+		sprite.Render();
 		if (renderHealth) {
-			healthBar.Render(Batch);
+			healthBar.Render();
 		}
 	}
 }
