@@ -122,14 +122,16 @@ void Creature::ChangeDirection()
 	raylib::Rectangle _rect2 = walkSprite.getSpriteRect();
 	if (!facingLeft) 
 	{
-		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,0,_rect.y, idleSprite.getFrameSize().height });
-		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,0,_rect2.y, walkSprite.getFrameSize().height });
+		//make them face left (bottom row of sprites)
+		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,0,_rect.width, idleSprite.getFrameSize().height });
+		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,0,_rect2.width, walkSprite.getFrameSize().height });
 		facingLeft = true;
 	}
 	else 
 	{
-		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,idleSprite.getFrameSize().height,_rect.y, idleSprite.getFrameSize().height * 2 });
-		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,walkSprite.getFrameSize().height,_rect2.y, walkSprite.getFrameSize().height * 2 });
+		//make them face right (top row of sprites)
+		idleSprite.setSpriteRect(raylib::Rectangle{ _rect.x,idleSprite.getFrameSize().height,_rect.width, idleSprite.getFrameSize().height });
+		walkSprite.setSpriteRect(raylib::Rectangle{ _rect2.x,walkSprite.getFrameSize().height,_rect2.width, walkSprite.getFrameSize().height});
 		facingLeft = false;
 	}
 	ChangeAnimation(currAction);

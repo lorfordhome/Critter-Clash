@@ -65,7 +65,7 @@ void ModeMgr::DeleteMode(GAMEMODE modeToDelete) {
 
 MenuMode::MenuMode() 
 {
-	Sprite _bg("Background", "map4.dds");
+	Sprite _bg("Background", "map6.dds");
 	_bg.Init(raylib::Vector2(0, 0), raylib::Vector2(2, 2), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,384 });
 	bgSprite = _bg;
 

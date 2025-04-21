@@ -26,14 +26,15 @@ protected:
 	raylib::Color colour = WHITE;
 	string spriteName="";//this is used for finding the texture within the texcache
 	string filePath="";
-	raylib::Texture2D texture;
+	//raylib::Texture2D texture;
+	shared_ptr<raylib::Texture2D> texture;
 	raylib::Rectangle dim{ 0,0,0,0 };
 	friend class Creature;
 public:
 	bool isHover = false;
 	bool active = true;
 	~Sprite() {
-		UnloadTexture(texture);
+		//UnloadTexture(texture);
 	}
 	enum spriteTYPE
 	{
@@ -49,8 +50,7 @@ public:
 	virtual void Render();
 	Sprite(string spriteName, string path);
 	Sprite();
-	void setTex(raylib::Texture2D* tex, const raylib::Rectangle& texRect);
-	void setTex(raylib::Texture2D* tex);
+	void setTex(string& filePath, const raylib::Rectangle& texRect);
 	void setPos(raylib::Vector2& pos) {
 		Position = pos;
 	}
@@ -61,7 +61,7 @@ public:
 		spriteRect = SpriteRect;
 	}
 	raylib::Rectangle getDim() {
-		dim = (raylib::Rectangle{ (spriteRect.x * Scale.x), (spriteRect.y * Scale.y), (spriteRect.width * Scale.x), (spriteRect.height * Scale.y) });
+		dim = (raylib::Rectangle{ (spriteRect.x), (spriteRect.y), (spriteRect.width * Scale.x), (spriteRect.height * Scale.y) });
 		return dim;
 	}
 	const raylib::Rectangle getSpriteRect() {

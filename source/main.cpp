@@ -6,6 +6,7 @@
 #include "game.h"
 #include "LuaHelper.h"
 #include "raylib-cpp.hpp"
+#include "rango.h"
 
 using namespace std;
 
@@ -45,8 +46,9 @@ int main()
 	float deltaTime = 0;
 	Rango rango;
 	new Game(rango);
+	SetTargetFPS(60);
 
-	while (!window.ShouldClose()||!rango.windowShouldClose)
+	while ( !window.ShouldClose() && !rango.windowShouldClose)
 	{
 		deltaTime = GetFrameTime();
 		//update

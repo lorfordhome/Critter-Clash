@@ -8,7 +8,7 @@
 raylib::Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
 {
 	raylib::Vector2 a = target - current;
-	a.Normalize();
+	a=a.Normalize();
 	float magnitude = (a.x * a.x + a.y * a.y);
 	if (magnitude <= maxDistanceDelta || magnitude == 0.f)
 	{

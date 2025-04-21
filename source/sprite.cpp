@@ -36,7 +36,7 @@ bool Sprite::setGridPositionNoPrev(Grid& grid, int x, int y, bool checkCol) {
 Sprite::Sprite() {
 };
 Sprite::Sprite(string SpriteName, string path) :spriteName(SpriteName),filePath(path) {
-	texture(filePath);
+	texture = Game::Get().GetRango().GetManager().load(filePath);
 }
 UISprite::UISprite() {
 	type = Sprite::spriteTYPE::UI;
@@ -44,7 +44,7 @@ UISprite::UISprite() {
 UISprite::UISprite(string SpriteName, string path) {
 	spriteName = SpriteName;
 	filePath = path;
-	texture = (Game::Get().GetRango().GetCache().LoadTexture(filePath, spriteName, true));
+	texture = Game::Get().GetRango().GetManager().load(filePath);
 	type = Sprite::spriteTYPE::UI;
 }
 void Sprite::Init(raylib::Vector2 position, raylib::Vector2 scale, raylib::Vector2 origin, raylib::Rectangle spriterect)
@@ -78,12 +78,12 @@ void Sprite::PlayAnimation(float dTime) {
 	if (animTime > animSpeed)
 	{
 		if (frameCount < totalFrames - 1) {
-			spriteRect.x += frameSize.x;
+			spriteRect.x += frameSize.width;
 			++frameCount;
 		}
 		else
 		{
-			spriteRect.x = frameSize.x;
+			spriteRect.x = frameSize.width;
 			frameCount = 0;
 		}
 		animTime = 0;
@@ -141,12 +141,7 @@ void Sprite::Render()
 	}
 }
 
-void Sprite::setTex(raylib::Texture2D* tex, const raylib::Rectangle& texRect) {
-	texture = tex;
+void Sprite::setTex(string& filePath, const raylib::Rectangle& texRect) {
+	texture = Game::Get().GetRango().GetManager().load(filePath);
 	spriteRect = texRect;
-}
-
-void Sprite::setTex(raylib::Texture2D* tex)
-{
-	texture = tex;
 }

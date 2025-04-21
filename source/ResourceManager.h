@@ -5,7 +5,8 @@
 
 #include <memory>
 #include <unordered_map>
-
+#include <string>
+#include <filesystem>
 #include "raylib-cpp.hpp"
 
  /** Template class for managing the loading and shared use of resources (e.g., textures).
@@ -25,63 +26,54 @@ template <class T>
 class ResourceManager {
 public:
 
-    // Resource managers should NOT be copyable
-    ResourceManager(const ResourceManager& other) = delete;
-    ResourceManager(ResourceManager&& other) = delete;
-    ResourceManager& operator=(const ResourceManager& other) = delete;
-
+    //// Resource managers should NOT be copyable
+    //ResourceManager(const ResourceManager& other) = delete;
+    //ResourceManager(ResourceManager&& other) = delete;
+    //ResourceManager& operator=(const ResourceManager& other) = delete;
+    ResourceManager() {
+    }
     ~ResourceManager() {
     }
 
     /** Load a resource.
      */
-    static std::shared_ptr<T> load(const std::string& filename) {
-        auto& resourceManager = instance();
+    std::shared_ptr<T> load(const std::string& fileName) {
+       // auto& resourceManager = instance();
         std::shared_ptr<T> resource;
 
         //prepare path
-        const std::string* pPath = &fileName;
-        std::string path;
-        if (appendPath) {
-            path = mAssetPath + fileName;
-            pPath = &path;
-        }
-        std::string ws(pPath->begin(), pPath->end());//create wide string with value of ppath
-
+        std::string pPath = mAssetPath;
+        pPath += fileName;
         // Check if the resource is already loaded
-        auto resIter = resourceManager.resources.find(ws);
-        if (resIter != resourceManager.resources.end()) {
+        auto resIter = resources.find(pPath);
+        if (resIter != resources.end()) {
             // The resource was loaded previously. Let's see if we can
             resource = resIter->second.lock();
         }
 
         if (!resource) {
             // Load the resource from disk
-            resource = std::make_shared<T>(ws);
-            resourceManager.resources[ws] = resource;
+            resource = std::make_shared<T>(pPath);
+            resources[pPath] = resource;
         }
 
         return resource;
     }
 
     /** Gets the global resource manager instance.
-     */
-    static auto& instance() {
-        static ResourceManager resourceManager;
-        return resourceManager;
-    }
+    // */
+    //static auto& instance() {
+    //    static ResourceManager resourceManager;
+    //    return resourceManager;
+    //}
 
     //usually we just have a texture file name, but they're all in a sub folder
     void SetAssetPath(const std::string& path) {
         mAssetPath = path;
     }
     const std::string& GetAssetPath() const { return mAssetPath; }
-private:
     std::string mAssetPath;
-    /** The constructor is private so that only the single instance can be used
-     */
-    ResourceManager() {
-    }
+private:
 
     /** The map of resources that have been loaded.
      */

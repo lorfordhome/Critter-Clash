@@ -32,7 +32,7 @@ public:
 
 	float health = 100;
 	float maxHealth = 100;
-	float speed = 100.f;
+	float speed = 50.f;
 
 	creatureType type = creatureType::NONE;
 

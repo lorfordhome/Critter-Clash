@@ -97,8 +97,8 @@ Game::Game(Rango& mrango):rango(mrango)
 	audioManager.Initialise();
 	//mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
 	//mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
-	rango.GetCache().SetAssetPath("data/");
-	assert(mySpriteBatch);
+	//rango.GetCache().SetAssetPath("data/");
+	rango.GetManager().SetAssetPath("data/");
 	mModeMgr.AddMode(new PlayMode());
 	mModeMgr.AddMode(new MenuMode());
 	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
@@ -123,7 +123,7 @@ void Game::Release() {
 	mySpriteBatch = nullptr;*/
 	troopCounts.clear();
 	mModeMgr.Release();
-	rango.GetCache().Release();
+	//rango.GetCache().Release();
 	audioManager.Shutdown();
 }
 
