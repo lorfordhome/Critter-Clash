@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClCompile Include="AudioMgr.cpp" />
     <ClCompile Include="AudioMgrFMOD.cpp" />
+    <ClCompile Include="fightMode.cpp" />
     <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="LuaHelper.cpp" />
     <ClCompile Include="playMode.cpp" />
@@ -111,6 +112,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModeMgr.cpp" />
+    <ClCompile Include="rango.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="TexCache.cpp" />
   </ItemGroup>

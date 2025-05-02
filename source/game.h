@@ -75,8 +75,6 @@ raylib::Vector2 getGridPosition(int gridWidth, int gridHeight, int gridCellSize,
 //GAME MODES
 
 class PlayMode : public AMode {
-	//SpriteFont* pixelFont = nullptr;
-	//SpriteFont* pixelFontSmall = nullptr;
 
 	std::vector<Creature> shopCreatures{};
 	std::vector<UISprite> uiSprites{};
@@ -92,8 +90,6 @@ public:
 	std::vector<Creature> gameCreatures{};
 	~PlayMode() 
 	{
-		//delete pixelFont;
-		//delete pixelFontSmall;
 		gameCreatures.clear();
 		uiSprites.clear();
 		lua_close(L);
@@ -130,14 +126,11 @@ public:
 	void GenerateScriptEnemies(int difficulty);
 	void InitLuaFunctions(Dispatcher& disp);
 	void ApplyLuaCheats(bool defeat);
-	//SpriteFont& GetFont() {
-	//	assert(pixelFont);
-	//	return *pixelFont;
-	//}
-	//SpriteFont& GetFontSmall() {
-	//	assert(pixelFontSmall);
-	//	return *pixelFontSmall;
-	//}
+
+	raylib::Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta);
+	bool checkCol(Sprite& spriteA, Sprite& spriteB);
+	bool checkCol(Creature& attacker, Creature& target);
+
 
 	int coins = 20;
 	unsigned char shopCreatureOffsetX = 20;

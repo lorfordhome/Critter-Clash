@@ -5,7 +5,10 @@
 #include "game.h"
 #include "LuaHelper.h"
 
-raylib::Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
+
+
+
+raylib::Vector2 PlayMode::MoveTowards(raylib::Vector2 current, raylib::Vector2 target, float maxDistanceDelta)
 {
 	raylib::Vector2 a = target - current;
 	a=a.Normalize();
@@ -18,7 +21,7 @@ raylib::Vector2 MoveTowards(raylib::Vector2 current, raylib::Vector2 target, flo
 	//return current + a / magnitude * maxDistanceDelta;
 }
 
-bool checkCol(Sprite& spriteA, Sprite& spriteB) 
+bool PlayMode::checkCol(Sprite& spriteA, Sprite& spriteB)
 {
 	//intialise Rectangles
 	raylib::Rectangle aRect = raylib::Rectangle(spriteA.getDim());
@@ -32,7 +35,7 @@ bool checkCol(Sprite& spriteA, Sprite& spriteB)
 
 }
 
-bool checkCol(Creature& attacker, Creature& target) 
+bool PlayMode::checkCol(Creature& attacker, Creature& target)
 {
 	//create col rectangle for the creatures attack
 	raylib::Rectangle aRect(attacker.sprite.Position.x, attacker.sprite.Position.y, attacker.attackRange, attacker.attackRange);
@@ -96,12 +99,6 @@ PlayMode::PlayMode() {
 	_sprite.Init(raylib::Vector2(525, 0), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,768 });
 	shopSprite = _sprite;
 
-
-	/*pixelFont = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelText.spritefont");
-	assert(pixelFont);
-
-	pixelFontSmall = new SpriteFont(&Game::Get().GetD3D().GetDevice(), L"../bin/data/pixelTextSmall.spritefont");
-	assert(pixelFontSmall);*/
 	L = luaL_newstate();
 	luaL_openlibs(L);
 
@@ -287,49 +284,6 @@ void PlayMode::InitBuild()
 	uiSprites.push_back(Button2);
 
 	state = State::BUILD;
-}
-void PlayMode::InitLose()
-{
-	state = State::LOSE;
-	//init text
-	Sprite Logo("defeatText", "defeatText.dds");
-	Logo.Init(raylib::Vector2(350, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,313,73 });
-	logoSprite = Logo;
-	//init ui
-	UISprite Button3("homeButton", "homeButton.dds");
-	Button3.Init(raylib::Vector2(410, 300), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
-	Button3.type = Sprite::spriteTYPE::UI;
-	Button3.uiType = UISprite::UITYPE::menu;
-	uiSprites.push_back(Button3);
-
-	UISprite Button("restartButton", "restartButton.dds");
-	Button.Init(raylib::Vector2(410, 400), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
-	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = UISprite::UITYPE::restart;
-	uiSprites.push_back(Button);
-	if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
-		Game::Get().getAudioMgr().GetSongMgr()->Stop();
-	}
-	Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Defeat"), false, false, &Game::Get().sfxHdl);
-}
-void PlayMode::InitWin()
-{
-	state = State::WIN;
-	//init text
-	Sprite Logo("victoryText", "victoryText.dds");
-	Logo.Init(raylib::Vector2(350, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,316,91 });
-	logoSprite = Logo;
-	//init ui
-	UISprite Button("nextButton", "nextButton.dds");
-	Button.Init(raylib::Vector2(420, 200), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
-	Button.type = Sprite::spriteTYPE::UI;
-	Button.uiType = UISprite::UITYPE::next;
-	uiSprites.push_back(Button);
-	if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
-		Game::Get().getAudioMgr().GetSongMgr()->Stop();
-	}
-	Game::Get().getAudioMgr().GetSfxMgr()->Play(utf8string("Victory"), false, false, &Game::Get().sfxHdl);
-
 }
 
 void PlayMode::InitBattle()
@@ -520,43 +474,6 @@ void PlayMode::StoreUpdate(float dTime)
 
 }
 
-void PlayMode::FightUpdate(float dTime)
-{
-	for (int i = 0; i < gameCreatures.size(); i++) 
-	{
-		if (gameCreatures[i].active) 
-		{
-			//update returns false if the creature has died
-			if (!gameCreatures[i].Update(dTime, true))
-			{
-				if (gameCreatures[i].isEnemy) {
-					enemiesAlive--;
-				}
-				else
-					teamAlive--;
-			}
-			gameCreatures[i].targetIndex = findClosest(i, gameCreatures[i].isEnemy); //find closest potential target
-
-			if (!checkCol(gameCreatures[i], gameCreatures[gameCreatures[i].targetIndex])) //if the creature isn't already within attack range of it's target
-			{
-				raylib::Vector2 posToMove = MoveTowards(gameCreatures[i].sprite.Position,
-					gameCreatures[gameCreatures[i].targetIndex].sprite.Position,
-					gameCreatures[i].speed*dTime);
-				gameCreatures[i].sprite.setPos(posToMove);
-			}
-			else
-			{
-				if (gameCreatures[i].readyToAttack)
-					gameCreatures[i].Attack(gameCreatures[gameCreatures[i].targetIndex]);
-			}
-		}
-	}
-	//check for end
-	if (enemiesAlive <= 0)
-		InitWin();
-	if (teamAlive <= 0)
-		InitLose();
-}
 
 void PlayMode::OverUpdate(float dTime) 
 {
@@ -623,7 +540,7 @@ void PlayMode::Render(float dTime) {
 void PlayMode::BuildRender(float dTime) {
 	bgSprite.Render();
 	coinSprite.Render();
-	//GetFont().DrawString(&batch, to_string(coins).c_str(), raylib::Vector2(35, 20));
+	Game::Get().GetRango().GetFont().DrawText(to_string(coins), raylib::Vector2(48, 13), Game::Get().GetRango().GetFontSizeLarge(), 2);
 	grid.RenderGrid(dTime);
 	for (int i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render();
@@ -632,7 +549,7 @@ void PlayMode::BuildRender(float dTime) {
 		gameCreatures[i].sprite.Render();
 	}
 	if (hasSavedTeam) {
-		//GetFontSmall().DrawString(&batch, "Successfully Saved Team To File", raylib::Vector2(300, 20));
+		Game::Get().GetRango().GetFont().DrawText("Successfully Saved Team To File", raylib::Vector2(300, 20), Game::Get().GetRango().GetFontSizeLarge(), 2);
 		textTimer += dTime;
 		if (textTimer >= timeToDisplaySaveText) {
 			hasSavedTeam = false;
@@ -641,24 +558,6 @@ void PlayMode::BuildRender(float dTime) {
 	}
 }
 
-void PlayMode::FightRender(float dTime)
-{
-
-	bgSprite.Render();
-	for (int i = 0; i < gameCreatures.size(); i++) {
-		gameCreatures[i].Render();
-	}
-	for (int i = 0; i < uiSprites.size(); i++) {
-		uiSprites[i].Render();
-	}
-	if (state == State::WIN || state == State::LOSE) {
-		logoSprite.Render();
-	}
-	if (state == State::LOSE) 
-	{
-		//GetFont().DrawString(&batch, ("You got to Round " + to_string(currentRound)).c_str(), raylib::Vector2(265, 150));
-	}
-}
 
 void PlayMode::spawnEnemy(creatureType enemyToSpawn, raylib::Vector2 position)
 {
@@ -685,7 +584,7 @@ void PlayMode::StoreRender(float dTime)
 {
 	bgSprite.Render();
 	coinSprite.Render();
-	//GetFont().DrawString(, to_string(coins).c_str(), raylib::Vector2(35, 20));
+	Game::Get().GetRango().GetFont().DrawText(to_string(coins), raylib::Vector2(48, 13), Game::Get().GetRango().GetFontSizeLarge(), 2);
 	grid.RenderGrid(dTime);
 	shopSprite.Render();
 	for (int i = 0; i < uiSprites.size(); i++) {
@@ -723,10 +622,27 @@ void PlayMode::StoreRender(float dTime)
 
 void PlayMode::RenderShopTile(Creature& creature,raylib::Vector2 tilePosition) //pass in upper-right corner of tile
 {
-	//need to fix these magic numbers
-	/*GetFontSmall().DrawString(&batch, creature.getName(), raylib::Vector2(tilePosition.x+70,tilePosition.y+5));
-	GetFontSmall().DrawString(&batch, creature.getDescriptor(), raylib::Vector2(tilePosition.x+30, tilePosition.y + 150));
-	GetFontSmall().DrawString(&batch, to_string(creature.getValue()).c_str(), raylib::Vector2(tilePosition.x+15, tilePosition.y+5));*/
+	//calling them now so we dont have to call these functions a billion times
+	raylib::Font& font = Game::Get().GetRango().GetFont();
+	float size = Game::Get().GetRango().GetFontSizeSmall();
+	// shop tile = 185x169, not including rounded edges
+	float shopTileDimensionX = 180;
+
+	//calculating position of description, as we want it to be centered
+	Vector2 descriptionSize= font.MeasureText(creature.getDescriptor(), size, 2);
+	if (descriptionSize.x > shopTileDimensionX)
+		descriptionSize.x = shopTileDimensionX;
+	Rectangle descriptionBox = { (tilePosition.x+8),(tilePosition.y+128),shopTileDimensionX,70 };
+	Vector2 center;
+	center.x = descriptionBox.x + descriptionBox.width / 2.0f;
+	center.y = descriptionBox.y + descriptionBox.height / 2.0f;
+	descriptionBox.x = center.x-(descriptionSize.x/2);
+
+	font.DrawText(creature.getName(), raylib::Vector2(tilePosition.x + 70, tilePosition.y + 5),size,2);
+	Rango::DrawTextBoxed(font, creature.getDescriptor(), descriptionBox, size, 2, true, WHITE);
+	//font.DrawText(creature.getDescriptor(), raylib::Vector2(tilePosition.x + 30, tilePosition.y + 150), size, 2);
+	font.DrawText(to_string(creature.getValue()), raylib::Vector2(tilePosition.x + 20, tilePosition.y + 5), size, 2);
+
 	coinSprite.setPos(raylib::Vector2(tilePosition.x + 5, tilePosition.y + 8));
 	coinSprite.Render();
 	creature.sprite.Render();
