@@ -177,7 +177,7 @@ void Game::Render(float dTime)
 	Vector2 screenSize = rango.GetGameScreenSize();
 	float scale = rango.GetScreenScale();
 	BeginDrawing();
-	ClearBackground(WHITE);     // Clear screen background
+	ClearBackground(BLACK);     // Clear screen background
 
 	target.GetTexture().Draw(raylib::Rectangle(0.0f, 0.0f, target.texture.width, -target.texture.height),
 		raylib::Rectangle(

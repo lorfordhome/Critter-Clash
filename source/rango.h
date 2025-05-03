@@ -31,11 +31,11 @@ public:
 private:
 	TextureManager resourceManager;
 	raylib::Font pixelFont;
-	const Vector2 screenSize = { 1280,720 };
+	const Vector2 screenSize = { 640,360 };
 	Vector2 windowSize = { 0,0 };
 	float fontSizeSmall = 10.f;
 	float fontSizeLarge = 25.f;
-	float screenScale = 0.f;
+	float screenScale = 1;
 public:
 	bool windowShouldClose = false;
 };

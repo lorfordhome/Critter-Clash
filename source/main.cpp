@@ -40,7 +40,7 @@ const int ASCII_ESC = 27;
 //main entry point for the game
 int main()
 {
-	Vector2 screenSize = { 1280,720 };
+	Vector2 screenSize = { 640,360 };
 	Vector2 windowSize = { 1280,720 };
 	raylib::Window window(windowSize.x, windowSize.y, "Critter Clash", FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 	window.SetMinSize(screenSize);
