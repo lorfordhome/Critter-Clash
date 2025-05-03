@@ -49,7 +49,7 @@
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <IncludePath>..\..\..\assimp-5.2.5prebuilt\include;$(VC_IncludePath);..\..\..\fmod\inc;$(WindowsSDK_IncludePath);..\..\..\raylib-cpp-5.5.0\include</IncludePath>
-    <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\debug;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath);..\..\..\DirectXTK\Bin\Desktop_2022\Win32\Debug</LibraryPath>
+    <LibraryPath>..\..\..\assimp-5.2.5prebuilt\lib\debug;..\..\..\fmod\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,7 +74,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp-vc143-mtd.lib;directxtk.lib;dxgi.lib;d3d11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(SolutionDir)\bin\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>

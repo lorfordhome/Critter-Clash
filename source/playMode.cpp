@@ -84,19 +84,16 @@ PlayMode::PlayMode() {
 
 	srand(time(NULL));
 
-	Sprite _bg("Background", "map6.dds"); //temp for initialising
-	_bg.Init(raylib::Vector2(0, 0), raylib::Vector2(2, 2), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,384 });
+	Sprite _bg("Background", "large grass.png"); //temp for initialising
+	_bg.Init(raylib::Vector2(0, -25), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,1280,768 });
 	bgSprite = _bg;
 
-	//Grid _grid;
-	//grid = _grid;
-
 	Sprite _coin("coin", "coin.dds");
-	_coin.Init(raylib::Vector2(5, 20), raylib::Vector2(0.8, 0.8), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,45,48 });
+	_coin.Init(raylib::Vector2(5, 20), raylib::Vector2(0.4, 0.4), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,45,48 });
 	coinSprite = _coin;
 
-	Sprite _sprite("store", "store.dds");
-	_sprite.Init(raylib::Vector2(525, 0), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,768 });
+	Sprite _sprite("store", "store.png");
+	_sprite.Init(raylib::Vector2(320, 0), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,512,768 });
 	shopSprite = _sprite;
 
 	L = luaL_newstate();
@@ -118,8 +115,8 @@ void PlayMode::InitShop()
 		resetShop = false;
 	}
 
-	UISprite _box("sellBox", "sellBox.dds");
-	_box.Init(raylib::Vector2(575, 590), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,416,146 });
+	UISprite _box("sellBox", "sellBox.png");
+	_box.Init(raylib::Vector2(287.5, 295), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,416,146 });
 	_box.type = Sprite::spriteTYPE::UI;
 	_box.uiType = UISprite::UITYPE::sell;
 
@@ -272,13 +269,13 @@ void PlayMode::InitBuild()
 	
 	//init ui
 	UISprite Button("playButton", "playButton.dds");
-	Button.Init(raylib::Vector2(550, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
+	Button.Init(raylib::Vector2(550, 50), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button.type = Sprite::spriteTYPE::UI;
 	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
 
 	UISprite Button2("storeButton", "storeButton.dds");
-	Button2.Init(raylib::Vector2(300, 50), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
+	Button2.Init(raylib::Vector2(300, 50), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button2.type = Sprite::spriteTYPE::UI;
 	Button2.uiType = UISprite::UITYPE::store;
 	uiSprites.push_back(Button2);
@@ -493,6 +490,8 @@ void PlayMode::OverUpdate(float dTime)
 	}
 	if(flagRestart)
 		Game::Get().RestartGame();
+	if (flagReturnToMenu)
+		Game::Get().ReturnToMenu();
 }
 
 
@@ -632,7 +631,7 @@ void PlayMode::RenderShopTile(Creature& creature,raylib::Vector2 tilePosition) /
 	Vector2 descriptionSize= font.MeasureText(creature.getDescriptor(), size, 2);
 	if (descriptionSize.x > shopTileDimensionX)
 		descriptionSize.x = shopTileDimensionX;
-	Rectangle descriptionBox = { (tilePosition.x+8),(tilePosition.y+128),shopTileDimensionX,70 };
+	Rectangle descriptionBox = { (tilePosition.x+5),(tilePosition.y+128),shopTileDimensionX,70 };
 	Vector2 center;
 	center.x = descriptionBox.x + descriptionBox.width / 2.0f;
 	center.y = descriptionBox.y + descriptionBox.height / 2.0f;
@@ -650,12 +649,12 @@ void PlayMode::RenderShopTile(Creature& creature,raylib::Vector2 tilePosition) /
 }
 
 void PlayMode::dragSprite(Sprite& sprite) {
-	raylib::Vector2 mousePos=GetMousePosition();
+	raylib::Vector2 mousePos = Game::Get().virtualMouse;
 	sprite.setPos(mousePos);
 }
 
 bool isSpriteClicked(Sprite& sprite) {
-	raylib::Vector2 mousepos = GetMousePosition();
+	raylib::Vector2 mousepos = Game::Get().virtualMouse;
 	raylib::Rectangle sRect = sprite.getDim();
 	raylib::Rectangle cRect = raylib::Rectangle(sRect);
 	cRect.x = sprite.Position.x;
@@ -680,7 +679,7 @@ bool isSpriteClicked(Sprite& sprite) {
 
 bool isSpriteClickReleased(Sprite& sprite)
 {
-		raylib::Vector2 mousepos = GetMousePosition();
+		raylib::Vector2 mousepos = Game::Get().virtualMouse;
 		raylib::Rectangle sRect = sprite.getDim();
 		raylib::Rectangle cRect = raylib::Rectangle(sRect);
 		cRect.x = sprite.Position.x;
@@ -705,7 +704,10 @@ bool isSpriteClickReleased(Sprite& sprite)
 
 bool PlayMode::isGridClicked(Grid& Grid, Sprite& sprite, bool noPrev) {
 	raylib::Vector2 gridPos = getGridPosition(grid, sprite.Position);
-	raylib::Vector2 mousePos = GetMousePosition();
+	//check its a valid gridpos
+	if (gridPos.x == 420)
+		return false;
+	raylib::Vector2 mousePos = Game::Get().virtualMouse;
 	//has player clicked within the grid?
 	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && (mousePos != raylib::Vector2(420, 420)))
 	{
@@ -767,14 +769,8 @@ void PlayMode::UIAction(UISprite& sprite)
 		}
 		else if (sprite.uiType == UISprite::UITYPE::menu)
 		{
-			Game::Get().GetModeMgr().DeleteMode(GAMEMODE::PLAY);
-			Game::Get().GetModeMgr().AddMode(new PlayMode());
-			Game::Get().GetModeMgr().SwitchMode(GAMEMODE::MENU);
-			//reset music
-			if (Game::Get().getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
-				Game::Get().getAudioMgr().GetSongMgr()->Stop();
-				Game::Get().getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
-			}
+			flagReturnToMenu = true;
+
 		}
 		else if (sprite.uiType == UISprite::UITYPE::store)
 		{

@@ -1,6 +1,12 @@
 #pragma once
 #include "rango.h"
 
+void Rango::UpdateWindowSize() {
+    windowSize.x = GetScreenWidth();
+    windowSize.y = GetScreenHeight();
+    screenScale = MIN((float)windowSize.x / screenSize.x, (float)windowSize.y / screenSize.y);
+}
+
 // Draw text using font inside rectangle limits
 void Rango::DrawTextBoxed(Font font, const char* text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
 {
@@ -62,14 +68,25 @@ void Rango::DrawTextBoxedSelectable(Font font, const char* text, Rectangle rec, 
                 if (i == endLine) endLine -= codepointByteCount;
                 if ((startLine + codepointByteCount) == endLine) endLine = (i - codepointByteCount);
 
-                state = !state;
+                if (state == 0)
+                    state = 1;
+                else
+                    state = 0;
             }
             else if ((i + 1) == length)
             {
                 endLine = i;
-                state = !state;
+                if (state == 0)
+                    state = 1;
+                else
+                    state = 0;
             }
-            else if (codepoint == '\n') state = !state;
+            else if (codepoint == '\n') {
+                if (state == 0)
+                    state = 1;
+                else
+                    state = 0;
+            }
 
             if (state == DRAW_STATE)
             {
@@ -129,7 +146,10 @@ void Rango::DrawTextBoxedSelectable(Font font, const char* text, Rectangle rec, 
                 selectStart += lastk - k;
                 k = lastk;
 
-                state = !state;
+                if (state == 0)
+                    state = 1;
+                else
+                    state = 0;
             }
         }
 

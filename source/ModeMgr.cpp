@@ -73,17 +73,17 @@ MenuMode::MenuMode()
 
 	//initialise UI
 	UISprite Button("playButton", "playButton.png");
-	Button.Init(raylib::Vector2(400, 200), raylib::Vector2(1,1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
+	Button.Init(raylib::Vector2(200, 100), raylib::Vector2(0.5,0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button.uiType = UISprite::UITYPE::start;
 	uiSprites.push_back(Button);
 
 	UISprite Button3("homeButton", "homeButton.dds");
-	Button3.Init(raylib::Vector2(400, 300), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
+	Button3.Init(raylib::Vector2(200, 150), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,144,72 });
 	Button3.uiType = UISprite::UITYPE::quit;
 	uiSprites.push_back(Button3);
 
-	Sprite Logo("Logo", "Logo.dds");
-	Logo.Init(raylib::Vector2(230, 75), raylib::Vector2(1, 1), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,502,89 });
+	Sprite Logo("Logo", "Logo.png");
+	Logo.Init(raylib::Vector2(115, 38), raylib::Vector2(0.5, 0.5), raylib::Vector2(0, 0), raylib::Rectangle{ 0,0,502,89 });
 	logoSprite = Logo;
 
 
@@ -114,6 +114,7 @@ void MenuMode::Render(float dTime)
 	for (size_t i = 0; i < uiSprites.size(); i++) {
 		uiSprites[i].Render();
 	}
+	DrawRectangle(Game::Get().virtualMouse.x, Game::Get().virtualMouse.y, 50, 50, WHITE);
 
 }
 

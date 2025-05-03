@@ -52,7 +52,7 @@ raylib::Vector2 getGridPosition(int gridWidth,int gridHeight,int gridCellSize,in
 Grid::Grid() {
 	Sprite GridSprite("gridLines", "gridSquare2.dds"); //temporary to initialise grid sprite
 	gridSprite = GridSprite;
-	gridSprite.setScale(raylib::Vector2(4, 4));
+	gridSprite.setScale(raylib::Vector2(2, 2));
 	gridSprite.setSpriteRect(raylib::Rectangle{ 0,0,33,33 });
 
 	for (int i = 0; i < gridWidth; i++) {
@@ -95,15 +95,14 @@ Game::Game(Rango& mrango):rango(mrango)
 {
 	File::initialiseSystem();
 	audioManager.Initialise();
-	//mouse.Initialise(WinUtil::Get().GetMainWnd(), true, false);
-	//mySpriteBatch = new SpriteBatch(&md3d.GetDeviceCtx());
-	//rango.GetCache().SetAssetPath("data/");
 	rango.GetManager().SetAssetPath("data/");
 	mModeMgr.AddMode(new PlayMode());
 	mModeMgr.AddMode(new MenuMode());
 	mModeMgr.SwitchMode(MenuMode::MODE_NAME);
 	audioManager.GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &musicHdl, audioManager.GetSongMgr()->GetVolume());
-
+	target = LoadRenderTexture(rango.GetGameScreenWidth(), rango.GetGameScreenHeight());
+	//target.Load(rango.GetGameScreenWidth(), rango.GetGameScreenHeight());
+	target.GetTexture().SetFilter(TEXTURE_FILTER_POINT);
 	CountTroops();
 
 }
@@ -119,8 +118,6 @@ void Game::CountTroops() {
 	lua_close(L);
 }
 void Game::Release() {
-	/*delete mySpriteBatch;
-	mySpriteBatch = nullptr;*/
 	troopCounts.clear();
 	mModeMgr.Release();
 	//rango.GetCache().Release();
@@ -137,20 +134,62 @@ void Game::RestartGame() {
 		getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
 	}
 }
+void Game::ReturnToMenu() {
+	if (GetModeMgr().GetModeName() == GAMEMODE::PLAY) {
+		GetModeMgr().DeleteMode(GetModeMgr().GetModeName());
+		GetModeMgr().AddMode(new PlayMode());
+	}
+	//reset music
+	if (getAudioMgr().GetSongMgr()->IsPlaying(Game::Get().musicHdl)) {
+		getAudioMgr().GetSongMgr()->Stop();
+		getAudioMgr().GetSongMgr()->Play(utf8string("MenuMusic"), true, false, &Game::Get().musicHdl, Game::Get().getAudioMgr().GetSongMgr()->GetVolume());
+	}
+	GetModeMgr().SwitchMode(GAMEMODE::MENU);
+}
 
+void Game::UpdateVirtualMouse() {
+	raylib::Vector2 mouse = raylib::Mouse::GetPosition();
+	float scale = rango.GetScreenScale();
+	virtualMouse.x = (mouse.x - (GetScreenWidth() - ((float)rango.GetGameScreenWidth() * scale)) * 0.5f) / scale;
+	virtualMouse.y = (mouse.y - (GetScreenHeight() - ((float)rango.GetGameScreenHeight() * scale)) * 0.5f) / scale;
+
+
+	virtualMouse = virtualMouse.Clamp(raylib::Vector2::Zero(), raylib::Vector2(rango.GetGameScreenWidth(), rango.GetGameScreenHeight()));
+}
 void Game::Update(float dTime)
 {
+	UpdateVirtualMouse();
 	audioManager.Update();
 	mModeMgr.Update(dTime);
 }
 void Game::Render(float dTime)
 {
-	BeginDrawing();
-	ClearBackground(GREEN);
+	
+	//draw within the render texture
+	target.BeginMode();
 
+	ClearBackground(BLACK);
 	mModeMgr.Render(dTime);
 
+	target.EndMode();
+
+	//draw render texture to screen, scaled
+	Vector2 screenSize = rango.GetGameScreenSize();
+	float scale = rango.GetScreenScale();
+	BeginDrawing();
+	ClearBackground(WHITE);     // Clear screen background
+
+	target.GetTexture().Draw(raylib::Rectangle(0.0f, 0.0f, target.texture.width, -target.texture.height),
+		raylib::Rectangle(
+			(GetScreenWidth() - (screenSize.x * scale)) * 0.5f,
+			(GetScreenHeight() - (screenSize.y * scale)) * 0.5f,
+			screenSize.x * scale, screenSize.y * scale
+		),
+		raylib::Vector2::Zero(), 0.0f, WHITE);
 	EndDrawing();
+
+	if (GetScreenHeight() != rango.GetWindowSize().y || GetScreenWidth() != rango.GetWindowSize().x)
+		rango.UpdateWindowSize();
 }
 
 void Game::ApplyLua() {

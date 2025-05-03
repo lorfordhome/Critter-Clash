@@ -27,37 +27,37 @@ Creature::Creature(creatureType typeToMake, raylib::Vector2 gridPos, Grid& grid,
 	{
 		Sprite _sprite("chunkyIdle", "chunkyIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.8f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(1, 1), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.8f, isShop);
 		//set stats
 		maxHealth = 125;
 		attackCooldown = 1.15f;
 		//set other animations
 		Sprite wSprite("chunkyWalk", "chunkyWalk.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(1, 1), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
 	}
 	if (typeToMake == creatureType::BUIZEL)
 	{
 		Sprite _sprite("Buizel", "mouseIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.6f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(1, 1), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.6f, isShop);
 		//set other animations
 		Sprite wSprite("buizelWalk", "mouseIdle.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(1, 1), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.3f);
 	}
 	if (typeToMake == creatureType::SKITTY) 
 	{
 		Sprite _sprite("Skitty", "mothfoxIdle.dds");
 		sprite = _sprite;
-		SpriteInit(grid, gridPos, raylib::Vector2(2, 2), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.7f, isShop);
+		SpriteInit(grid, gridPos, raylib::Vector2(1, 1), false, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 2, 0.7f, isShop);
 		//set stats
 		attackRange = 300.f;
 		maxHealth = 75;
 		//set other animations
 		Sprite wSprite("skittyWalk", "mothfoxWalk.dds");
 		walkSprite = wSprite;
-		walkSprite.Init(gridPos, raylib::Vector2(2, 2), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
+		walkSprite.Init(gridPos, raylib::Vector2(1, 1), true, raylib::Rectangle{ 0,0,64,64 }, raylib::Rectangle{ 0,0,64,64 }, 4, 0.3f);
 	}
 	health = maxHealth;
 	idleSprite = sprite;

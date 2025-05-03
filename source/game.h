@@ -16,13 +16,13 @@ struct Tile {
 class Grid {
 	Sprite gridSprite;
 public: 
-	int gridOriginX = 128;
-	int gridOriginY = 128;
+	int gridOriginX = 64;
+	int gridOriginY = 64;
 	int XOFFSET = 0;
 	int YOFFSET = 0;
 	static constexpr int gridWidth = 3;
 	static constexpr int gridHeight = 4;
-	static constexpr int cellSize = 128;
+	static constexpr int cellSize = 64;
 	Tile grid[gridWidth][gridHeight];
 	bool visible = true;
 	Grid();
@@ -45,6 +45,8 @@ public:
 	void CountTroops();
 	void Release();
 	void RestartGame();
+	void ReturnToMenu();
+	void UpdateVirtualMouse();
 	void Update(float dTime);
 	void Render(float dTime);
 	void ProcessKey(char key) {
@@ -63,6 +65,8 @@ public:
 	//number of saved troops
 	int maxDifficulty = 5;
 	vector<int> troopCounts;
+	raylib::Vector2 virtualMouse;
+	raylib::RenderTexture2D target;
 private:
 	const float difficultyDivisor = 2;
 	Rango& rango;
@@ -146,16 +150,16 @@ private:
 	void GenerateRandomEnemy();
 	//call when placing creature
 	void PlaceCreatureSFX(Creature& creature);
-
 	float timeToDisplaySaveText = 1.f;
 	float textTimer = 0.f;
 	bool flagRestart = false;
-	const raylib::Vector2 baseTilePos = { 561, 133 };
+	bool flagReturnToMenu = false;
+	const raylib::Vector2 baseTilePos = { 350, 80 };
 	bool wasClickReleased = false;
 	bool spriteDragging = false;
 	bool draggingShop = false;
-	const unsigned char pixelsBetweenTilesX = 250;
-	const unsigned char pixelsBetweenTilesY = 245;
+	const unsigned char pixelsBetweenTilesX = 125;
+	const unsigned char pixelsBetweenTilesY = 122;
 	unsigned char enemiesAlive = 0;
 	unsigned char teamAlive = 0;
 	unsigned char maxShopSlots = 4;
